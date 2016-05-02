@@ -1,0 +1,3 @@
+-DPCL_DIR:PATH=/home/dell/codebase/installed_lib/share/pcl-1.7 -DCeres_DIR:PATH=/home/dell/codebase/installed_lib/share/Ceres -DCMAKE_BUILD_TYPE=Release
+
+-DCMAKE_BUILD_TYPE=Debug
