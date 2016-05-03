@@ -1,0 +1,44 @@
+*************************************************************************
+
+Distribution:  ply2vri, version 1.0
+
+Copyright (c) 2002 University of Washington
+
+Prepared with US Government Funding under NSF grant CCR-0098005, and 
+ Canadian Government Funding through an NSERC fellowship.
+
+
+Use of this Distribution in source and binary formats, with or without
+modification, for non-commercial applications or industrial evaluation is
+permitted, provided the following conditions are met:
+
+You acknowledge the right of the University of Washington to prepare and
+publish modifications to this Distribution that may be substantially similar
+or functionally equivalent to modifications you prepare, and if you obtain
+patent protection for any modification the practice of which relies on
+rights granted under this license, you agrees not to allege or enjoin
+infringement of your patent by the University of Washington;
+ 
+Recipient and anyone obtaining access to the Distribution through recipient's
+actions accept all risk associated with possession and use of the
+Distribution;
+
+Redistributions must retain the above notices and this list of conditions, and
+the following disclaimer;
+
+Modified formats carry the marking "Based on or developed using ply2vri";
+ 
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+UNIVERSITY OF WASHINGTON OR CONTRIBUTORS TO THE DISTRIBUTION BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR REVENUE; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGE.
+ 
+*************************************************************************
