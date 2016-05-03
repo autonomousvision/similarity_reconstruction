@@ -11,7 +11,7 @@
 #endif
 #include <cmath>
 #include <math.h>
-#include "common/utility/eigen_utility.h"
+#include "common/utilities/eigen_utility.h"
 
 
 #include <opencv2/opencv.hpp>
