@@ -23,7 +23,7 @@
 #include <glog/logging.h>
 
 #include "tsdf_operation/tsdf_slice.h"
-#include "tsdf_operation//tsdf_feature_generate.h"
+// #include "tsdf_operation//tsdf_feature_generate.h"
 #include "tsdf_representation/tsdf_hash.h"
 #include "marching_cubes/marching_cubes_tsdf_hash.h"
 #include "common/utilities/pcl_utility.h"

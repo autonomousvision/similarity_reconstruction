@@ -20,19 +20,16 @@ add_library (tsdf_io STATIC
               tsdf_io.cpp
               tsdf_io.h)
 
-
-add_library (tsdf_feature_generate STATIC
-              tsdf_feature_generate.cpp
-              tsdf_feature_generate.h)
-
 add_library (tsdf_smooth STATIC
               tsdf_smooth.cpp
               tsdf_smooth.h
             )
+
 add_library (diffusion_hole_filling STATIC
               diffusion_hole_filling.cpp
               diffusion_hole_filling.h
             )
+
 add_library (tsdf_align STATIC
               tsdf_align.cpp
               tsdf_align.h
@@ -44,7 +41,6 @@ add_library (tsdf_slice STATIC
 
 target_link_libraries(tsdf_clean marching_cubes tsdf_hash hashmap_utility ${PCL_IO_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(tsdf_io oriented_boundingbox marching_cubes tsdf_hash tsdf_slice tsdf_align hashmap_utility ${MATIO_LIBRARIES} ${OpenCV_LIBS} ${Boost_LIBRARIES})
-target_link_libraries(tsdf_feature_generate detector svm_wrapper tsdf_hash tsdf_slice hashmap_utility ${OpenCV_LIBS} ${Boost_LIBRARIES})
 target_link_libraries (tsdf_smooth tsdf_hash ${OpenCV_LIBS})
 target_link_libraries (diffusion_hole_filling tsdf_smooth tsdf_hash ${OpenCV_LIBS} ${CERES_LIBRARIES})
 target_link_libraries (tsdf_pca tsdf_transform tsdf_io ${OpenCV_LIBS} ${Boost_LIBRARIES})
