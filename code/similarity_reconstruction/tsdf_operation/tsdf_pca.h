@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #pragma once
 #include <vector>
 #include <algorithm>

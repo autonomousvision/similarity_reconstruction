@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #pragma once
 #include <Eigen/Eigen>
 namespace cpu_tsdf {

@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "marching_cubes_tsdf_hash.h"
 #include <Eigen/Eigen>
 #include "../tsdf_representation/tsdf_hash.h"

@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #pragma once
 /**
   * 1. AlignTSDF(): Compute the affine transformation (rotation, translation, scale) to align tsdf_model to tsdf_template.

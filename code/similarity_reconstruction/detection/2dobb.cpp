@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "2dobb.h"
 
 bool OBB2D::overlaps1Way(const OBB2D &other) const {

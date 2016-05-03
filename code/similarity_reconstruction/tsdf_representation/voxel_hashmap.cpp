@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "voxel_hashmap.h"
 #include <iostream>
 

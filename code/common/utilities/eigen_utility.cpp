@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "eigen_utility.h"
 #include <iostream>
 #include <fstream>

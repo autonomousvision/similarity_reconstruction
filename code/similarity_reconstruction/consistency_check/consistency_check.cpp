@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "consistency_check.h"
 #include <pcl/console/print.h>
 #include <pcl/console/time.h>

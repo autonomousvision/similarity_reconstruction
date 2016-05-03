@@ -1,3 +1,7 @@
+/*
+ * Load urban reconstruction data
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "urban_reconstruction_data_load.h"
 
 #include <string>

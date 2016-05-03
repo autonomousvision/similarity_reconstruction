@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "obb_intersection.h"
 #include <Eigen/Eigen>
 #include "2dobb.h"

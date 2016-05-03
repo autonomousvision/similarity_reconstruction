@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "detector.h"
 #include <vector>
 #include <algorithm>

@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "tsdf_hash.h"
 #include <cmath>
 #include <iostream>

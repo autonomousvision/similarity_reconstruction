@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "svm_wrapper.h"
 #include <iostream>
 #include <cstdlib>

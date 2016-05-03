@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include <vector>
 #include <cmath> // std::abs
 #include <cassert>

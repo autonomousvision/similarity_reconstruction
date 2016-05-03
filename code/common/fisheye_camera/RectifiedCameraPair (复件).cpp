@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "RectifiedCameraPair.h"
 #include <cmath>
 #include <cstdlib>

@@ -24,3 +24,5 @@ CMakeCache.txt
 *.tlog
 build
 similarity_reconstruction-build
+add_copyright.sh
+mycopyright

@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "detection_utility.h"
 #include <vector>
 #include <string>

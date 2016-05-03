@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #pragma once
 /** converts the variable run length representation used in the original Volumetric fusion code
  * to hash representation

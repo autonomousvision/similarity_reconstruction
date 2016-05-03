@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "tsdf_joint_optimization.h"
 #include <vector>
 #include <string>

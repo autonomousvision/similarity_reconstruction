@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "detect_sample.h"
 #include <Eigen/Eigen>
 #include <Eigen/Sparse>

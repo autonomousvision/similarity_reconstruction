@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #pragma once
 /**
   * 1. SliceTSDF*(): Getting part of the TSDF satisfying some condition

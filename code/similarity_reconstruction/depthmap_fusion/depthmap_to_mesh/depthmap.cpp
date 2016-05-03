@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "depthmap.h"
 #include <vector>
 #include <climits>

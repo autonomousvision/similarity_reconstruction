@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "utility.h"
 
 #include <boost/filesystem/convenience.hpp>

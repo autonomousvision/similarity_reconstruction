@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "tsdf_clean.h"
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/edge_list.hpp>

@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #pragma once
 /**
   * Marching cubes for TSDF representation, core part from PCL library.

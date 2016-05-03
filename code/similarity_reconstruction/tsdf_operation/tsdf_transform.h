@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include <map>
 #include <opencv2/opencv.hpp>
 #include <Eigen/Geometry>

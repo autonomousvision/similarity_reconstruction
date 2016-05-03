@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "matlab_utility.h"
 #include <iostream>
 using namespace std;

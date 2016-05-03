@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include <opencv2/opencv.hpp>
 #include <pcl/console/print.h>
 #include <pcl/console/time.h>

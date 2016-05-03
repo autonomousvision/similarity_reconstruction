@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "tsdf_transform.h"
 #include <iostream>
 #include <vector>

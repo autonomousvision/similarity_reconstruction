@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "oriented_boundingbox.h"
 #include <iostream>
 #include <Eigen/Eigen>

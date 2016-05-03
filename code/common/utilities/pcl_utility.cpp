@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "pcl_utility.h"
 #include <algorithm>
 #include <pcl/console/print.h>

@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "convert_vrl_to_hash.h"
 #include <string>
 #include <climits>

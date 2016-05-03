@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "tsdf_pca.h"
 #include <cstdio>
 #include <Eigen/Eigen>

@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 // utilities for hashmap
 #pragma once
 #include <vector>

@@ -1,3 +1,6 @@
+/*
+ * Chen Zhou (zhouch@pku.edu.cn)
+ */
 #include "diffusion_hole_filling.h"
 #include <memory>
 #include <vector>
