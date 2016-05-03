@@ -186,7 +186,7 @@ main (int argc, char** argv)
 
         cout << "begin following optimization " << endl;
 
-        tsdf_optimization::JointClusteringAndModelLearning(*scene_tsdf,
+        tsdf_optimization::JointOptimization(*scene_tsdf,
                                                            params,
                                                            &model_means,
                                                            &model_bases,

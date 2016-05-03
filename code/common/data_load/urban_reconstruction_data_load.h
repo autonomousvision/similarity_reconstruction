@@ -1,4 +1,5 @@
 /*
+ * Load urban reconstruction data
  * Chen Zhou (zhouch@pku.edu.cn)
  */
 #pragma once
@@ -11,6 +12,7 @@ namespace cv {
 class Mat;
 }
 
+// Loading relevant files for 3D reconstruction
 bool LoadUrbanReconstructionData(const std::string& urban_data_root,
                                  const std::string& param_prefix,
                                  const std::string& image_prefix,
@@ -82,4 +84,3 @@ bool ListFilesWithinFrameRange(
         int start_image,
         int end_image,
         std::vector<std::string>* filelist);
-

@@ -39,76 +39,9 @@ bool LoadUrbanReconstructionData(const std::string& urban_data_root,
                                  std::vector<std::string>* image_files,
                                  std::vector<std::string>* depth_files);
 
-cv::Mat LoadSemanticLabelAsMat(const std::string & semantic_label_filename)
-{
-  using std::cout;
-  using std::endl;
-  if (semantic_label_filename.empty() ||
-      !bfs::exists(semantic_label_filename)) return cv::Mat();
 
-  std::ifstream ifs(semantic_label_filename);
-  string dummy;
-  char dummy_char;
-  string original_file;
 
-  ifs >> dummy >> original_file;
-  int imw = 0;
-  int imh = 0;
-  cv::Mat origin_im = cv::imread(original_file);
-  imh = origin_im.rows;
-  imw = origin_im.cols;
-  assert(imh > 0 && imw > 0);
 
-  cv::Mat label_mat = cv::Mat::zeros(imh, imw, CV_16UC1);
-  ifs.get();
-  while (ifs >> dummy) {
-      assert(dummy == "object:");
-      int cur_obj_cnt = 0;
-      ifs >> cur_obj_cnt;
-
-      int cur_semantic_label = -1;
-      ifs >> dummy >> cur_semantic_label;
-      assert(dummy == "<housenumber>:");
-      assert(cur_semantic_label > 0);
-      ifs.get();
-
-      cv::Rect bbox;
-      std::getline(ifs, dummy);
-      sscanf(dummy.c_str(), "bbox: %d,%d,%d,%d", &bbox.x, &bbox.y, &bbox.width, &bbox.height);
-
-      ifs.get();
-
-      label_mat(bbox) = (unsigned short)cur_semantic_label;
-
-      std::cout << "original_file: " << original_file << endl;
-      std::cout << "cur_obj: " << cur_obj_cnt << endl;
-      std::cout << "housenum: " << cur_semantic_label << endl;
-      std::cout << "bbox: " << bbox.x << " " << bbox.y << " " << bbox.width << " " << bbox.height << endl;
-    }
-  cv::imwrite(semantic_label_filename + ".label.png", label_mat);
-  return label_mat;
-}
-
-bool ListFiles(const std::string& dir, const std::string& extension, std::vector<std::string>* filelist)
-{
-    if(!bfs::exists(dir))
-        return false;
-    bfs::directory_iterator end_itr;
-    for (bfs::directory_iterator itr (dir); itr != end_itr; ++itr)
-    {
-        std::string cur_extension = boost::algorithm::to_lower_copy
-                                    (bfs::extension (itr->path ()));
-        //std::string basename = bfs::basename (itr->path ());
-        std::string filename = (itr->path ().filename().string());
-        std::string pathname = itr->path ().string ();
-        if (cur_extension == extension && filename[0]<='9' && filename[0]>='0')
-        {
-            filelist->push_back(pathname);
-        }
-    }
-    std::sort(filelist->begin(), filelist->end());
-    return true;
-}
 
 bool ListDirs(const std::string &root_dir, const std::string &prefix, std::vector<std::string> *dirlist)
 {
@@ -130,11 +63,6 @@ bool ListDirs(const std::string &root_dir, const std::string &prefix, std::vecto
 bool ListFilesWithinFrameRange(const std::string& dir, const std::string& ext, int start_image, int end_image, std::vector<std::string>* filelist)
 {
     using namespace bfs;
-//    int total_file = std::count_if(
-//                directory_iterator(dir),
-//                directory_iterator(),
-//                bind( static_cast<bool(*)(const path&)>(is_regular_file),
-//                bind( &directory_entry::path, std::placeholders::_1 ) ) );
     start_image = std::max(start_image, 0);
     if (end_image < 0) end_image = 1e8;
     // end_image = std::min(end_image, total_file);
@@ -405,3 +333,76 @@ bool LoadUrbanReconstructionData(
 
 
 
+
+
+cv::Mat LoadSemanticLabelAsMat(const std::string &semantic_label_filename)
+{
+    using std::cout;
+    using std::endl;
+    if (semantic_label_filename.empty() ||
+            !bfs::exists(semantic_label_filename)) return cv::Mat();
+
+    std::ifstream ifs(semantic_label_filename);
+    string dummy;
+    char dummy_char;
+    string original_file;
+
+    ifs >> dummy >> original_file;
+    int imw = 0;
+    int imh = 0;
+    cv::Mat origin_im = cv::imread(original_file);
+    imh = origin_im.rows;
+    imw = origin_im.cols;
+    assert(imh > 0 && imw > 0);
+
+    cv::Mat label_mat = cv::Mat::zeros(imh, imw, CV_16UC1);
+    ifs.get();
+    while (ifs >> dummy) {
+        assert(dummy == "object:");
+        int cur_obj_cnt = 0;
+        ifs >> cur_obj_cnt;
+
+        int cur_semantic_label = -1;
+        ifs >> dummy >> cur_semantic_label;
+        assert(dummy == "<housenumber>:");
+        assert(cur_semantic_label > 0);
+        ifs.get();
+
+        cv::Rect bbox;
+        std::getline(ifs, dummy);
+        sscanf(dummy.c_str(), "bbox: %d,%d,%d,%d", &bbox.x, &bbox.y, &bbox.width, &bbox.height);
+
+        ifs.get();
+
+        label_mat(bbox) = (unsigned short)cur_semantic_label;
+
+        std::cout << "original_file: " << original_file << endl;
+        std::cout << "cur_obj: " << cur_obj_cnt << endl;
+        std::cout << "housenum: " << cur_semantic_label << endl;
+        std::cout << "bbox: " << bbox.x << " " << bbox.y << " " << bbox.width << " " << bbox.height << endl;
+    }
+    cv::imwrite(semantic_label_filename + ".label.png", label_mat);
+    return label_mat;
+}
+
+
+bool ListFiles(const std::string &dir, const std::string &extension, std::vector<std::string> *filelist)
+{
+    if(!bfs::exists(dir))
+        return false;
+    bfs::directory_iterator end_itr;
+    for (bfs::directory_iterator itr (dir); itr != end_itr; ++itr)
+    {
+        std::string cur_extension = boost::algorithm::to_lower_copy
+                (bfs::extension (itr->path ()));
+        //std::string basename = bfs::basename (itr->path ());
+        std::string filename = (itr->path ().filename().string());
+        std::string pathname = itr->path ().string ();
+        if (cur_extension == extension && filename[0]<='9' && filename[0]>='0')
+        {
+            filelist->push_back(pathname);
+        }
+    }
+    std::sort(filelist->begin(), filelist->end());
+    return true;
+}

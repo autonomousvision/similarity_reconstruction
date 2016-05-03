@@ -23,104 +23,6 @@ using namespace std;
 using tsdf_test::TestOBBsIntersection2D;
 
 namespace tsdf_detection {
-//bool UseGroundTruthOBB(
-//        const cpu_tsdf::TSDFHashing &scene_tsdf,
-//        const cpu_tsdf::OrientedBoundingBox &obb,
-//        const Eigen::Vector3i& voxel_bb_size,
-//        const float min_mesh_weight)
-//{
-//    tsdf_detection::Sample::SampleSize(voxel_bb_size);
-//    tsdf_detection::Sample sample(obb, scene_tsdf, min_mesh_weight, 1);
-//    // if (sample.OccupiedRatio() < 0.1) return false;
-
-//    // for houses, filter wide houses
-//   // if (obb.bb_sidelengths[1] > obb.bb_sidelengths[0] * 1.1) return false;
-
-//    // for houses, filter longer houses
-//    // if (obb.bb_sidelengths[0] > obb.bb_sidelengths[1] * 1.1) return false;
-
-//    // for houses, filter small houses
-//    // if (obb.bb_sidelengths[0] < 5) return false;
-
-//    return true;
-//}
-
-//void FilterGroundTruthOBBs(
-//        const cpu_tsdf::TSDFHashing& scene_tsdf,
-//        const Eigen::Vector3i& voxel_bb_size,
-//        const float min_mesh_weight,
-//        const std::vector<cpu_tsdf::OrientedBoundingBox> &obbs,
-//        std::vector<bool> *obb_to_use)
-//{
-//    obb_to_use->resize(obbs.size());
-//    for (int i = 0; i < obb_to_use->size(); ++i)
-//    {
-//        // if (UseGroundTruthOBB(scene_tsdf, obbs[i], voxel_bb_size, min_mesh_weight))
-//        if (true)
-//        {
-//            (*obb_to_use)[i] = true;
-//        }
-//        else
-//        {
-//            (*obb_to_use)[i] = false;
-//        }
-//    }
-//}
-
-//void ExtendOBBs(std::vector<cpu_tsdf::OrientedBoundingBox> *obbs, const Eigen::Vector3f& meters)
-//{
-//    for (int i = 0; i < obbs->size(); ++i)
-//    {
-//        (*obbs)[i].bb_offset = (*obbs)[i].bb_offset - (*obbs)[i].bb_orientation * (meters);
-//        (*obbs)[i].bb_sidelengths = (*obbs)[i].bb_sidelengths + (meters) * 2.0;
-//    }
-//}
-
-//void ExtendOBB(cpu_tsdf::OrientedBoundingBox& obb, const Eigen::Vector3f& meters)
-//{
-//    obb.bb_offset = obb.bb_offset - obb.bb_orientation * Eigen::Vector3f(meters[0], meters[1], meters[2]);
-//    obb.bb_sidelengths =obb.bb_sidelengths + Eigen::Vector3f(meters[0]*2, meters[1]*2, meters[2]*2);
-
-//}
-
-void ExtendOBBsNoBottom(std::vector<cpu_tsdf::OrientedBoundingBox> *obbs, const Eigen::Vector3f& meters)
-{
-    for (int i = 0; i < obbs->size(); ++i)
-    {
-       ExtendOBBNoBottom((*obbs)[i], meters);
-    }
-}
-
-void ExtendOBBNoBottom(cpu_tsdf::OrientedBoundingBox& obb, const Eigen::Vector3f& meters)
-{
-    obb.bb_offset = obb.bb_offset - obb.bb_orientation * Eigen::Vector3f(meters[0], meters[1], 0);
-    obb.bb_sidelengths =obb.bb_sidelengths + Eigen::Vector3f(meters[0]*2, meters[1]*2, meters[2]);
-}
-
-//void ExtendOBBByPercentOfMinSide(cpu_tsdf::OrientedBoundingBox& obb, float percent)
-//{
-//    float min_len = obb.bb_sidelengths.minCoeff() * percent;
-//    Eigen::Vector3f meters(min_len, min_len, min_len);
-//    obb.bb_offset = obb.bb_offset - obb.bb_orientation * (meters);
-//    obb.bb_sidelengths =obb.bb_sidelengths + (meters) * 2.0;
-//}
-
-//void ExtendOBBNoBottomByPercentOfMinSide(cpu_tsdf::OrientedBoundingBox& obb, float percent)
-//{
-//    float min_len = obb.bb_sidelengths.minCoeff() * percent;
-//    Eigen::Vector3f meters(min_len, min_len, min_len);
-//    obb.bb_offset = obb.bb_offset - obb.bb_orientation * (Eigen::Vector3f(meters[0], meters[1], 0));
-//    //obb.bb_sidelengths =obb.bb_sidelengths + (meters) * 2.0;  // height increased by 2
-//    obb.bb_sidelengths =obb.bb_sidelengths + Eigen::Vector3f(meters[0]*2, meters[1]*2, meters[2]);
-//}
-
-//void ExtendOBBsByPercentOfMinSide(std::vector<cpu_tsdf::OrientedBoundingBox> *obbs, float percent)
-//{
-//    for (int i = 0; i < obbs->size(); ++i)
-//    {
-//        ExtendOBBByPercentOfMinSide((*obbs)[i], percent);
-//    }
-//}
 
 Detector::Detector(const string &svm_modelpath) {
     if(!ReadFromFile(svm_modelpath)) {
@@ -303,7 +205,7 @@ void Detect(const cpu_tsdf::TSDFHashing& scene_tsdf, const Detector& model,
     // combine the results into one vector
     cout << "combining results" << endl;
     for (int iangle = 0; iangle < discret_ranges[2]; ++iangle) {
-        cout << "sample num: " << iangle << " detected samples: " << sample_collections[iangle].samples.size() << " threshold: " << params.min_score_to_keep << endl;
+        cout << "parallel angle number: " << iangle << " detected samples: " << sample_collections[iangle].samples.size() << " threshold: " << params.min_score_to_keep << endl;
         samples->samples.insert(samples->samples.end(), sample_collections[iangle].samples.begin(), sample_collections[iangle].samples.end());
         sample_collections[iangle].samples.clear();
     }

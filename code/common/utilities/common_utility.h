@@ -110,56 +110,6 @@ template<typename T>
     cv::imwrite(filename, colored_image);
   }
 
-//  inline bool OutputVector(const std::string& filename, const std::vector<float>& vec)
-//  {
-//      FILE* hf = fopen(filename.c_str(), "w");
-//      for (int i = 0; i < vec.size(); i+=2)
-//      {
-//          fprintf(hf, "%f %f\n", vec[i], vec[i+1]);
-//      }
-//      fprintf(hf, "\n");
-//      fclose(hf);
-//      return true;
-//  }
-
-  inline bool OutputVector(const std::string& filename, const std::vector<float>& vec)
-  {
-      FILE* hf = fopen(filename.c_str(), "w");
-      for (int i = 0; i < vec.size(); i++)
-      {
-          fprintf(hf, "%f\n", vec[i]);
-      }
-      fprintf(hf, "\n");
-      fclose(hf);
-      return true;
-  }
-
-  template<typename T>
-  inline bool OutputVectorTemplate(const std::string& filename, const std::vector<T>& vec)
-  {
-      using namespace std;
-      ofstream os(filename);
-      for (int i = 0; i < vec.size(); i++)
-      {
-          os << vec[i] << endl;
-      }
-      os << endl;
-      return true;
-  }
-
-  inline bool ReadinVector(const std::string& filename, std::vector<float>& vec)
-  {
-      FILE* hf = fopen(filename.c_str(), "r");
-      int in_num = -1;
-      float cur_num;
-      while((in_num = fscanf(hf, "%f\n", &cur_num)) == 1)
-      {
-          vec.push_back(cur_num);
-      }
-      fclose(hf);
-      return true;
-  }
-
   inline void mapJet(double v, double vmin, double vmax, uchar& r, uchar& g, uchar& b)
   {
       r = 255;
@@ -205,6 +155,33 @@ template<typename T>
       g = (uchar)(255 * dg);
       b = (uchar)(255 * db);
   }
+
+  template<typename T>
+  inline bool OutputVector(const std::string& filename, const std::vector<T>& vec)
+  {
+      using namespace std;
+      ofstream os(filename);
+      for (int i = 0; i < vec.size(); i++)
+      {
+          os << vec[i] << endl;
+      }
+      os << endl;
+      return true;
+  }
+
+  template<typename T>
+  inline bool ReadVector(const std::string& filename, std::vector<T>& vec)
+  {
+      using namespace std;
+      ifstream is(filename);
+      T temp;
+      while (is >> temp) {
+          vec.push_back(temp);
+      }
+      return true;
+  }
+
+
 
 inline void Write3DPointToFile(const std::string& fname, const std::vector<cv::Vec3d>& points3d, const std::vector<cv::Vec3b>* colors = NULL)
 {

@@ -1,4 +1,5 @@
 /*
+ * The fisheye famera pair model
  * Chen Zhou (zhouch@pku.edu.cn)
  */
 #pragma once
@@ -9,16 +10,15 @@
 #include <cstdlib>
 #include <cstdio>
 #include <Eigen/Eigen>
-#ifdef _MSC_VER
-#define _USE_MATH_DEFINES
-#endif
 #include <cmath>
 #include <math.h>
 #include "common/utilities/eigen_utility.h"
 
-
 #include <opencv2/opencv.hpp>
 
+/*
+ * Converts between image coord <-> rectified camera coord <-> unrectified camera coord <-> world coord <-> voxel coord for TSDF
+ */
 class RectifiedCameraPair
 {
     friend std::ostream& operator <<(std::ostream &os, const RectifiedCameraPair &params);
@@ -38,13 +38,11 @@ public:
     void SetExtrinsicPair(const cv::Matx34d& P1, const cv::Matx34d& P2);
     void GetExtrinsicPair(cv::Matx34d* P1, cv::Matx34d* P2) { *P1 = P1_; *P2 = P2_; }
     void InitializeBackProjectionBuffers();
-    //void SetRelativeMotion(const cv::Matx34d& Tr);
     void SetCameraParameters(double theta1, double theta2, double theta_n,
                              double phi1, double phi2, double phi_n,
                              const cv::Matx33d& R1, const cv::Matx33d& R2,
                              const cv::Matx34d& P1, const cv::Matx34d& P2);
     void SetVoxelScalingParameters(const cv::Vec3d& volume_offset, double voxel_scale_factor, double depth_image_scaling_factor, double max_cam_distance);
-
 
     void ClearBackProjectionBuffers();
 
@@ -107,10 +105,6 @@ public:
         assert(!cos_phis_.empty());
         assert(depth_image_scaling_ > 0);
 
-//        std::cout << "double im coord"<<std::endl;
-//        std::cout << "im x " << x << std::endl;
-//        std::cout << "im y " << y << std::endl;
-
         double theta = theta1_ + delta_theta_ * x;
         double phi = phi1_ + delta_phi_ * y;
         double sin_theta = sin(theta);
@@ -122,9 +116,6 @@ public:
                     sin_theta * cos_phi,
                     sin_theta * sin_phi,
                     cos_theta);
-//        cv::Vec3d sphere_point(sin_thetas_[x]*cos_phis_[y],
-//                           sin_thetas_[x]*sin_phis_[y],
-//                           cos_thetas_[x]);
        return static_cast<cv::Vec3d>(ext_R1_trans_rectify_scaled_ * sphere_point * ((double)depth * depth_image_scaling_)
                                   + ext_t1_inv_offseted_scaled_);
     }
@@ -166,9 +157,6 @@ public:
         T phi;
         theta = acos(pz);
         phi = asin(py/sin(theta));
-
-        //*imx = (int)((theta - theta1_) * delta_theta_inv_);
-        //*imy = (int)((phi - phi1_) * delta_phi_inv_);
 
         *imx = (int)round((theta - theta1_) * delta_theta_inv_);
         *imy = (int)round((phi - phi1_) * delta_phi_inv_);
@@ -226,7 +214,6 @@ public:
 
     inline bool Voxel3DPointToImageCoord(const cv::Vec3d& voxel_point, int* imx, int* imy, float* length=NULL) const {
         cv::Vec3d rectified_local_pt = Voxel3DPointToLocalRectifiedCoord(voxel_point);
-        //std::cout << "rectified_localpt " << rectified_local_pt << std::endl;
         if (rectified_local_pt[0] < 0 || cv::norm(rectified_local_pt) > max_cam_distance_) return false;
         RectifiedCoordPointToImageCoord<double>(rectified_local_pt[0], rectified_local_pt[1], rectified_local_pt[2], imx, imy);
         if (!(0<=*imx && *imx<im_width_ && 0<=*imy && *imy<im_height_)) return false;

@@ -131,7 +131,7 @@ bool FilterTriangle(const std::vector<int>& connected_components, const int comp
 {
     if (comp_num == 0) return false;
     vector<int> component_sizes = ComponentSizes(comp_num, connected_components);
-    utility::OutputVectorTemplate("/home/dell/debug_compnun.txt", component_sizes);
+    // utility::OutputVector("/home/dell/debug_compnun.txt", component_sizes);
     if (thresh < 0)
     {
         thresh = *(std::max_element(component_sizes.begin(), component_sizes.end()));

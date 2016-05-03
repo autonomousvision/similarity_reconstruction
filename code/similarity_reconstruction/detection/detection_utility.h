@@ -20,61 +20,6 @@ class TSDFHashing;
 }
 
 namespace tsdf_detection {
-struct XYAngleLess
-{
-    bool operator ()(const Eigen::Vector3f& lhs_xyangle, const Eigen::Vector3f& rhs_xyangle) const
-    {
-        using utility::EqualFloat;
-        if (!EqualFloat(lhs_xyangle[0], rhs_xyangle[0]))
-        {
-            return lhs_xyangle[0] < rhs_xyangle[0];
-        }
-        else if (!EqualFloat(lhs_xyangle[1], rhs_xyangle[1]))
-        {
-            return lhs_xyangle[1] < rhs_xyangle[1];
-        }
-        else if (!EqualFloat(lhs_xyangle[2], rhs_xyangle[2]))
-        {
-            return lhs_xyangle[2] < rhs_xyangle[2];
-        }
-        return false;  // equal
-    }
-};
-
-struct XYAngleEqual
-{
-    bool operator ()(const Eigen::Vector3f& lhs_xyangle, const Eigen::Vector3f& rhs_xyangle) const
-    {
-        using utility::EqualFloat;
-        return (EqualFloat(lhs_xyangle[0], rhs_xyangle[0]) &&
-                EqualFloat(lhs_xyangle[1], rhs_xyangle[1]) &&
-                EqualFloat(lhs_xyangle[2], rhs_xyangle[2]));
-    }
-};
-
-inline void NormalizeAngle(float* angle)
-{
-    while (*angle >= M_PI) *angle -= (2*M_PI);
-    while (*angle < -M_PI) *angle += (2*M_PI);
-    CHECK_GE(*angle, -M_PI);
-    CHECK_LT(*angle, M_PI);
-}
-
-// angle: [-pi, pi)
-inline void OBBToXYAngle(const cpu_tsdf::OrientedBoundingBox& obb, Eigen::Vector3f* xyangle)
-{
-    Eigen::Vector3f center = obb.BoxCenter();
-    const Eigen::AngleAxisf aa(obb.bb_orientation);
-    float angle = aa.angle();
-    Eigen::Vector3f axis = aa.axis();
-    //CHECK_LT(fabs(fabs(axis[2]) - 1), 1e-3);
-    angle *= axis[2];
-    NormalizeAngle(&angle);
-    // angle: [-pi, pi)
-    (*xyangle)[0] = center[0];
-    (*xyangle)[1] = center[1];
-    (*xyangle)[2] = angle;
-}
 
 class SceneDiscretizeInfo {
 public:

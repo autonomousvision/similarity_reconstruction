@@ -34,22 +34,6 @@ private:
     SampleTemplate sample_template_;
 };
 
-void ExtendOBBs(std::vector<cpu_tsdf::OrientedBoundingBox>* obbs, const Eigen::Vector3f& meters);
-
-void ExtendOBBsByPercentOfMinSide(std::vector<cpu_tsdf::OrientedBoundingBox> *obbs, float percent);
-
-void ExtendOBBByPercentOfMinSide(cpu_tsdf::OrientedBoundingBox& obb, float percent);
-
-void ExtendOBBNoBottom(cpu_tsdf::OrientedBoundingBox& obb, const Eigen::Vector3f& meters);
-
-void ExtendOBB(cpu_tsdf::OrientedBoundingBox& obb, const Eigen::Vector3f& meters);
-
-void ExtendOBBsNoBottom(std::vector<cpu_tsdf::OrientedBoundingBox> *obbs, const Eigen::Vector3f& meters);
-
-
-
-
-
 void NMS_OneAngle(const Eigen::Vector3f& obb_sidelengths, const DetectionParams &params, tsdf_detection::SampleCollection* samples);
 
 void NMS(const DetectionParams& params, SampleCollection *samples) ;
