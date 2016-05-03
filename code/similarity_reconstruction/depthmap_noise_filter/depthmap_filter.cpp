@@ -169,29 +169,9 @@ void VisibilityFusion(const vector<RectifiedCameraPair>& cam_infos,
                 }  //end if
             }  //end for c
         }  // end for r
-//        cv::imshow("origin-dep", *(depths[0]));
-//        cv::Mat debug_depmap = cv::Mat::zeros(depths[ref_depth]->rows, depths[ref_depth]->cols, CV_8U);
-//        for (int r = 0; r < debug_depmap.rows; ++r) {
-//            for (int c = 0; c < debug_depmap.cols; ++c) {
-//                if (!ref_depth_candidate_map[r][c].empty()) {
-//                    debug_depmap.at<uchar>(r,c) = 255;
-//                }
-//            }
-//        }
-//        cv::imshow("debug-dep", debug_depmap);
-//        cv::waitKey();
+
     }  // end for i
 
-//    cv::Mat debug_depmap = cv::Mat::zeros(depths[ref_depth]->rows, depths[ref_depth]->cols, CV_8U);
-//    for (int r = 0; r < debug_depmap.rows; ++r) {
-//        for (int c = 0; c < debug_depmap.cols; ++c) {
-//            if (!ref_depth_candidate_map[r][c].empty()) {
-//                debug_depmap.at<uchar>(r,c) = 255;
-//            }
-//        }
-//    }
-//    cv::imshow("debug-dep", debug_depmap);
-//    cv::waitKey();
     // for every candidates on each pixel of the ref depth map, select the best.
     cout << "selecting best candidate...\n";
     for (int r = 0; r < depths[ref_depth]->rows; ++r)
@@ -397,36 +377,6 @@ void SimpleFusion(const vector<RectifiedCameraPair>& cam_infos,
                 fusioned_map->at<double>(r, c) = cur_depth;
                 confidence_map->at<double>(r, c) = support_percent;
             }
-////////////////////////////////////////////////////////////////////////
-
-//            const double median_depth = cur_list[(cur_list.size()-1)/2];
-//            const double DIST_RANGE_EPSILON = DIST_RANGE_EPSILON_K * median_depth * median_depth;
-//            double accept_dist_range_low;
-//            double accept_dist_range_high;
-//            int accept_dist_st_idx = 0;
-//            int accept_dist_ed_idx = 0;
-//            for (int i = 0; i < cur_list.size(); ++i)
-//            {
-//                double cur_dist = cur_list[i];
-//                accept_dist_range_low = cur_dist - DIST_RANGE_EPSILON;
-//                accept_dist_range_high = cur_dist + DIST_RANGE_EPSILON;
-//                while (cur_list[accept_dist_st_idx] < accept_dist_range_low)
-//                {
-//                    accept_dist_st_idx++;
-//                }
-//                while (accept_dist_ed_idx < cur_list.size() && cur_list[accept_dist_ed_idx] <= accept_dist_range_high)
-//                {
-//                    accept_dist_ed_idx++;
-//                }
-//                int depth_in_range = accept_dist_ed_idx - accept_dist_st_idx;
-//                double range_percent = double(depth_in_range)/cur_list.size();
-//                if (depth_in_range > 2 && range_percent > 0.5)
-//                {
-//                    fusioned_map->at<double>(r, c) = cur_list[i];
-//                    confidence_map->at<double>(r, c) = range_percent;
-//                    break;
-//                }
-//            }  // end for i
         }  // end for c
     }  // end for r
     return;
@@ -622,13 +572,7 @@ void SimpleFusionDisparity(const vector<RectifiedCameraPair>& cam_infos,
                         support_cnt++;
                     }
                 }
-                //////////////////////////////////////////////////////////////////////
-//                if (ref_supported && q_supported) {
-//                    support_cnt++;
-//                }
             }
-            //double support_percent = (double)(support_cnt+1) / (cur_list.size()+1);
-            //double support_percent = (double)(support_cnt) / ((depths.size()-1)*2.0);
             double confidence_val = ((double)(support_cnt) - (occlusion_cnt + free_violation_cnt) ) / ((depths.size()-1)*2.0);
             if ( confidence_val > support_thresh && support_cnt >= 4) {
                 fusioned_map->at<double>(r, c) = cur_depth;
@@ -782,70 +726,25 @@ void SimpleFusionDisparity_onlyrefsupport(const vector<RectifiedCameraPair>& cam
             double ref_angular_disp = cam_infos[ref_depth].DepthToAngularDisparity(c, cur_depth);
 ////////////////////////////////////////////////////////////////////////
             int support_cnt = 0;
-//            int occlusion_cnt = 0;
-//            int free_violation_cnt = 0;
-//            cv::Vec3d rect_ref3d_pt =
-//                        ref_cam_info.RectifiedRefImagePointToRectifiedCam3DPointNoDepthScaling(c, r, cur_depth);
             double accept_disp_range_low = ref_angular_disp - DISP_ERROR_EPSILON;
             double accept_disp_range_high = ref_angular_disp + DISP_ERROR_EPSILON;
             for (int i = 0; i < cur_list.size(); ++i)
             {
-                //bool ref_supported = false;
-                //bool q_supported = false;
                 double cur_angular_disp = cam_infos[ref_depth].DepthToAngularDisparity(c, cur_list[i]);
-//                if (cur_angular_disp > accept_disp_range_high)
-//                {
-//                    // too close
-//                    occlusion_cnt++;
-//                }
-//                else if (cur_angular_disp >= accept_disp_range_low &&
+
                 if (cur_angular_disp >= accept_disp_range_low &&
                 cur_angular_disp <= accept_disp_range_high)
                 {
                     support_cnt++;
                     //ref_supported = true;
                 }
-                /////////////////////////////////////////////////////////////////////
-//                int q = ref_depth_index_map[r][c][i];  // corresponding depth map
-//                cv::Vec3d q_rectified_3d_pt =
-//                rotation_ref2k[q] * rect_ref3d_pt + translation_ref2k[q];
-//                cv::Point2i q_rect_im_pt;
-//                cam_infos[q].RectifiedCoordPointToImageCoord(q_rectified_3d_pt[0],
-//                q_rectified_3d_pt[1],
-//                q_rectified_3d_pt[2],
-//                &q_rect_im_pt.x,
-//                &q_rect_im_pt.y);
-//                double ref2q_depth = cv::norm(q_rectified_3d_pt);
-//                if ( 0 <= q_rect_im_pt.x && q_rect_im_pt.x < depths[q]->cols &&
-//                0 <= q_rect_im_pt.y && q_rect_im_pt.y < depths[q]->rows )
-//                {
-//                    double q_depth = double(depths[q]->at<unsigned short>(q_rect_im_pt.y, q_rect_im_pt.x)) * cam_infos[q].DepthImageScaling();
-//                    double ref2q_angular_disp = cam_infos[q].DepthToAngularDisparity(q_rect_im_pt.x, ref2q_depth);
-//                    double q_angular_disp = cam_infos[q].DepthToAngularDisparity(q_rect_im_pt.x, q_depth);
-//                    if (q_angular_disp < ref2q_angular_disp - DISP_ERROR_EPSILON)
-//                    {
-//                        free_violation_cnt++;
-//                    }
-//                    else if (std::abs(q_angular_disp - ref2q_angular_disp) <= DISP_ERROR_EPSILON)
-//                    {
-//                        //q_supported = true;
-//                        support_cnt++;
-//                    }
-//                }
-//                //////////////////////////////////////////////////////////////////////
-////                if (ref_supported && q_supported) {
-////                    support_cnt++;
-////                }
             }
             double confidence_val = (double)(support_cnt+1) / (depths.size());
-            //double support_percent = (double)(support_cnt) / ((depths.size()-1)*2.0);
-            //double confidence_val = ((double)(support_cnt) - (occlusion_cnt + free_violation_cnt) ) / ((depths.size()-1)*2.0);
             if ( confidence_val > support_thresh && support_cnt >= 2) {
                 fusioned_map->at<double>(r, c) = cur_depth;
                 assert(confidence_val >= 0);
                 confidence_map->at<double>(r, c) = confidence_val;
             }
-////////////////////////////////////////////////////////////////////////
         }  // end for c
     }  // end for r
     return;
@@ -992,67 +891,21 @@ void Fusion_SphericalError(const vector<RectifiedCameraPair>& cam_infos,
             double ref_angular_disp = cam_infos[ref_depth].DepthToAngularDisparity(c, cur_depth);
 ////////////////////////////////////////////////////////////////////////
             int support_cnt = 0;
-//            int occlusion_cnt = 0;
-//            int free_violation_cnt = 0;
-//            cv::Vec3d rect_ref3d_pt =
-//                        ref_cam_info.RectifiedRefImagePointToRectifiedCam3DPointNoDepthScaling(c, r, cur_depth);
             double accept_disp_range_low = ref_angular_disp - DISP_ERROR_EPSILON;
             double accept_disp_range_high = ref_angular_disp + DISP_ERROR_EPSILON;
             for (int i = 0; i < cur_list.size(); ++i)
             {
-                //bool ref_supported = false;
-                //bool q_supported = false;
                 double cur_angular_disp = cam_infos[ref_depth].DepthToAngularDisparity(c, cur_list[i]);
-//                if (cur_angular_disp > accept_disp_range_high)
-//                {
-//                    // too close
-//                    occlusion_cnt++;
-//                }
-//                else if (cur_angular_disp >= accept_disp_range_low &&
                 if (cur_angular_disp >= accept_disp_range_low &&
                 cur_angular_disp <= accept_disp_range_high)
                 {
                     support_cnt++;
-                    //ref_supported = true;
                 }
-                /////////////////////////////////////////////////////////////////////
-//                int q = ref_depth_index_map[r][c][i];  // corresponding depth map
-//                cv::Vec3d q_rectified_3d_pt =
-//                rotation_ref2k[q] * rect_ref3d_pt + translation_ref2k[q];
-//                cv::Point2i q_rect_im_pt;
-//                cam_infos[q].RectifiedCoordPointToImageCoord(q_rectified_3d_pt[0],
-//                q_rectified_3d_pt[1],
-//                q_rectified_3d_pt[2],
-//                &q_rect_im_pt.x,
-//                &q_rect_im_pt.y);
-//                double ref2q_depth = cv::norm(q_rectified_3d_pt);
-//                if ( 0 <= q_rect_im_pt.x && q_rect_im_pt.x < depths[q]->cols &&
-//                0 <= q_rect_im_pt.y && q_rect_im_pt.y < depths[q]->rows )
-//                {
-//                    double q_depth = double(depths[q]->at<unsigned short>(q_rect_im_pt.y, q_rect_im_pt.x)) * cam_infos[q].DepthImageScaling();
-//                    double ref2q_angular_disp = cam_infos[q].DepthToAngularDisparity(q_rect_im_pt.x, ref2q_depth);
-//                    double q_angular_disp = cam_infos[q].DepthToAngularDisparity(q_rect_im_pt.x, q_depth);
-//                    if (q_angular_disp < ref2q_angular_disp - DISP_ERROR_EPSILON)
-//                    {
-//                        free_violation_cnt++;
-//                    }
-//                    else if (std::abs(q_angular_disp - ref2q_angular_disp) <= DISP_ERROR_EPSILON)
-//                    {
-//                        //q_supported = true;
-//                        support_cnt++;
-//                    }
-//                }
-//                //////////////////////////////////////////////////////////////////////
-////                if (ref_supported && q_supported) {
-////                    support_cnt++;
-////                }
             }
             double confidence_val = (double)(support_cnt+1) / (depths.size());  // [0,1], support count normalized
             double error_value = cam_infos[ref_depth].DepthErrorWithDisparity(c, cur_depth, M_PI/float(depths[0]->cols));
             double confidence_val_new = std::exp(-2*error_value);
 
-            //double support_percent = (double)(support_cnt) / ((depths.size()-1)*2.0);
-            //double confidence_support = ((double)(support_cnt) - (occlusion_cnt + free_violation_cnt) ) / ((depths.size()-1)*2.0);
             if ( confidence_val > support_thresh && support_cnt >= 2) {
                 fusioned_map->at<double>(r, c) = cur_depth;
                 assert(confidence_val_new >= 0);
@@ -1063,387 +916,3 @@ void Fusion_SphericalError(const vector<RectifiedCameraPair>& cam_infos,
     }  // end for r
     return;
 }
-
-
-//void SimpleFusion(const vector<RectifiedCameraPair>& cam_infos,
-//                  const vector<std::unique_ptr<cv::Mat>>& depths,
-//                  cv::Mat* fusioned_map, cv::Mat* confidence_map, double maxCamDistance)
-//{
-//    assert(cam_infos.size() > 1);
-//    assert(cam_infos.size() == depths.size());
-//    const int ref_depth = 0;
-//    *fusioned_map = cv::Mat::zeros(depths[ref_depth]->rows, depths[ref_depth]->cols, CV_64FC1);
-//    *confidence_map = cv::Mat::zeros(depths[ref_depth]->rows, depths[ref_depth]->cols, CV_64FC1);
-//    // rectified k -> rectified ref
-//    vector<cv::Matx33d> rotation_k2ref(cam_infos.size());
-//    vector<cv::Vec3d> translation_k2ref(cam_infos.size());
-//    vector<cv::Matx33d> rotation_ref2k(cam_infos.size());
-//    vector<cv::Vec3d> translation_ref2k(cam_infos.size());
-//    // store all transform matrices
-//    const Matx33d& rectify_ref = cam_infos[ref_depth].ReferenceRectifyMat();
-//    Matx33d ref_rotation;
-//    Vec3d ref_translation;
-//    cam_infos[ref_depth].ReferenceCameraPose(&ref_rotation, &ref_translation);
-//    rotation_k2ref[ref_depth] = cv::Matx33d::eye();
-//    translation_k2ref[ref_depth] = cv::Vec3d(0,0,0);
-//    rotation_ref2k[ref_depth] = cv::Matx33d::eye();
-//    translation_k2ref[ref_depth] = cv::Vec3d(0,0,0);
-//    for (int i = 1; i < cam_infos.size(); ++i)
-//    {
-//        Matx33d k_rotation;
-//        Vec3d k_translation;
-//        cam_infos[i].ReferenceCameraPose(&k_rotation, &k_translation);
-//        Matx33d rectify_k = cam_infos[i].ReferenceRectifyMat();
-//        Matx33d rotation_k_ref = rectify_ref.t() * ref_rotation.t() * k_rotation * rectify_k;
-//        Vec3d translation_k_ref = rectify_ref.t() * ref_rotation.t() * (k_translation - ref_translation);
-//        rotation_k2ref[i] = rotation_k_ref;
-//        translation_k2ref[i] = translation_k_ref;
-//        rotation_ref2k[i] = rotation_k_ref.t();
-//        translation_ref2k[i] = -rotation_k_ref.t() * translation_k_ref;
-//    }
-//    // generate all depth candidates
-//    cout << "generate all depth candidates.. ";
-//    const RectifiedCameraPair& ref_cam_info = cam_infos[ref_depth];
-//    const double depth_image_scaling_factor = ref_cam_info.DepthImageScaling();
-//    vector<vector<vector<double> > > ref_depth_candidate_map(depths[ref_depth]->rows);
-//    vector<vector<bool> > ref_depth_indicator_map(depths[ref_depth]->rows);
-//    for (int r = 0; r < ref_depth_candidate_map.size(); ++r)
-//    {
-//        ref_depth_candidate_map[r].resize(depths[ref_depth]->cols);
-//        ref_depth_indicator_map[r].resize(depths[ref_depth]->cols, false);
-//    }
-//    for (int i = 0; i < cam_infos.size(); ++i)
-//    {
-//        // for each new depthmap reset the indicator map
-//        for (int r = 0; r < ref_depth_indicator_map.size(); ++r)
-//        {
-//            ref_depth_indicator_map[r].assign(depths[ref_depth]->cols, false);
-//        }
-//        // for all depth maps, including the reference pair, reproject to ref view
-//        const RectifiedCameraPair& cur_cam_info = cam_infos[i];
-//        for (int r = 0; r < depths[i]->rows; ++r)
-//        {
-//            for (int c = 0; c < depths[i]->cols; ++c)
-//            {
-//                unsigned short cur_int_depth = depths[i]->at<unsigned short>(r, c);
-//                double cur_true_depth = (double)cur_int_depth * depth_image_scaling_factor;
-//                if (cur_true_depth <= 0.0 + 1e-10 || cur_true_depth > maxCamDistance)
-//                {
-//                    continue;
-//                }
-//                cv::Vec3d k_rectified_cam_3d_pt =
-//                    cur_cam_info.RectifiedRefImagePointToRectifiedCam3DPointNoDepthScaling(c, r, cur_true_depth);
-//                cv::Vec3d ref_rectified_cam_3d_pt = rotation_k2ref[i] * k_rectified_cam_3d_pt + translation_k2ref[i];
-//                cv::Point2i ref_rectified_im_pt;
-//                ref_cam_info.RectifiedCoordPointToImageCoord(ref_rectified_cam_3d_pt[0],
-//                        ref_rectified_cam_3d_pt[1],
-//                        ref_rectified_cam_3d_pt[2],
-//                        &ref_rectified_im_pt.x,
-//                        &ref_rectified_im_pt.y);
-//                double ref_true_depth = cv::norm(ref_rectified_cam_3d_pt);
-//                if ( 0 <= ref_rectified_im_pt.x && ref_rectified_im_pt.x < depths[ref_depth]->cols &&
-//                        0 <= ref_rectified_im_pt.y && ref_rectified_im_pt.y < depths[ref_depth]->rows &&
-//                        ref_true_depth <= maxCamDistance )
-//                {
-//                    if (ref_depth_indicator_map[ref_rectified_im_pt.y][ref_rectified_im_pt.x] == false)
-//                    {
-//                        ref_depth_candidate_map[ref_rectified_im_pt.y][ref_rectified_im_pt.x].push_back(ref_true_depth);
-//                        ref_depth_indicator_map[ref_rectified_im_pt.y][ref_rectified_im_pt.x] = true;
-//                    }
-//                    else
-//                    {
-//                        ref_depth_candidate_map[ref_rectified_im_pt.y][ref_rectified_im_pt.x].back()
-//                            = std::min(ref_true_depth, ref_depth_candidate_map[ref_rectified_im_pt.y][ref_rectified_im_pt.x].back());
-//                    }
-//                }  //end if
-//            }  //end for c
-//        }  // end for r
-//    }// end for i
-//    // for every candidates on each pixel of the ref depth map, select the best.
-//    const double DIST_RANGE_EPSILON_K = 0.01/2.5/2.5;
-//    cout << "selecting best candidate...\n";
-//    for (int r = 0; r < depths[ref_depth]->rows; ++r)
-//    {
-//        for (int c = 0; c < depths[ref_depth]->cols; ++c)
-//        {
-//            vector<double>& cur_list = ref_depth_candidate_map[r][c];
-//            if (cur_list.empty()) continue;
-//////////////////////////////////////////////////////////////////////////
-//            const double ref_depth = cur_list[0];
-//            const double DIST_RANGE_EPSILON = DIST_RANGE_EPSILON_K * ref_depth * ref_depth;
-//            double accept_dist_range_low = ref_depth - DIST_RANGE_EPSILON;
-//            double accept_dist_range_high = ref_depth + DIST_RANGE_EPSILON;
-//            int support_cnt = 0;
-//            for (int i = 1; i < cur_list.size(); ++i)
-//            {
-//                if (cur_list[i] > accept_dist_range_low &&
-//                cur_list[i] < accept_dist_range_high)
-//                {
-//                    support_cnt++;
-//                }
-//
-//            }
-//            double support_percent = (double)support_cnt / cur_list.size();
-//            if ( support_percent > 0.5 && support_cnt >= 2) {
-//                fusioned_map->at<double>(r, c) = ref_depth;
-//                confidence_map->at<double>(r, c) = support_percent;
-//            }
-//////////////////////////////////////////////////////////////////////////
-//
-////            const double median_depth = cur_list[(cur_list.size()-1)/2];
-////            const double DIST_RANGE_EPSILON = DIST_RANGE_EPSILON_K * median_depth * median_depth;
-////            double accept_dist_range_low;
-////            double accept_dist_range_high;
-////            int accept_dist_st_idx = 0;
-////            int accept_dist_ed_idx = 0;
-////            for (int i = 0; i < cur_list.size(); ++i)
-////            {
-////                double cur_dist = cur_list[i];
-////                accept_dist_range_low = cur_dist - DIST_RANGE_EPSILON;
-////                accept_dist_range_high = cur_dist + DIST_RANGE_EPSILON;
-////                while (cur_list[accept_dist_st_idx] < accept_dist_range_low)
-////                {
-////                    accept_dist_st_idx++;
-////                }
-////                while (accept_dist_ed_idx < cur_list.size() && cur_list[accept_dist_ed_idx] <= accept_dist_range_high)
-////                {
-////                    accept_dist_ed_idx++;
-////                }
-////                int depth_in_range = accept_dist_ed_idx - accept_dist_st_idx;
-////                double range_percent = double(depth_in_range)/cur_list.size();
-////                if (depth_in_range > 2 && range_percent > 0.5)
-////                {
-////                    fusioned_map->at<double>(r, c) = cur_list[i];
-////                    confidence_map->at<double>(r, c) = range_percent;
-////                    break;
-////                }
-////            }  // end for i
-//        }  // end for c
-//    }  // end for r
-//    return;
-//}
-
-//void SimpleFusionDisparity(const vector<RectifiedCameraPair>& cam_infos,
-//                  const vector<std::unique_ptr<cv::Mat>>& depths,
-//                  cv::Mat* fusioned_map, cv::Mat* confidence_map, double maxCamDistance,
-//                  const vector<std::string>& param_file_list,
-//                  const std::vector<std::string>& image_file_list,
-//                  const std::string& save_dir /*= std::string("/ps/geiger/czhou/2013_05_28/2013_05_28_drive_0000_sync/image_02/rect/debug")*/)
-//{
-//    assert(cam_infos.size() > 1);
-//    assert(cam_infos.size() == depths.size());
-//    const int ref_depth = 0;
-//    *fusioned_map = cv::Mat::zeros(depths[ref_depth]->rows, depths[ref_depth]->cols, CV_64FC1);
-//    *confidence_map = cv::Mat::zeros(depths[ref_depth]->rows, depths[ref_depth]->cols, CV_64FC1);
-//    // rectified k -> rectified ref
-//    vector<cv::Matx33d> rotation_k2ref(cam_infos.size());
-//    vector<cv::Vec3d> translation_k2ref(cam_infos.size());
-//    vector<cv::Matx33d> rotation_ref2k(cam_infos.size());
-//    vector<cv::Vec3d> translation_ref2k(cam_infos.size());
-//    // store all transform matrices
-//    const Matx33d& rectify_ref = cam_infos[ref_depth].ReferenceRectifyMat();
-//    Matx33d ref_rotation;
-//    Vec3d ref_translation;
-//    cam_infos[ref_depth].ReferenceCameraPose(&ref_rotation, &ref_translation);
-//    rotation_k2ref[ref_depth] = cv::Matx33d::eye();
-//    translation_k2ref[ref_depth] = cv::Vec3d(0,0,0);
-//    rotation_ref2k[ref_depth] = cv::Matx33d::eye();
-//    translation_k2ref[ref_depth] = cv::Vec3d(0,0,0);
-//    for (int i = 1; i < cam_infos.size(); ++i)
-//    {
-//        Matx33d k_rotation;
-//        Vec3d k_translation;
-//        cam_infos[i].ReferenceCameraPose(&k_rotation, &k_translation);
-//        Matx33d rectify_k = cam_infos[i].ReferenceRectifyMat();
-//        Matx33d rotation_k_ref = rectify_ref.t() * ref_rotation.t() * k_rotation * rectify_k;
-//        Vec3d translation_k_ref = rectify_ref.t() * ref_rotation.t() * (k_translation - ref_translation);
-//        rotation_k2ref[i] = rotation_k_ref;
-//        translation_k2ref[i] = translation_k_ref;
-//        rotation_ref2k[i] = rotation_k_ref.t();
-//        translation_ref2k[i] = -rotation_k_ref.t() * translation_k_ref;
-//    }
-//    // generate all depth candidates
-//    cout << "generate all depth candidates.. ";
-//    const RectifiedCameraPair& ref_cam_info = cam_infos[ref_depth];
-//    const double depth_image_scaling_factor = ref_cam_info.DepthImageScaling();
-//    vector<vector<vector<double> > > ref_depth_candidate_map(depths[ref_depth]->rows);
-//    vector<vector<bool> > ref_depth_indicator_map(depths[ref_depth]->rows);
-//    for (int r = 0; r < ref_depth_candidate_map.size(); ++r)
-//    {
-//        ref_depth_candidate_map[r].resize(depths[ref_depth]->cols);
-//        ref_depth_indicator_map[r].resize(depths[ref_depth]->cols, false);
-//    }
-//    for (int i = 1; i < cam_infos.size(); ++i)
-//    {
-//#ifdef _ZCDEBUG
-//        cv::Mat cur_depth_map = cv::Mat::zeros(depths[ref_depth]->rows, depths[ref_depth]->cols, CV_16UC1);
-//        cv::Mat cur_rgb_map = cv::Mat::zeros(depths[ref_depth]->rows, depths[ref_depth]->cols, CV_8UC3);
-//        cv::Mat image = cv::imread(image_file_list[i]);
-//#endif // _ZCDEBUG
-//        // for each new depthmap reset the indicator map
-//        for (int r = 0; r < ref_depth_indicator_map.size(); ++r)
-//        {
-//            ref_depth_indicator_map[r].assign(depths[ref_depth]->cols, false);
-//        }
-//        // for all depth maps, including the reference pair, reproject to ref view
-//        const RectifiedCameraPair& cur_cam_info = cam_infos[i];
-//        for (int r = 0; r < depths[i]->rows; ++r)
-//        {
-//            for (int c = 0; c < depths[i]->cols; ++c)
-//            {
-//                unsigned short cur_int_depth = depths[i]->at<unsigned short>(r, c);
-//                double cur_true_depth = (double)cur_int_depth * depth_image_scaling_factor;
-//                if (cur_true_depth <= 0.0 + 1e-10 || cur_true_depth > maxCamDistance)
-//                {
-//                    continue;
-//                }
-//                cv::Vec3d k_rectified_cam_3d_pt =
-//                    cur_cam_info.RectifiedRefImagePointToRectifiedCam3DPointNoDepthScaling(c, r, cur_true_depth);
-//                cv::Vec3d ref_rectified_cam_3d_pt = rotation_k2ref[i] * k_rectified_cam_3d_pt + translation_k2ref[i];
-//                cv::Point2i ref_rectified_im_pt;
-//                ref_cam_info.RectifiedCoordPointToImageCoord(ref_rectified_cam_3d_pt[0],
-//                        ref_rectified_cam_3d_pt[1],
-//                        ref_rectified_cam_3d_pt[2],
-//                        &ref_rectified_im_pt.x,
-//                        &ref_rectified_im_pt.y);
-//                double ref_true_depth = cv::norm(ref_rectified_cam_3d_pt);
-//                if ( 0 <= ref_rectified_im_pt.x && ref_rectified_im_pt.x < depths[ref_depth]->cols &&
-//                        0 <= ref_rectified_im_pt.y && ref_rectified_im_pt.y < depths[ref_depth]->rows &&
-//                        ref_true_depth <= maxCamDistance )
-//                {
-//                    if (ref_depth_indicator_map[ref_rectified_im_pt.y][ref_rectified_im_pt.x] == false)
-//                    {
-//                        ref_depth_candidate_map[ref_rectified_im_pt.y][ref_rectified_im_pt.x].push_back(ref_true_depth);
-//                        ref_depth_indicator_map[ref_rectified_im_pt.y][ref_rectified_im_pt.x] = true;
-//                    }
-//                    else
-//                    {
-//                        ref_depth_candidate_map[ref_rectified_im_pt.y][ref_rectified_im_pt.x].back()
-//                            = std::min(ref_true_depth, ref_depth_candidate_map[ref_rectified_im_pt.y][ref_rectified_im_pt.x].back());
-//                    }
-//#ifdef _ZCDEBUG
-//                    cur_depth_map.at<ushort>(ref_rectified_im_pt.y, ref_rectified_im_pt.x) = ushort(ref_true_depth/30.0*65535);
-//                    cv::Vec3b cur_color = image.at<cv::Vec3b>(r, c);
-//                    cur_rgb_map.at<cv::Vec3b>(ref_rectified_im_pt.y, ref_rectified_im_pt.x) = cur_color;
-//
-//#endif // _ZCDEBUG
-//
-//                }  //end if
-//            }  //end for c
-//        }  // end for r
-//#ifdef _ZCDEBUG
-//        fs::path fbasename = fs::path(param_file_list[i]).stem();
-//        std::string save_path = save_dir + "/" + fbasename.string() + "-warped.png";
-//        imwrite(save_path, cur_depth_map);
-//        std::string save_path_orig = save_dir + "/" + fbasename.string() + "-orig.png";
-//        imwrite(save_path_orig, *(depths[i]));
-//        std::string save_path_rgb = save_dir + "/" + fbasename.string() + "-rgb.png";
-//        imwrite(save_path_rgb, cur_rgb_map);
-//#endif // _ZCDEBUG
-//    }// end for i
-//    // for every candidates on each pixel of the ref depth map, select the best.
-//    const double DISP_ERROR_EPSILON = M_PI/ depths[ref_depth]->cols;  // one pixel matching error.
-//    const int col_start = 180;
-//    const int col_end = depths[ref_depth]->cols - col_start;
-//    cout << "selecting best candidate...\n";
-//    for (int r = 0; r < depths[ref_depth]->rows; ++r)
-//    {
-//        for (int c = col_start; c < col_end; ++c)
-//        {
-//            const double cur_depth = double(depths[ref_depth]->at<ushort>(r, c)) * depth_image_scaling_factor;
-//            if (!(cur_depth > 0.0 && cur_depth <= maxCamDistance)) {
-//                continue;
-//            }
-//            vector<double>& cur_list = ref_depth_candidate_map[r][c];
-//            if (cur_list.empty()) continue;
-//            double ref_angular_disp = cam_infos[ref_depth].DepthToAngularDisparity(c, cur_depth);
-//////////////////////////////////////////////////////////////////////////
-//            double accept_disp_range_low = ref_angular_disp - DISP_ERROR_EPSILON;
-//            double accept_disp_range_high = ref_angular_disp + DISP_ERROR_EPSILON;
-//            int support_cnt = 0;
-//            int occlusion_cnt = 0;
-//            int free_violation_cnt = 0;
-//            for (int i = 0; i < cur_list.size(); ++i)
-//            {
-//                double cur_angular_disp = cam_infos[ref_depth].DepthToAngularDisparity(c, cur_list[i]);
-//                if (cur_angular_disp > accept_disp_high) { // too close
-//                    occlusion_cnt++;
-//                } else if (cur_angular_disp >= accept_disp_range_low &&
-//                cur_angular_disp <= accept_disp_range_high)
-//                {
-//                    support_cnt++;
-//                }
-//            }
-//            //////////////////////////////////////////////////////////////////////////
-//            // compute free_violation_cnt;
-//            cv::Vec3d rect_ref3d_pt =
-//                        ref_cam_info.RectifiedRefImagePointToRectifiedCam3DPointNoDepthScaling(c, r, cur_depth);
-//            for (int q = 1; q < depths.size(); ++q)
-//                {
-//                    cv::Vec3d q_rectified_3d_pt =
-//                        rotation_ref2k[q] * rect_ref3d_pt + translation_ref2k[q];
-//                    cv::Point2i q_rect_im_pt;
-//                    cam_infos[q].RectifiedCoordPointToImageCoord(q_rectified_3d_pt[0],
-//                            q_rectified_3d_pt[1],
-//                            q_rectified_3d_pt[2],
-//                            &q_rect_im_pt.x,
-//                            &q_rect_im_pt.y);
-//                    double ref2q_depth = cv::norm(q_rectified_3d_pt);
-//                    if ( 0 <= q_rect_im_pt.x && q_rect_im_pt.x < depths[q]->cols &&
-//                            0 <= q_rect_im_pt.y && q_rect_im_pt.y < depths[q]->rows )
-//                    {
-//                        double q_depth = double(depths[q]->at<unsigned short>(q_rect_im_pt.y, q_rect_im_pt.x)) * cam_infos[q].DepthImageScaling();
-//                        double ref2q_angular_disp = cam_infos[q].DepthToAngularDisparity(q_rect_im_pt.x, ref2q_depth);
-//                        double q_angular_disp = cam_infos[q].DepthToAngularDisparity(q_rect_im_pt.x, q_depth);
-//                        if (q_angular_disp < ref2q_angular_disp - DISP_ERROR_EPSILON)
-//                        {
-//                            free_violation_cnt++;
-//                        }
-////                        if (std::abs(q_depth - ref2q_depth) <= EPSILON)
-////                        {
-////                            support++;
-////                        }
-////                        all_depth_cnt++;
-//                    }
-//                }
-//            ////////////////////////////////////////////////////////////////////////////
-//            //double support_percent = (double)(support_cnt+1) / (cur_list.size()+1);
-//            double support_percent = (double)(support_cnt+1) / (depths.size());
-//            if ( support_percent > 0.5 && support_cnt >= 2) {
-//                fusioned_map->at<double>(r, c) = cur_depth;
-//                confidence_map->at<double>(r, c) = support_percent;
-//            }
-//////////////////////////////////////////////////////////////////////////
-//
-////            const double median_depth = cur_list[(cur_list.size()-1)/2];
-////            const double DIST_RANGE_EPSILON = DIST_RANGE_EPSILON_K * median_depth * median_depth;
-////            double accept_dist_range_low;
-////            double accept_dist_range_high;
-////            int accept_dist_st_idx = 0;
-////            int accept_dist_ed_idx = 0;
-////            for (int i = 0; i < cur_list.size(); ++i)
-////            {
-////                double cur_dist = cur_list[i];
-////                accept_dist_range_low = cur_dist - DIST_RANGE_EPSILON;
-////                accept_dist_range_high = cur_dist + DIST_RANGE_EPSILON;
-////                while (cur_list[accept_dist_st_idx] < accept_dist_range_low)
-////                {
-////                    accept_dist_st_idx++;
-////                }
-////                while (accept_dist_ed_idx < cur_list.size() && cur_list[accept_dist_ed_idx] <= accept_dist_range_high)
-////                {
-////                    accept_dist_ed_idx++;
-////                }
-////                int depth_in_range = accept_dist_ed_idx - accept_dist_st_idx;
-////                double range_percent = double(depth_in_range)/cur_list.size();
-////                if (depth_in_range > 2 && range_percent > 0.5)
-////                {
-////                    fusioned_map->at<double>(r, c) = cur_list[i];
-////                    confidence_map->at<double>(r, c) = range_percent;
-////                    break;
-////                }
-////            }  // end for i
-//        }  // end for c
-//    }  // end for r
-//    return;
-//}

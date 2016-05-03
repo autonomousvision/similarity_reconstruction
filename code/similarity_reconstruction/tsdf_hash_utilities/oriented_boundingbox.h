@@ -8,6 +8,8 @@
 #include <Eigen/Eigen>
 #include <pcl/PolygonMesh.h>
 
+// cpu_tsdf::OrientedBoudingBox is the deprecated class for OBB.
+// use tsdf_utility::OrientedBoundingBox instead
 namespace cpu_tsdf {
 class OrientedBoundingBox;
 }

@@ -5,12 +5,8 @@
 #include <string>
 #include <vector>
 
-#include <pcl/console/print.h>
-#include <pcl/console/time.h>
-#include <pcl/visualization/cloud_viewer.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/io/ply_io.h>
-#include <pcl/io/vtk_lib_io.h>
 #include <pcl/pcl_macros.h>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem.hpp>
@@ -27,7 +23,6 @@
 #include "detection/detect_sample.h"
 #include "tsdf_operation/tsdf_slice.h"
 #include "tsdf_operation/tsdf_align.h"
-// #include "tsdf_operation/tsdf_joint_align.h"
 #include "tsdf_representation/tsdf_hash.h"
 #include "marching_cubes/marching_cubes_tsdf_hash.h"
 #include "common/utilities/pcl_utility.h"

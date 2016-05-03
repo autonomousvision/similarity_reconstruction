@@ -25,127 +25,15 @@
 #include "tsdf_operation/tsdf_smooth.h"
 #include "tsdf_operation/diffusion_hole_filling.h"
 
-//using std::vector;
-//using std::string;
 using namespace std;
-
-
-//bool
-//reprojectPoint (const pcl::PointXYZRGBA &pt, int &u, int &v)
-//{
-//  u = (pt.x * focal_length_x_ / pt.z) + principal_point_x_;
-//  v = (pt.y * focal_length_y_ / pt.z) + principal_point_y_;
-//  return (!pcl_isnan (pt.z) && pt.z > 0 && u >= 0 && u < width_ && v >= 0 && v < height_);
-//}
-
-//void
-//remapCloud (pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr cloud,
-//            const Eigen::Affine3d &pose,
-//            pcl::PointCloud<pcl::PointXYZRGBA> &cloud_remapped)
-//{
-//  // Reproject
-//  cloud_remapped = pcl::PointCloud<pcl::PointXYZRGBA> (width_, height_);
-//  // Initialize to nan
-//#pragma omp parallel for
-//  for (size_t i = 0; i < cloud_remapped.size (); i++)
-//  {
-//    cloud_remapped[i].z = std::numeric_limits<float>::quiet_NaN ();
-//  }
-//  cloud_remapped.is_dense = false;
-//  for (size_t i = 0; i < cloud->size (); i++)
-//  {
-//    const pcl::PointXYZRGBA &pt = cloud->at (i);
-//    int u, v;
-//    if (!reprojectPoint (pt, u, v))
-//      continue;
-//    pcl::PointXYZRGBA &pt_remapped = cloud_remapped (u, v);
-//    if (pcl_isnan (pt_remapped.z) || pt_remapped.z > pt.z)
-//      pt_remapped = pt;
-//  }
-//}
-
-
-
-
-//void IntegratePointCloud(std::vector<RectifiedCameraPair>& cam_infos,
-//                         const std::vector<std::string>& image_filelist,
-//                         const std::vector<std::string>& depth_filelist,
-//                         double maxCamDistance,
-//                         double depth_image_scaling_factor,
-//                         std::vector<cv::Vec3d>& points3d, std::vector<cv::Vec3b>& pointscolor)
-//{
-//    for (int i = 0; i < cam_infos.size(); ++i)
-//    {
-//        cv::Mat depth_map = cv::imread(depth_filelist[i], -1);
-//        cv::Mat image = cv::imread(image_filelist[i], 1);  // always color
-//        cam_infos[i].SetVoxelScalingParameters(cv::Vec3d(0,0,0),
-//                                               1.0,
-//                                               depth_image_scaling_factor);
-//        cam_infos[i].InitializeBackProjectionBuffers(depth_map.cols, depth_map.rows);
-//        int imHeight = depth_map.rows;
-//        int imWidth = depth_map.cols;
-//        for(int y=0; y<imHeight; y++)
-//        {
-//            for(int x=0; x<imWidth; x++)
-//            {
-//                const unsigned short quant_depth = depth_map.at<unsigned short>(y,x);
-//                const float pz = float(quant_depth)*cam_infos[i].DepthImageScaling();  // unit: in meter
-//                if(pz > 0.0f && pz < maxCamDistance)
-//                {
-//                    cv::Vec3d tpoint = cam_infos[i].RectifiedRefImagePointToVoxel3DPoint(x, y, quant_depth);  // unit: in voxel
-//                    //printf("%f %f %f\n",float(x), float(y), float(pz) );
-//                    points3d.push_back(static_cast<cv::Vec3d>(tpoint));
-//                    cv::Vec3b tcolor = image.at<cv::Vec3b>(y,x);
-//                    pointscolor.push_back(tcolor);
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//void IntegratePointCloud(std::vector<RectifiedCameraPair>& cam_infos,
-//                         const std::vector<std::string>& image_filelist,
-//                         const std::vector<std::string>& depth_filelist,
-//                         double maxCamDistance,
-//                         double depth_image_scaling_factor,
-//                         pcl::PointCloud<pcl::PointXYZRGBA>& pointcloud) {
-//  vector<cv::Vec3d> points3d;
-//  vector<cv::Vec3b> pointscolor;
-//  IntegratePointCloud(cam_infos, image_filelist, depth_filelist,
-//                      maxCamDistance, depth_image_scaling_factor, points3d, pointscolor);
-//  for(int i = 0; i < points3d.size(); ++i) {
-//    pcl::PointXYZRGBA pnew;
-//    pnew.x = points3d[i][0];
-//    pnew.y = points3d[i][1];
-//    pnew.z = points3d[i][2];
-//    uchar r,g,b;
-//    b = pointscolor[i][0];
-//    g = pointscolor[i][1];
-//    r = pointscolor[i][2];
-//    unsigned int rgb = (r << 16) | (g << 8) | b;
-//    pnew.rgba = *(float *)(&rgb); // makes the point red
-//    pointcloud.push_back(pnew);
-//  }
-//  pointcloud.is_dense = true;
-//  pointcloud.height = 1;
-//}
-//
 
 void MaskImageSidesAsZero(const int side_width, cv::Mat* image)
 {
-//    cv::imshow("test0", *image);
-//    cv::waitKey();
-//    cv::destroyWindow("test0");
-
     cv::Mat band_left = cv::Mat(*image, cv::Rect(0, 0, side_width, image->rows));
     cv::Mat band_right = cv::Mat(*image, cv::Rect(image->cols - side_width, 0, side_width, image->rows));
 
     band_left.setTo(0);
     band_right.setTo(0);
-
-//    cv::imshow("test", *image);
-//    cv::waitKey();
-//    cv::destroyWindow("test");
 }
 
 int
@@ -156,7 +44,6 @@ main (int argc, char** argv)
   bpo::options_description opts_desc("Allowed options");
   double world_offset_x = 0;
   double world_offset_y = 0;
-  //std::string output_tsdf_filepath;
   std::string tsdf_fpath;
   float max_camera_distance = 35.0;
   float pos_trunc_dist = 2.0;
@@ -233,22 +120,14 @@ main (int argc, char** argv)
   eigen_offset(0) = offset[0]; eigen_offset(1) = offset[1]; eigen_offset(2) = offset[2]; 
   float voxel_length = 0.1;
   if (opts.count("voxel_length")) voxel_length = opts["voxel_length"].as<float>();
-//  float truncation_limit = voxel_length * 8;
-//  if (opts.count("truncation_limit")) truncation_limit = opts["truncation_limit"].as<float>();
   pos_trunc_dist = voxel_length * 8;
   neg_trunc_dist = -pos_trunc_dist;
   if (opts.count("pos_truncation_limit")) pos_trunc_dist = opts["pos_truncation_limit"].as<float>();
   if (opts.count("neg_truncation_limit")) neg_trunc_dist = opts["neg_truncation_limit"].as<float>();
 
-  //    const float neg_dist_full_weight_threshold = - voxel_length_ / 5.0;
-  //    const float neg_weight_thresh1 = 0.05;
-  //    const float neg_weight_dist_thresh =  - voxel_length_ * 3;
   neg_dist_full_weight_delta = - voxel_length / 5.0;
   neg_weight_thresh = 0.05;
   neg_weight_dist_thresh =  - voxel_length * 3;
-//  ("neg_full_weight_delta", bpo::value<float>(), "negative full weight distance")
-//  ("neg_weight_dist_thresh", bpo::value<float>(), "negative inflection distance")
-//  ("neg_weight_thresh", bpo::value<float>(), "negative inflection weight")
   if (opts.count("neg_full_weight_delta")) neg_dist_full_weight_delta = opts["neg_full_weight_delta"].as<float>();
   if (opts.count("neg_weight_dist_thresh")) neg_weight_dist_thresh = opts["neg_weight_dist_thresh"].as<float>();
   if (opts.count("neg_weight_thresh")) neg_weight_thresh = opts["neg_weight_thresh"].as<float>();
@@ -263,7 +142,6 @@ main (int argc, char** argv)
 
   cpu_tsdf::TSDFHashing::Ptr tsdf (new cpu_tsdf::TSDFHashing(eigen_offset, voxel_length, pos_trunc_dist, neg_trunc_dist, neighbor_add_limit));
   std::string out_ply_file = opts["out"].as<std::string> ();
-  // std::string tsdf_fpath = opts["input-tsdf-filepath"].as<string>();
   if (opts.count("input-tsdf-filepath") && !tsdf_fpath.empty() )
   {
       if (!bfs::exists(tsdf_fpath))
@@ -296,8 +174,6 @@ main (int argc, char** argv)
       vector<string> depth_filelist;
       vector<string> confidence_filelist;
       vector<string> semantic_filelist;
-//      if(!LoadUrbanReconstructionData(urban_data_root, param_prefix, image_prefix, depth_prefix, semantic_prefix,
-//                  &cam_infos, &image_filelist, &depth_filelist, &confidence_filelist, &semantic_filelist, use_confidence)) {
       if(!LoadUrbanReconstructionData(urban_data_root, param_prefix, image_prefix, depth_prefix, semantic_prefix,
                                       start_image, end_image,
                                       &cam_infos, &image_filelist, &depth_filelist, &confidence_filelist, &semantic_filelist, use_confidence)) {
@@ -309,8 +185,6 @@ main (int argc, char** argv)
           exit(1);
       }
 
-
-      //if (opts.count("max-camera-distance")) max_camera_distance = opts["max-camera-distance"].as<float>();
       float depth_image_scaling_factor = max_camera_distance/65535.0;
       cv::Mat temp_depth = cv::imread(depth_filelist[0], -1);
       InitializeCamInfos(temp_depth.cols, temp_depth.rows, cv::Vec3d(utility::EigenVectorToCvVector3(tsdf->offset())), tsdf->voxel_length(),
@@ -339,13 +213,6 @@ main (int argc, char** argv)
           cout << "cam_info: " << cam_infos[i] << endl;
       }
 
-//      int startimage = 0;
-//      int endimage = depth_filelist.size()-1;
-//      if(opts.count("startimage")) { startimage = std::max(opts["startimage"].as<int>(), startimage); }
-//      if(opts.count("endimage")) { endimage = std::min(opts["endimage"].as<int>(), endimage); }
-//      std::vector<cv::Vec3d> debug_points;
-//      std::vector<cv::Vec3b> debug_colors;
-
       // Set up visualization
       for (size_t i = 0; i < depth_filelist.size(); i++)
       {
@@ -373,9 +240,6 @@ main (int argc, char** argv)
               semantic_label_mat = LoadSemanticLabelAsMat(semantic_filelist[i]);
             }
 
-          //cam_infos[i].ProjectToWorldPointCloud(depth_map, image, &debug_points, &debug_colors);
-
-          //tsdf->integrateCloud_Spherical_Queue(depth_map, confidence_map, image, semantic_label_mat, cam_infos[i]);
           tsdf->integrateCloud_Spherical_Queue_DoubleImCoord
                   (depth_map, confidence_map, image, semantic_label_mat, cam_infos[i], stepsize,
                    neg_dist_full_weight_delta,
@@ -385,41 +249,8 @@ main (int argc, char** argv)
           bfs::path output_file_path(out_ply_file);
           std::string outputname((output_file_path.parent_path()/output_file_path.stem()).string());
           outputname += "_frame_" + boost::lexical_cast<string>(i) + "_" + bfs::path(depth_filelist[i]).stem().string() + ".ply";
-//          Eigen::Vector3f min_pt(1252.7, 3784.2, 123.0);
-//          Eigen::Vector3f max_pt(1253.9, 3785.4, 124.2);
-//          Eigen::Vector3f min_pt(1256.0, 3785.8, 120.2);
-//          Eigen::Vector3f max_pt(1256.4, 3786.2, 120.6);
-          //CC_POINT_#111(1254.800049;3784.800049;122.599998)
-//          Eigen::Vector3f min_pt(1254.4, 3784.4, 122.2);
-//          Eigen::Vector3f max_pt(1255.2, 3785.2, 123.0);
-//          Eigen::Vector3f min_pt(1254.7, 3783.1, 123.5);
-//          Eigen::Vector3f max_pt(1255.3, 3783.7, 124.1);
-//            Eigen::Vector3f min_pt(1249.5, 3784.9, 122.5);
-//            Eigen::Vector3f max_pt(1250.1, 3785.5, 123.1);
-//          Eigen::Vector3f min_pt(1052.3, 3736.4, 117.8);
-//          Eigen::Vector3f max_pt(1052.7, 3736.8, 118.2);
-//            tsdf->OutputTSDFGrid(outputname, &min_pt, &max_pt, &(cam_infos[i]), &(depth_map), &depth_image_scaling_factor);
-
-//          if((i - startimage)%20 == 0 && i > 60)
-//          {
-//              bfs::path output_file_path(out_ply_file);
-//              std::string pt_cloud_name((output_file_path.parent_path()/output_file_path.stem()).string());
-//              pt_cloud_name += "_frame_" + boost::lexical_cast<string>(i) + "_" + bfs::path(depth_filelist[i]).stem().string() + "_ptcloud.ply";
-//              utility::Write3DPointToFilePCL(pt_cloud_name, debug_points, &debug_colors);
-
-
-//          }
-
       }
-//      fprintf(stderr, "writing out TSDF file\n");
-//      bfs::path output_file_path(out_ply_file);
-//      std::string outputname((output_file_path.parent_path()/output_file_path.stem()).string());
-//      outputname += "_origin_bin_tsdf_file.bin";
-//      std::ofstream os(outputname, std::ios_base::out);
-//      boost::archive::binary_oarchive oa(os);
-//      oa << *tsdf;
 
-      //tsdf->RemoveDuplicateSurfaceTSDF(min_weight);
       fprintf(stderr, "writing out TSDF file\n");
       bfs::path output_file_path(out_ply_file);
       std::string outputname((output_file_path.parent_path()/output_file_path.stem()).string());
@@ -428,18 +259,6 @@ main (int argc, char** argv)
       boost::archive::binary_oarchive oa(os);
       oa << *tsdf;
   }
-  // do smoothing for TSDF.
-  //bfs::path output_file_path(out_dir);
-  //std::string outputname((output_file_path.parent_path()/output_file_path.stem()).string());
-  //outputname += "_gridTSDF_beforesmooth.ply";
-  //tsdf->OutputTSDFGrid(outputname);
-
-//  if(opts.count("smooth"))
-//  {
-//      cpu_tsdf::TSDFHashing smoothed_tsdf;
-//      SmoothTSDFFunctionOnlyExtension(tsdf.get(), 1, &smoothed_tsdf);
-//      *tsdf = smoothed_tsdf;
-//  }
 
   if(opts.count("diffusion-smooth"))
   {
@@ -451,7 +270,6 @@ main (int argc, char** argv)
   }
 
   // Save
-  //boost::filesystem::create_directory (out_dir);
   cpu_tsdf::MarchingCubesTSDFHashing mc;
 
   mc.setMinWeight(min_weight);

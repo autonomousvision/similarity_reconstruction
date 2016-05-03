@@ -1,4 +1,5 @@
 /*
+ * Cleaning noise in TSDFs
  * Chen Zhou (zhouch@pku.edu.cn)
  */
 #pragma once

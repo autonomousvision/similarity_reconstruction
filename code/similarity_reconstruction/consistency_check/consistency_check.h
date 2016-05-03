@@ -79,6 +79,5 @@ void CheckMeshVerticesWithSkyMapAndDepMapCheckOBB(const pcl::PolygonMesh &mesh,
         const std::vector<tsdf_utility::OrientedBoundingBox> &obbs,
         const int sky_thresh, const bool sky_map_check, const bool depth_map_check,
         std::vector<bool> *kept_vertices);
-////////////////////////////////////////////////////////////////////////
 
 

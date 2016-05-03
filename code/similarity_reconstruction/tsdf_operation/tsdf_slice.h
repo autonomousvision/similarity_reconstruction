@@ -1,4 +1,5 @@
 /*
+ * Slicing part of the TSDF
  * Chen Zhou (zhouch@pku.edu.cn)
  */
 #pragma once
@@ -14,10 +15,6 @@
 #include <iostream>
 #include <vector>
 #include <string>
-// #include <pcl/io/pcd_io.h>
-// #include <pcl/io/ply_io.h>
-// #include <pcl/io/vtk_lib_io.h>
-// #include <pcl/pcl_macros.h>
 
 #include "tsdf_representation/tsdf_hash.h"
 #include "tsdf_hash_utilities/utility.h"
@@ -44,48 +41,19 @@ bool ExtractSampleFromOBB(const TSDFHashing &scene_tsdf,
         Eigen::SparseVector<float> *weight);
 
 
-// moved from utility.h 17th, Feb, 2016
 bool ExtractSamplesFromAffineTransform(
         const TSDFHashing &scene_tsdf,
         const std::vector<Eigen::Affine3f> &affine_transforms,
         const TSDFGridInfo &options,
         Eigen::SparseMatrix<float, Eigen::ColMajor> *samples,
         Eigen::SparseMatrix<float, Eigen::ColMajor> *weights);
-//bool ExtractSamplesFromAffineTransform2(
-//        const TSDFHashing &scene_tsdf,
-//        const std::vector<Eigen::Affine3f> &affine_transforms,
-//        const TSDFGridInfo &options,
-//        Eigen::SparseMatrix<float, Eigen::ColMajor> *samples,
-//        Eigen::SparseMatrix<float, Eigen::ColMajor> *weights);
+
 bool ExtractOneSampleFromAffineTransform(const TSDFHashing &scene_tsdf,
                                          const Eigen::Affine3f &affine_transform,
                                          const TSDFGridInfo &options,
                                          Eigen::SparseVector<float> *sample,
                                          Eigen::SparseVector<float> *weight);
-//bool ExtractOneSampleFromAffineTransform2(const TSDFHashing &scene_tsdf,
-//                                          const Eigen::Affine3f &affine_transform,
-//                                          const TSDFGridInfo &options,
-//                                          Eigen::SparseVector<float> *sample,
-//                                          Eigen::SparseVector<float> *weight);
-// deprecated
-//bool ExtractSamplesFromAffineTransform(
-//        const TSDFHashing &scene_tsdf,
-//        const std::vector<Eigen::Affine3f> &affine_transforms,
-//        const PCAOptions &options,
-//        Eigen::SparseMatrix<float, Eigen::ColMajor> *samples,
-//        Eigen::SparseMatrix<float, Eigen::ColMajor> *weights);
-//
-///* deprecated*/
-//bool ExtractOneSampleFromAffineTransform(const TSDFHashing &scene_tsdf,
-//                                         const Eigen::Affine3f &affine_transform,
-//                                         const PCAOptions &options,
-//                                         Eigen::SparseVector<float> *sample,
-//                                         Eigen::SparseVector<float> *weight);
 
-//bool MergeTSDF(const TSDFHashing& src,
-//               TSDFHashing* target,
-//               float neg_dist_full_weight_delta, float neg_weight_thresh, float neg_weight_dist_thresh);
-//bool MergeTSDFNoReweight(const TSDFHashing &src, cpu_tsdf::TSDFHashing *target);
 bool MergeTSDFNearestNeighbor(const TSDFHashing &src, cpu_tsdf::TSDFHashing *target);
 
 bool MergeTSDFs(const std::vector<TSDFHashing::Ptr>& srcs, cpu_tsdf::TSDFHashing *target);
@@ -265,13 +233,6 @@ bool GetTSDFSemanticMajorPartOrientedBoundingbox2D(const TSDFHashing* tsdf_volum
                                                    const Eigen::Matrix3f &orientation, Eigen::Vector3f *pmin_pt, Eigen::Vector3f *lengths);
 
 /**
- * @brief for debugging/output. compute the 8vertices of the bounding box
- */
-//bool ComputeOrientedBoundingboxVertices(const Eigen::Matrix3f &orientation, const Eigen::Vector3f& offset, const Eigen::Vector3f& world_side_lengths, Eigen::Vector3f *box_vertices);
-
-//bool SaveOrientedBoundingbox(const Eigen::Matrix3f &orientation, const Eigen::Vector3f& offset, const Eigen::Vector3f& lengths, const std::string& filename);
-
-/**
  * @brief ProjectTSDFTo2DHist Compute a 2D histogram
  * @param tsdf_volume
  * @param semantic_label
@@ -293,18 +254,4 @@ bool ProjectTSDFTo2DHist(const cpu_tsdf::TSDFHashing* tsdf_volume, int semantic_
 
 bool ComputeOrientedBoundingbox(const cpu_tsdf::TSDFHashing* tsdf_origin, const Eigen::Matrix3f& orientation, Eigen::Vector3f* offset, Eigen::Vector3f* sidelengths);
 
-#ifdef BOUNDINGBOX_1D_PROJECTION
-bool GetTSDFSemanticMajorPartOrientedBoundingbox1D(const TSDFHashing* tsdf_volume, int semantic_label, int neighborhood, float thresh_percent,
-                                                   const Eigen::Matrix3f &orientation, Eigen::Vector3f *pmin_pt, Eigen::Vector3f *lengths);
-
-bool ProjectTSDFTo1DHist(const TSDFHashing* tsdf_volume,
-                         int semantic_label,
-                         const Eigen::Matrix3f& orientation,
-                         const Eigen::Vector3f& pmin_pt,
-                         const Eigen::Vector3f& lengths,
-                         const float voxel_length,
-                         std::vector<std::vector<float>>* hist_1d_xyz,
-                         int* total_cnt);
-bool MinimumIntervalWithSemanticLabel(const std::vector<float>& hist_1d, float sum_threshold, int* st, int* ed); // ed: not including.
-#endif
 }

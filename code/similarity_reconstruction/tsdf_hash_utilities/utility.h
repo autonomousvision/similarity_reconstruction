@@ -89,48 +89,13 @@ private:
     float min_model_weight_;
 };
 
-class PCAOptions
-{
-public:
-    Eigen::Vector3i boundingbox_size;
-    float min_model_weight;
-    std::string save_path;
-    float lambda_scale_diff;
-    float lambda_observation;
-    float lambda_reg_rot;
-    float lambda_reg_scale;
-    float lambda_reg_trans;
-    float lambda_reg_zscale;
-    float lambda_outlier;
-    float robust_loss_outlier_threshold;
-//    cpu_tsdf::TSDFHashing tsdf_for_parameters;
-
-//    float voxel_length() { return tsdf_for_parameters.voxel_length(); }
-//    Eigen::Vector3f offset() { return tsdf_for_parameters.offset(); }
-//    float max_dist_pos() { return tsdf_for_parameters.max_dist_pos(); }
-//    float max_dist_neg() { return tsdf_for_parameters.max_dist_neg(); }
-//    float dist_neg_inflection_point() { return tsdf_for_parameters.dist_neg_inflection_point(); }
-//    float neg_inflection_weight() { return tsdf_for_parameters.neg_inflection_weight(); }
-
-
-    float voxel_length;
-    Eigen::Vector3f offset;
-    float max_dist_pos;
-    float max_dist_neg;
-//    float dist_neg_inflection_point;
-//    float neg_inflection_weight;
-
-
-    //float ratio_original_voxel_length_to_unit_cube_vlength;
-};
-
+// deprecated, use tsdf_utility::OrientedBoundingBox for new code
 struct OrientedBoundingBox
 {
     Eigen::Matrix3f bb_orientation;
     Eigen::Vector3f bb_sidelengths;
     Eigen::Vector3f bb_offset;
     Eigen::Vector3f voxel_lengths;
-    // bool is_trainining_sample;
     inline Eigen::Vector3f BoxCenter() const
     {
         return bb_offset + (bb_orientation.col(0) * bb_sidelengths[0] + bb_orientation.col(1) * bb_sidelengths[1] + bb_orientation.col(2) * bb_sidelengths[2])/2.0;
@@ -160,14 +125,6 @@ struct OrientedBoundingBox
         Eigen::Vector3f test = (voxel_lengths.cwiseProduct((voxel_side_lengths).cast<float>() - Eigen::Vector3f::Ones()) - bb_sidelengths);
         CHECK_LE(test.norm(), 1e-4);
     }
-
-    //OrientedBoundingBox JitterSample(float transx, float transy, float angle, const Eigen::Vector3f& scales);
-
-
-//    inline Eigen::Vector3f BoxCenter2Offset(const Eigen::Vector3f& center)
-//    {
-//        return center - (bb_orientation.col(0) * bb_sidelengths[0] + bb_orientation.col(1) * bb_sidelengths[1] + bb_orientation.col(2) * bb_sidelengths[2])/2.0;
-//    }
 };
 
 inline bool VerticeInOBB(const Eigen::Vector3f& point, const OrientedBoundingBox& obb)
@@ -225,8 +182,6 @@ Eigen::SparseMatrix<float, Eigen::ColMajor> SparseVectorsToEigenMat(const std::v
 
 std::vector<Eigen::SparseVector<float>> EigenMatToSparseVectors(const Eigen::SparseMatrix<float, Eigen::ColMajor> & samples);
 
-
-
 inline void ConvertDataMatrixToDataVectors(const Eigen::SparseMatrix<float, Eigen::ColMajor> &data_mat, std::vector<Eigen::SparseVector<float> > *data_vec)
 {
     *data_vec = EigenMatToSparseVectors(data_mat);
@@ -237,19 +192,6 @@ inline void ConvertDataVectorsToDataMat(const std::vector<Eigen::SparseVector<fl
     *data_mat = SparseVectorsToEigenMat(data_vec);
 }
 
-//bool ExtractSamplesFromAffineTransform(
-//        const TSDFHashing &scene_tsdf,
-//        const std::vector<Eigen::Affine3f> &affine_transforms,
-//        const TSDFGridInfo &options,
-//        Eigen::SparseMatrix<float, Eigen::ColMajor> *samples,
-//        Eigen::SparseMatrix<float, Eigen::ColMajor> *weights);
-//
-//bool ExtractOneSampleFromAffineTransform(const TSDFHashing &scene_tsdf,
-//                                         const Eigen::Affine3f &affine_transform,
-//                                         const TSDFGridInfo &options,
-//                                         Eigen::SparseVector<float> *sample,
-//                                         Eigen::SparseVector<float> *weight);
-//
 bool ConvertDataVectorToTSDFWithWeightAndWorldPos(const Eigen::SparseVector<float> &tsdf_data_vec,
         const Eigen::SparseVector<float> &tsdf_weight_vec,
         const TSDFGridInfo& tsdf_info,
@@ -266,25 +208,9 @@ bool ConvertDataVectorToTSDFNoWeight(
         const cpu_tsdf::TSDFGridInfo &options,
         TSDFHashing *tsdf);
 
-bool ConvertDataVectorToTSDFNoWeight(
-        const Eigen::SparseVector<float> &tsdf_data_vec,
-        const PCAOptions &options,
-        TSDFHashing *tsdf);
-
 bool ConvertDataVectorsToTSDFsNoWeight(
         const std::vector<Eigen::SparseVector<float> > &tsdf_data_vec,
         const TSDFGridInfo &options,
-        std::vector<TSDFHashing::Ptr> *tsdfs);
-
-bool ConvertDataVectorsToTSDFsNoWeight(
-        const std::vector<Eigen::SparseVector<float> > &tsdf_data_vec,
-        const PCAOptions &options,
-        std::vector<TSDFHashing::Ptr> *tsdfs);
-
-bool ConvertDataVectorsToTSDFsWithWeight(
-        const std::vector<Eigen::SparseVector<float> > &tsdf_data_vec,
-        const std::vector<Eigen::SparseVector<float> > &tsdf_weight_vec,
-        const PCAOptions &options,
         std::vector<TSDFHashing::Ptr> *tsdfs);
 
 bool ConvertDataVectorsToTSDFsWithWeight(
@@ -293,19 +219,11 @@ bool ConvertDataVectorsToTSDFsWithWeight(
         const TSDFGridInfo &options,
         std::vector<TSDFHashing::Ptr> *tsdfs);
 
-
-bool ConvertDataVectorsToTSDFsWithWeight(
-        const std::vector<Eigen::SparseVector<float> > &tsdf_data,
-        Eigen::SparseMatrix<float, Eigen::ColMajor> &tsdf_weights,
-        const PCAOptions &options,
-        std::vector<TSDFHashing::Ptr> *tsdfs);
-
 bool ConvertDataVectorsToTSDFsWithWeight(
         const std::vector<Eigen::SparseVector<float> > &tsdf_data,
         Eigen::SparseMatrix<float, Eigen::ColMajor> &tsdf_weights,
         const TSDFGridInfo &options,
         std::vector<TSDFHashing::Ptr> *tsdfs);
-
 
 bool ConvertDataMatrixToTSDFs(
         const float voxel_length,
@@ -334,39 +252,6 @@ bool ConvertDataMatrixToTSDFsNoWeight(
         const Eigen::Vector3i &voxel_bounding_box_size,
         const Eigen::SparseMatrix<float, Eigen::ColMajor> &data_mat,
         std::vector<cpu_tsdf::TSDFHashing::Ptr> *projected_tsdf_models);
-
-/*
- * deprecated
-*/
-
-/* deprecated*/
-//bool ExtractSamplesFromAffineTransform(
-//        const TSDFHashing &scene_tsdf,
-//        const std::vector<Eigen::Affine3f> &affine_transforms,
-//        const PCAOptions &options,
-//        Eigen::SparseMatrix<float, Eigen::ColMajor> *samples,
-//        Eigen::SparseMatrix<float, Eigen::ColMajor> *weights);
-//
-///* deprecated*/
-//bool ExtractOneSampleFromAffineTransform(const TSDFHashing &scene_tsdf,
-//                                         const Eigen::Affine3f &affine_transform,
-//                                         const PCAOptions &options,
-//                                         Eigen::SparseVector<float> *sample,
-//                                         Eigen::SparseVector<float> *weight);
-
-/* deprecated*/
-bool ConvertDataVectorToTSDFWithWeightAndWorldPos(const Eigen::SparseVector<float> &tsdf_data_vec,
-        const Eigen::SparseVector<float> &tsdf_weight_vec,
-        const PCAOptions &options,
-        TSDFHashing *tsdf,
-        std::map<int, std::pair<Eigen::Vector3i, Eigen::Vector3f> > *idx_worldpos);
-
-/* deprecated*/
-bool ConvertDataVectorToTSDFWithWeight(
-        const Eigen::SparseVector<float>& tsdf_data_vec,
-        const Eigen::SparseVector<float>& tsdf_weight_vec,
-        const PCAOptions& options,
-        cpu_tsdf::TSDFHashing* tsdf);
 
 void MaskImageSidesAsZero(const int side_width, cv::Mat* image);
 

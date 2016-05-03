@@ -83,7 +83,4 @@ struct OptimizationParams {
     int noise_connected_component_thresh;
 };
 
-cpu_tsdf::PCAOptions OptParams2PCAOptions(const OptimizationParams& params);
-OptimizationParams PCAOptions2OptParams(const cpu_tsdf::PCAOptions& options);
-
 }

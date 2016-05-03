@@ -1,4 +1,5 @@
 /*
+ * Applying an affine transform to the TSDF (moving, rotation, scaling)
  * Chen Zhou (zhouch@pku.edu.cn)
  */
 #include <map>

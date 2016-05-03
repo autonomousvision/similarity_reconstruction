@@ -36,61 +36,6 @@ using namespace bfs;
 
 
 namespace cpu_tsdf {
-//void WriteResultsForICCV(
-//        TSDFHashing::ConstPtr original_scene,
-//        const std::vector<Eigen::Affine3f> &affine_transforms,
-//        const std::vector<Eigen::SparseVector<float> > &model_means,
-//        const std::vector<Eigen::SparseMatrix<float, Eigen::ColMajor> > &model_bases,
-//        const std::vector<Eigen::VectorXf> &projected_coeffs,
-//        const Eigen::SparseMatrix<float, Eigen::ColMajor>& reconstructed_sample_weights,
-//        const std::vector<int> &model_assign_idx,
-//        const PCAOptions& pca_options,
-//        const string &output_dir, const string &file_prefix)
-//{
-//    PCAOptions my_option = pca_options;
-//    static int call_count = 0;
-//    char call_count_str[10] = {'\0'};
-//    sprintf(call_count_str, "%d", call_count);
-
-//    bfs::path write_dir(output_dir);
-//    bfs::create_directory(write_dir);
-//    bfs::path write_prefix = write_dir/file_prefix;
-
-//    // save original scene mesh file
-//    const float mesh_min_weight = my_option.min_model_weight;
-//    cpu_tsdf::WriteTSDFModel(original_scene,
-//                             (write_prefix.replace_extension("original_scene.ply")).string(),
-//                             false, true, mesh_min_weight);
-//    // save all the bounding boxes and cropped tsdfs
-//    my_option.save_path = (write_prefix.replace_extension("obbs.ply")).string();
-//    WriteAffineTransformsAndTSDFs(*original_scene, affine_transforms, my_option);
-//    // save reconstructed samples
-//    cpu_tsdf::TSDFGridInfo grid_info(*original_scene, my_option.boundingbox_size, mesh_min_weight);
-//    std::vector<cpu_tsdf::TSDFHashing::Ptr> reconstructed_samples_original_pos;
-//    cpu_tsdf::ReconstructTSDFsFromPCAOriginPos(
-//            model_means,
-//            model_bases,
-//            projected_coeffs,
-//            reconstructed_sample_weights,
-//            model_assign_idx,
-//            affine_transforms,
-//            grid_info,
-//            original_scene->voxel_length(),
-//            original_scene->offset(),
-//            &reconstructed_samples_original_pos);
-//    cpu_tsdf::WriteTSDFModels(reconstructed_samples_original_pos,
-//                              write_prefix.replace_extension("_frecon_tsdf.ply").string(),
-//                              false, true, mesh_min_weight);
-//    // save merged scene model
-//    cpu_tsdf::TSDFHashing::Ptr copied_scene(new cpu_tsdf::TSDFHashing);
-//    *copied_scene = *original_scene;
-//    cpu_tsdf::MergeTSDFs(reconstructed_samples_original_pos, copied_scene.get());
-//    cpu_tsdf::CleanTSDF(copied_scene, 100);
-//    cpu_tsdf::WriteTSDFModel(copied_scene,
-//                             (write_prefix.replace_extension("_merged_tsdf.ply")).string(),
-//                             true, true, mesh_min_weight);
-//}
-
 
 bool WriteOrientedBoundingboxPly(const OrientedBoundingBox &obb, const std::string &filename)
 {
@@ -161,25 +106,7 @@ bool WriteOrientedBoundingboxesPly(const std::vector<OrientedBoundingBox> &obb, 
         WriteOrientedBoundingboxPly(obb[i], cur_path.replace_extension(tmp_char).string());
     }
 }
-//
-//
-//bool WriteAffineTransformPly(const Eigen::Affine3f &affine, const string &filename)
-//{
-//    OrientedBoundingBox obb;
-//    AffineToOrientedBB(affine, &obb);
-//    WriteOrientedBoundingboxPly(obb, filename);
-//}
-//
-//
-//bool WriteAffineTransformsPly(const std::vector<Eigen::Affine3f> &obbs, const string &filename)
-//{
-//    for (int i = 0; i < obbs.size(); ++i)
-//    {
-//        WriteAffineTransformPly(obbs[i], (bfs::path(filename).replace_extension(utility::int2str(i) + "_obb.ply")).string());
-//    }
-//}
-//
-//
+
 bool WriteOrientedBoundingBoxes(const string &filename, const std::vector<OrientedBoundingBox> obbs, const std::vector<int> sample_model_assign, const std::vector<bool> is_train_sample)
 {
     using namespace std;
@@ -280,11 +207,6 @@ bool ReadOrientedBoundingBoxes(const string &filename, std::vector<OrientedBound
         if (is_train_sample)
             is_train_sample->push_back(is_train);
 
-//        cout << "bb_offset: \n" << cur_box.bb_offset << endl;
-//        cout << "bb_orientation: \n" << cur_box.bb_orientation << endl;
-//        cout << "bb_sidelengths: \n" << cur_box.bb_sidelengths << endl;
-//        cout << "voxel_lengths: \n" << cur_box.voxel_lengths << endl;
-//        cout << "sample_model assign: " << sample_model_assign->back() << endl;
     }
     return true;
 }
@@ -349,8 +271,6 @@ bool WriteTSDFModels(const std::vector<TSDFHashing::Ptr> &tsdf_models,
     }
     return true;
 }
-
-
 
 void WriteTSDFMesh(
         TSDFHashing::ConstPtr tsdf_model,
@@ -448,100 +368,6 @@ bool WriteAffineTransformsAndTSDFs(
     return true;
 }
 
-bool WriteAffineTransformsAndTSDFs(const TSDFHashing &scene_tsdf,
-                           const std::vector<Eigen::Affine3f> &affine_transforms,
-                           const PCAOptions& options,
-                           bool save_text_data)
-{
-    const int sample_num = affine_transforms.size();
-    Eigen::SparseMatrix<float, Eigen::ColMajor> samples;
-    Eigen::SparseMatrix<float, Eigen::ColMajor> weights;
-    cpu_tsdf::TSDFGridInfo grid_info(scene_tsdf, options.boundingbox_size, options.min_model_weight);
-    ExtractSamplesFromAffineTransform(
-            scene_tsdf,
-            affine_transforms,
-            grid_info,
-            &samples,
-            &weights);
-
-    for (int i = 0; i < sample_num; ++i)
-    {
-        bfs::path prefix(options.save_path);
-        std::string cur_save_path = (prefix.parent_path()/prefix.stem()).string() + "_obb_" + boost::lexical_cast<string>(i) + ".ply";
-        // 1. save obb
-        Eigen::Matrix3f test_r;
-        Eigen::Vector3f test_scale;
-        Eigen::Vector3f test_trans;
-        utility::EigenAffine3fDecomposition(
-                    affine_transforms[i],
-                    &test_r,
-                    &test_scale,
-                    &test_trans);
-        WriteOrientedBoundingboxPly(test_r, test_trans - (test_r * test_scale.asDiagonal() * Eigen::Vector3f::Ones(3, 1))/2.0f, test_scale, cur_save_path);
-        // 2. save TSDF
-        TSDFHashing::Ptr cur_tsdf(new TSDFHashing);
-        ConvertDataVectorToTSDFWithWeight(
-        samples.col(i),
-        weights.col(i),
-        options,
-        cur_tsdf.get());
-        string save_path = (prefix.parent_path()/prefix.stem()).string() + "_affinetrans_" + boost::lexical_cast<string>(i) + ".ply";
-        TSDFHashing::Ptr transformed_tsdf(new TSDFHashing);
-        float voxel_len = (scene_tsdf.voxel_length());
-        TransformTSDF(*cur_tsdf, affine_transforms[i], transformed_tsdf.get(), &voxel_len);
-        WriteTSDFModel(transformed_tsdf, save_path, false, true, options.min_model_weight);
-
-        string save_path_canonical = (prefix.parent_path()/prefix.stem()).string() + "_canonical_" + boost::lexical_cast<string>(i) + ".ply";
-        WriteTSDFModel(cur_tsdf, save_path_canonical, false, true, options.min_model_weight);
-
-        // 3. save data vector, weight vector, data world coordinate (all in canonical positions)
-        if (save_text_data)
-        {
-            string text_save_path = (prefix.parent_path()/prefix.stem()).string() + "_textdata_canonical_" + boost::lexical_cast<string>(i) + ".txt";
-            Eigen::MatrixXf save_mat(samples.rows(), 8);
-            save_mat.setZero();
-            save_mat.col(0) = samples.col(i); // data
-            save_mat.col(1) = weights.col(i); // weight
-
-            TSDFHashing tmp_tsdf;
-            std::map<int, std::pair<Eigen::Vector3i, Eigen::Vector3f>> idx_worldpos;
-            ConvertDataVectorToTSDFWithWeightAndWorldPos(samples.col(i),
-                                                         weights.col(i),
-                                                         options,
-                                                         &tmp_tsdf,
-                                                         &idx_worldpos);
-            for (std::map<int, std::pair<Eigen::Vector3i, Eigen::Vector3f>>::const_iterator citr = idx_worldpos.begin(); citr !=  idx_worldpos.end(); ++citr)
-            {
-                CHECK_LT(citr->first, save_mat.rows());
-                save_mat.coeffRef(citr->first, 2 + 0) = (citr->second).first[0];
-                save_mat.coeffRef(citr->first, 2 + 1) = (citr->second).first[1];
-                save_mat.coeffRef(citr->first, 2 + 2) = (citr->second).first[2];
-
-                save_mat.coeffRef(citr->first, 2 + 3) = (citr->second).second[0];
-                save_mat.coeffRef(citr->first, 2 + 4) = (citr->second).second[1];
-                save_mat.coeffRef(citr->first, 2 + 5) = (citr->second).second[2];
-            }
-            utility::WriteEigenMatrix(save_mat, text_save_path);
-        }
-    }
-    return true;
-}
-
-
-//bool WriteObbsAndTSDFs(
-//        const TSDFHashing& scene_tsdf,
-//        const std::vector<OrientedBoundingBox>& obbs,
-//        const Eigen::Vector3i& sample_obb_voxel_size,
-//        const std::string& save_path,
-//        const float vmin_model_weight,
-//        bool save_text_data)
-//{
-//    TSDFGridInfo tsdf_info(scene_tsdf, sample_obb_voxel_size, vmin_model_weight);
-//    std::vector<Eigen::Affine3f> affines;
-//    OBBsToAffines(obbs, &affines);
-//    return WriteAffineTransformsAndTSDFs(scene_tsdf, affines, tsdf_info, save_path, save_text_data);
-//}
-
 void WriteTSDFsFromMatNoWeight(const Eigen::SparseMatrix<float, Eigen::ColMajor> &data_mat, const Eigen::Vector3i &boundingbox_size, const float voxel_length, const Eigen::Vector3f &offset, const float max_dist_pos, const float max_dist_neg, const string &save_filepath)
 {
     std::vector<cpu_tsdf::TSDFHashing::Ptr> projected_tsdf_models;
@@ -631,7 +457,6 @@ bool WriteTSDFFromVectorWithWeight_Matlab(const Eigen::SparseVector<float> &data
         mat = Mat_Create((save_filepath).c_str(), NULL);
         CHECK_NOTNULL(mat);
     }
-//    if(mat)
     {
         cout << "opened mat" << endl;
         /* first matrix */
@@ -647,8 +472,6 @@ bool WriteTSDFFromVectorWithWeight_Matlab(const Eigen::SparseVector<float> &data
         Mat_Close(mat);
         return true;
     }
-//    else
-//        return false;
 }
 
 bool Write3DArrayMatlab(const std::vector<float>& data,
@@ -750,27 +573,6 @@ void ConvertCopyMatlab3DArrayToVector(std::vector<double>* vec, const double* ma
                 (*vec)[(i * ty + j) * tz + k] = matlab_array[cnt];
                 cnt++;
             }
-
-//    double datamat_3d[bbsize[0]][bbsize[1]][bbsize[2]];
-
-//    int cnt = 0;
-//    for(int i=0;i<tx;i++)
-//        for(int j=0;j<ty;j++)
-//            for (int k=0;k<tz;k++)
-//            {
-//                datamat_3d[i][j][k] = (matlab_array)[cnt];
-//                cnt++;
-//            }
-
-//    cnt = 0;
-//    for(int i=0;i<tx;i++)
-//        for(int j=0;j<ty;j++)
-//            for (int k=0;k<tz;k++)
-//            {
-//                // to ensure c++ reads as x, y, z order
-//                c_array[cnt] = datamat_3d[k][j][i];
-//                cnt++;
-//            }
 }
 
 void ConvertCopyMatlabMatrixToEigenVector(Eigen::MatrixXf* mat, const double* matlab_array, const Eigen::Vector2i& bbsize)
@@ -1019,17 +821,5 @@ bool WriteOBBsAndTSDFs(const TSDFHashing &scene_tsdf, const std::vector<tsdf_uti
     }
     return true;
 }
-
-
-
-//bool Write3DArrayMatlab(const Eigen::VectorXf &data, const Eigen::Vector3i &bbsize, const string &varname, const string &save_filepath)
-//{
-//    std::vector<float> stdata(data.size());
-//    for (int i = 0; i < data.size(); ++i)
-//    {
-//        stdata[i] = data.coeff(i);
-//    }
-//    Write3DArrayMatlab(stdata, bbsize, varname, save_filepath);
-//}
 
 } // end namespace cpu_tsdf

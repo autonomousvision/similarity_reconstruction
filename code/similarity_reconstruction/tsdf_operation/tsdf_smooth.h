@@ -1,11 +1,8 @@
 /*
+ *  Functions for smoothing a TSDF.
  * Chen Zhou (zhouch@pku.edu.cn)
  */
 #pragma once
-/**
- *  Functions for smoothing a TSDF.
- */
-//#include <opencv2/opencv.hpp>
 namespace cpu_tsdf
 {
 class TSDFHashing;

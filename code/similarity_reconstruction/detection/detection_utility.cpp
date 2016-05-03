@@ -15,50 +15,6 @@
 #include "obb_intersection.h"
 #include "detect_sample.h"
 
-//bool tsdf_detection::RandomGenerateOneBoundingbox(
-//        const Eigen::Vector3f& min_pt,
-//        const Eigen::Vector3f& max_pt,
-//        const float bottom_z,
-//        const Eigen::Vector3f& side_lengths,
-//        const std::vector<cpu_tsdf::OrientedBoundingBox> &avoided_obbs,
-//        cpu_tsdf::OrientedBoundingBox *bounding_box)
-//{
-//    using namespace std;
-//    Eigen::Vector3f scene_sidelengths = max_pt - min_pt;
-//    int ctry = 0;
-//    for (; ctry < 1000; ++ctry)
-//    {
-//        // x1, y1: center
-//        float x1 = ( (float(rand())/RAND_MAX) * scene_sidelengths[0]) + min_pt[0];
-//        float y1 = ( (float(rand())/RAND_MAX) * scene_sidelengths[1]) + min_pt[1];
-//        static const float angle_resolution = 1.0;
-//        float theta = int( (float(rand())/RAND_MAX) * (360.0/angle_resolution) ) * angle_resolution / 180.0 * M_PI;
-//        NormalizeAngle(&theta);
-
-//        cout << "maxpt: " << max_pt << endl;
-//        cout << "minpt: " << min_pt << endl;
-//        cout << "x1, y1: " << x1 << " " << y1 << endl;
-//        cout << "angle: " << theta << endl;
-
-//        Eigen::Vector3f xyangle(x1, y1, theta);
-//        cpu_tsdf::OrientedBoundingBox cur_bb;
-//        XYAngleToOBB(xyangle, bottom_z + side_lengths[2], side_lengths, &cur_bb);
-//        if(tsdf_test::TestOBBsIntersection(cur_bb, avoided_obbs)) continue;
-
-//        *bounding_box = (cur_bb);
-//        break;
-//    }
-//    if (ctry == 1000)
-//    {
-//        LOG(WARNING) << "tried 1000 times to generate random boxes but failed";
-//        return false;
-//    }
-//    return true;
-//}
-
-
-
-
 namespace tsdf_detection {
 SceneDiscretizeInfo::SceneDiscretizeInfo(const Eigen::Vector2f &rangex, const Eigen::Vector2f &rangey, const Eigen::Vector3f &deltas)
     :rangex_(rangex), rangey_(rangey), deltas_(deltas) {
@@ -150,13 +106,6 @@ void FindCorrectOBBs(const DetectionParams& params, const std::vector<tsdf_utili
         }
     }
 }
-
-//void RemoveCorrectOBBs(const std::vector<tsdf_utility::OrientedBoundingBox> &pos_samples, std::vector<tsdf_utility::OrientedBoundingBox> *detections)
-//{
-//    std::vector<bool> to_remove;
-//    FindCorrectOBBs((*detections), pos_samples, &to_remove);
-//    cpu_tsdf::EraseElementsAccordingToFlags(to_remove, detections);
-//}
 
 void RemoveCorrectDetections(const DetectionParams& params, const SampleCollection &pos_samples, SampleCollection *detections)
 {
@@ -319,20 +268,5 @@ void StepSizeFromOBB(const Eigen::Vector3f &side_lengths, float &delta_x, float 
         delta_x = 0.5; delta_y = 0.5; delta_rotation = 1 / 180.0 * M_PI;
     }
 }
-
-
-
-//bool FindIntersectionOBB(const tsdf_utility::OrientedBoundingBox &obb, const std::vector<tsdf_utility::OrientedBoundingBox> &to_match, int *matched_idx)
-//{
-//    *matched_idx = -1;
-//    *intersect_area = 0;
-//    for (int i = 0; i < to_match.size(); ++i) {
-//        if (tsdf_test::TestOBBIntersection(obb, to_match[i])) {
-//           *matched_idx = i;
-//        }
-//    }
-//    return *matched_idx >= 0;
-//}
-
 
 }

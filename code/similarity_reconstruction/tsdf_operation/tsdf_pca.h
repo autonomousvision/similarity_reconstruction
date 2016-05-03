@@ -1,4 +1,5 @@
 /*
+ * Performing PCA on TSDF samples
  * Chen Zhou (zhouch@pku.edu.cn)
  */
 #pragma once
@@ -71,18 +72,6 @@ bool PCAReconstructionResult(
         const std::vector<int> &model_assign_idx,
         std::vector<Eigen::SparseVector<float> > *reconstructed_samples);
 
-bool OptimizeModelAndCoeff(const Eigen::SparseMatrix<float, Eigen::ColMajor>& samples,
-        const Eigen::SparseMatrix<float, Eigen::ColMajor>& weights,
-        const std::vector<int>& model_assign_idx,
-        const std::vector<double>& outlier_gammas,
-        const int component_num, const int max_iter,
-        std::vector<Eigen::SparseVector<float>> * model_means,
-        std::vector<Eigen::SparseVector<float> > *model_mean_weight,
-        std::vector<Eigen::SparseMatrix<float, Eigen::ColMajor>> *model_bases,
-        std::vector<Eigen::VectorXf> * projected_coeffs,
-        PCAOptions &options
-        );
-
 bool OptimizeModelAndCoeff(
         const Eigen::SparseMatrix<float, Eigen::ColMajor> &samples,
         const Eigen::SparseMatrix<float, Eigen::ColMajor> &weights,
@@ -94,34 +83,6 @@ bool OptimizeModelAndCoeff(
         std::vector<Eigen::SparseMatrix<float, Eigen::ColMajor> > *model_bases,
         std::vector<Eigen::VectorXf> *projected_coeffs,
         tsdf_utility::OptimizationParams& params);
-
-bool GrassmanAverageWeightedZC_CallProgram(
-        const Eigen::SparseMatrix<float, Eigen::ColMajor>& samples,
-        const Eigen::SparseMatrix<float, Eigen::ColMajor>& weights,
-        const int component_num, const int percentage_to_trim,
-        Eigen::SparseVector<float> *mean_mat,
-        Eigen::SparseVector<float>* mean_weight,
-        Eigen::SparseMatrix<float, Eigen::ColMajor> *base_mat,
-        Eigen::MatrixXf *coeff_mat,
-        const PCAOptions& options);
-
-bool RPCAMJB_WeightedZC_CallProgram(
-        const Eigen::SparseMatrix<float, Eigen::ColMajor>& samples,
-        const Eigen::SparseMatrix<float, Eigen::ColMajor>& weights,
-        const int component_num, const Eigen::Vector3i data_dim_size,
-        Eigen::SparseVector<float> *mean_mat,
-        Eigen::SparseVector<float>* mean_weight,
-        Eigen::SparseMatrix<float, Eigen::ColMajor> *base_mat,
-        Eigen::MatrixXf *coeff_mat,
-        const PCAOptions& options);
-
-bool WeightedPCADeflationOrthogonal(const Eigen::SparseMatrix<float, Eigen::ColMajor>& samples,
-        const Eigen::SparseMatrix<float, Eigen::ColMajor>& weights,
-        const int component_num, const int max_iter,
-        Eigen::SparseVector<float> *mean_mat, Eigen::SparseVector<float> *mean_weight,
-        Eigen::SparseMatrix<float, Eigen::ColMajor> *base_mat,
-        Eigen::MatrixXf *coeff_mat,
-        const PCAOptions& options);
 
 bool WeightedPCADeflationOrthogonal(const Eigen::SparseMatrix<float, Eigen::ColMajor>& samples,
                 const Eigen::SparseMatrix<float, Eigen::ColMajor>& weights,

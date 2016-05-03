@@ -10,7 +10,6 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/is_bitwise_serializable.hpp>
-//#include <boost/serialization/unordered_map.hpp>
 #include <opencv2/opencv.hpp>
 
 #include "voxel_data.h"
@@ -58,7 +57,6 @@ namespace cpu_tsdf {
       struct { int x; int y; int z; };
       int pos[3];
       inline int operator [] (int idx) const { return pos[idx]; }
-      //inline int& operator [] (int idx) { return pos[idx]; }
       inline cv::Vec3i ToCvVec3i() const { return cv::Vec3i(x, y, z); }
       explicit BrickPosition(const cv::Vec3i& vpos) : x(vpos[0] & kBrickPosMask), y(vpos[1] & kBrickPosMask), z(vpos[2] & kBrickPosMask) {}
       BrickPosition(int vx, int vy, int vz) : x(vx & kBrickPosMask), y(vy & kBrickPosMask), z(vz & kBrickPosMask) {}
@@ -235,27 +233,6 @@ namespace cpu_tsdf {
       _VoxelHashMapItr itr_;
       unsigned short ix_, iy_, iz_;
 
-//      inline void RetriveData(cv::Vec3i* pos, float* d, float* w, cv::Vec3b* color) const
-//      {
-//        *pos = cv::Vec3i(itr_->first.x + ix_, itr_->first.y + iy_, itr_->first.z + iz_);
-//        (itr_->second).RetriveData(cv::Vec3i(ix_, iy_, iz_), d, w, color);
-//      }
-//      inline void RetriveData(cv::Vec3i* pos, float* d, float* w, cv::Vec3b* color, VoxelData::VoxelState* st) const
-//      {
-//        *pos = cv::Vec3i(itr_->first.x + ix_, itr_->first.y + iy_, itr_->first.z + iz_);
-//        (itr_->second).RetriveData(cv::Vec3i(ix_, iy_, iz_), d, w, color, st);
-//      }
-
-//      inline bool SetTSDFValue(float d, float w, const cv::Vec3b& color,
-//                               float max_dist_pos, float max_dist_neg)
-//      {
-//        return (itr_->second).SetTSDFValue(cv::Vec3i(ix_, iy_, iz_), d, w, color, max_dist_pos, max_dist_neg);
-//      }
-//      inline bool SetTSDFValue(float d, float w, const cv::Vec3b& color,
-//                               const VoxelData::VoxelState& st, float max_dist_pos, float max_dist_neg)
-//      {
-//        return (itr_->second).SetTSDFValue(cv::Vec3i(ix_, iy_, iz_), d, w, color, st, max_dist_pos, max_dist_neg);
-//      }
     };
     typedef VoxelIterator<VoxelData, VoxelData*, VoxelData&, voxel_hashing_type_iterator>  iterator;
     typedef VoxelIterator<VoxelData, const VoxelData*, const VoxelData&, voxel_hashing_type_const_iterator> const_iterator;
@@ -264,68 +241,7 @@ namespace cpu_tsdf {
     iterator end() { return iterator(voxel_hash_map_.end(), 0, 0, 0); }
     const_iterator end() const { return const_iterator(voxel_hash_map_.end(), 0, 0, 0); }
 
-
-//    class ConstVoxelIterator
-//    {
-//    public:
-//      ConstVoxelIterator(VoxelHashMap::voxel_hashing_type_const_iterator citr,
-//                         unsigned short vx,
-//                         unsigned short vy,
-//                         unsigned short vz) : citr_(citr), ix_(vx), iy_(vy), iz_(vz)
-//      {
-//        assert(ix_ < kBrickSideLength);
-//        assert(iy_ < kBrickSideLength);
-//        assert(iz_ < kBrickSideLength);
-//      }
-//      ConstVoxelIterator& operator++()
-//      {
-//        if(iz_ < kBrickSideLength - 1)
-//          {
-//            iz_++;
-//          }
-//        else if (iy_ < kBrickSideLength - 1)
-//          {
-//            iz_ = 0;
-//            iy_++;
-//          }
-//        else if (ix_ < kBrickSideLength - 1)
-//          {
-//            iy_ = iz_ = 0;
-//            ix_++;
-//          }
-//        else
-//          {
-//            ix_ = iy_ = iz_ = 0;
-//            citr_++;
-//          }
-//        //printf("(%d %d %d)\n", ix_, iy_, iz_);
-//        return *this;
-//      }  // pre
-//      bool operator !=(const ConstVoxelIterator& rhs)
-//      {
-//        return this->citr_ != rhs.citr_ || this->ix_ != rhs.ix_ || this->iy_ != rhs.iy_ || this->iz_ != rhs.iz_;
-//      }
-//      inline void RetriveData(cv::Vec3i* pos, float* d, float* w, cv::Vec3b* color) const
-//      {
-//        *pos = cv::Vec3i(citr_->first.x + ix_, citr_->first.y + iy_, citr_->first.z + iz_);
-//        (citr_->second).RetriveData(cv::Vec3i(ix_, iy_, iz_), d, w, color);
-//      }
-//      inline void RetriveData(cv::Vec3i* pos, float* d, float* w, cv::Vec3b* color, VoxelData::VoxelState* st, int* semantic_label) const
-//      {
-//        *pos = cv::Vec3i(citr_->first.x + ix_, citr_->first.y + iy_, citr_->first.z + iz_);
-//        (citr_->second).RetriveData(cv::Vec3i(ix_, iy_, iz_), d, w, color, st, semantic_label);
-//      }
-
-//    private:
-//      VoxelHashMap::voxel_hashing_type_const_iterator citr_;
-//      unsigned short ix_, iy_, iz_;
-//    };
-//    ConstVoxelIterator begin() const { return ConstVoxelIterator(voxel_hash_map_.begin(), 0, 0, 0); }
-//    ConstVoxelIterator end() const { return ConstVoxelIterator(voxel_hash_map_.end(), 0, 0, 0); }
-
     VoxelHashMap(): min_pt_(INT_MAX, INT_MAX, INT_MAX), max_pt_(INT_MIN, INT_MIN, INT_MIN) {}
-
-
 
     static inline float getVoxelMaxWeight() { return VoxelData::max_weight; }
     inline bool SetTSDFValue(const cv::Vec3i& voxel_coord,
@@ -422,14 +338,6 @@ namespace cpu_tsdf {
       return (itr != voxel_hash_map_.end());
     }
 
-//    inline BrickData& RetriveBrickData(const cv::Vec3i& pos)
-//    {
-//      const BrickPosition cur_brick_voxel(pos);
-//      min_pt_ = min_vec3(cur_brick_voxel.ToCvVec3i(), min_pt_);
-//      max_pt_ = max_vec3(cur_brick_voxel.ToCvVec3i() + cv::Vec3i(kBrickSideLength, kBrickSideLength, kBrickSideLength), max_pt_);
-//      return voxel_hash_map_[cur_brick_voxel];
-//    }
-
     inline bool RetriveData(const cv::Vec3i& voxel_coord, float* d, float* w, cv::Vec3b* color, VoxelData::VoxelState* st = NULL) const
     {
       static const unsigned int kNotAndMask32 = ~kBrickPosMask;
@@ -454,28 +362,6 @@ namespace cpu_tsdf {
     {
       return bdata.RetriveData(brick_offset, pd, pw, pcolor, st);
     }
-
-//    inline bool Find(const cv::Vec3i& voxel_coord, const BrickPosition** pos, const BrickData** data) const
-//    {
-//      voxel_hashing_type_const_iterator itr = voxel_hash_map_.find(BrickPosition(voxel_coord));
-//      if(itr != voxel_hash_map_.end())
-//        {
-//          *pos = &(itr->first);
-//          *data = &(itr->second);
-//        }
-//      return (itr != voxel_hash_map_.end());
-//    }
-
-//    inline bool Find(const cv::Vec3i& voxel_coord, const BrickPosition** pos, BrickData** data)
-//    {
-//      voxel_hashing_type_iterator itr = voxel_hash_map_.find(BrickPosition(voxel_coord));
-//      if(itr != voxel_hash_map_.end())
-//        {
-//          *pos = &(itr->first);
-//          *data = &(itr->second);
-//        }
-//      return (itr != voxel_hash_map_.end());
-//    }
 
     void DisplayHashMapInfo() const;
 
@@ -513,14 +399,6 @@ namespace cpu_tsdf {
         }
     }
 
-    inline void RemoveDuplicateSurfaceTSDF(float min_mesh_weight)
-    {
-        for(iterator citr = (this)->begin(); citr != (this)->end(); ++citr)
-        {
-            citr->RemoveDuplicateSurfaceTSDF(min_mesh_weight);
-        }
-    }
-
     inline void SetAllTSDFWeightToOne()
     {
         for(iterator citr = (this)->begin(); citr != (this)->end(); ++citr)
@@ -528,8 +406,6 @@ namespace cpu_tsdf {
             citr->SetAllTSDFWeightToOne();
         }
     }
-
-    //inline const voxel_hashing_type& getVoxelHashMap() const { return voxel_hash_map_; }
 
     inline void Clear()
     {
@@ -547,5 +423,4 @@ namespace cpu_tsdf {
   };
 }  // namespace cpu_tsdf
 
-//BOOST_IS_BITWISE_SERIALIZABLE(cpu_tsdf::VoxelHashMap::BrickPosition)
 BOOST_CLASS_IMPLEMENTATION(cpu_tsdf::VoxelHashMap::BrickPosition,boost::serialization::object_serializable)

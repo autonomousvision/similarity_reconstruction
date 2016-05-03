@@ -1,10 +1,8 @@
 /*
+ * Marching cubes for TSDF representation, core part from PCL library.
  * Chen Zhou (zhouch@pku.edu.cn)
  */
 #pragma once
-/**
-  * Marching cubes for TSDF representation, core part from PCL library.
-  */
 #include <pcl/surface/marching_cubes.h>
 #include <pcl/surface/impl/marching_cubes.hpp>
 

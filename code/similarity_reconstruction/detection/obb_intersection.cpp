@@ -26,31 +26,6 @@ bool OBBOverlap
         VECTOR*	B	//orthonormal basis
 );
 
-bool TestOBBsIntersection3D(const cpu_tsdf::OrientedBoundingBox &obb, const std::vector<cpu_tsdf::OrientedBoundingBox> &test_obbs)
-{
-    for (int i = 0; i < test_obbs.size(); ++i)
-    {
-        if (TestOBBIntersection3D(obb, test_obbs[i]))
-            return true;
-    }
-    return false;
-}
-
-
-bool TestOBBIntersection3D(const cpu_tsdf::OrientedBoundingBox &a, const cpu_tsdf::OrientedBoundingBox &b)
-{
-    Eigen::Vector3f extent_a = a.bb_sidelengths/2.0;
-    Eigen::Vector3f pos_a = a.bb_offset + a.bb_orientation * extent_a;
-    Eigen::Vector3f basis_a[3] = {a.bb_orientation.col(0), a.bb_orientation.col(1), a.bb_orientation.col(2)};
-
-    Eigen::Vector3f extent_b = b.bb_sidelengths/2.0;
-    Eigen::Vector3f pos_b = b.bb_offset + b.bb_orientation * extent_b;
-    Eigen::Vector3f basis_b[3] = {b.bb_orientation.col(0), b.bb_orientation.col(1), b.bb_orientation.col(2)};
-
-    return OBBOverlap(extent_a, pos_a, basis_a,
-                      extent_b, pos_b, basis_b);
-}
-
 bool TestOBBsIntersection3D(const tsdf_utility::OrientedBoundingBox &obb, const std::vector<tsdf_utility::OrientedBoundingBox> &test_obbs)
 {
     for (int i = 0; i < test_obbs.size(); ++i)
@@ -72,67 +47,14 @@ bool TestOBBIntersection3D(
     Eigen::Vector3f basis_a[3] = {orient_a.col(0), orient_a.col(1), orient_a.col(2)};
 
     Eigen::Vector3f extent_b = b.SideLengths()/2.0;
-    // Eigen::Vector3f pos_b = b.Offset()+ b.Orientbtions() * extent_b;
     Eigen::Vector3f pos_b = b.Offset()+ b.Orientations() * extent_b;
     Eigen::Matrix3f orient_b = b.Orientations();
     Eigen::Vector3f basis_b[3] = {orient_b.col(0), orient_b.col(1), orient_b.col(2)};
 
-    //Eigen::Vector3f extent_b = b.SideLengths()/2.0;
-    //Eigen::Vector3f pos_b = b.bb_offset + b.bb_orientation * extent_b;
-    //Eigen::Vector3f basis_b[3] = {b.bb_orientation.col(0), b.bb_orientation.col(1), b.bb_orientation.col(2)};
 
     return OBBOverlap(extent_a, pos_a, basis_a,
                       extent_b, pos_b, basis_b);
 }
-
-
-bool OBBsLargeOverlapArea(const cpu_tsdf::OrientedBoundingBox &obb1, const std::vector<cpu_tsdf::OrientedBoundingBox> &obbs, int *intersected_box, float *intersect_area, const float thresh)
-{
-    float fintersect_area = 0;
-    for (int i = 0; i < obbs.size(); ++i)
-    {
-        float cur_area = OBBOverlapArea(obb1, obbs[i]) ;
-        if (cur_area > thresh)
-        {
-            if (cur_area > fintersect_area)
-            {
-                fintersect_area = cur_area;
-                if (intersected_box) *intersected_box = i;
-            }
-        }
-    }
-    if (fintersect_area > 0)
-    {
-        if (intersect_area) *intersect_area = fintersect_area;
-        return true;
-    }
-    else
-    {
-        if (intersect_area) *intersect_area = 0;
-        if (intersected_box) *intersected_box = -1;
-        return false;
-    }
-
-}
-
-
-double OBBOverlapArea(const cpu_tsdf::OrientedBoundingBox &obb1, const cpu_tsdf::OrientedBoundingBox &obb2)
-{
-    if (!TestOBBIntersection3D(obb1, obb2)) return 0;
-    Eigen::Matrix4f Tr1, Tr2;
-    Tr1.setZero();
-    Tr1.block(0, 0, 3, 3) = obb1.bb_orientation * obb1.bb_sidelengths.asDiagonal();
-    Tr1.block(0, 3, 3, 1) = obb1.BoxCenter();
-    Tr1(3, 3) = 1;
-
-    Tr2.setZero();
-    Tr2.block(0, 0, 3, 3) = obb2.bb_orientation * obb2.bb_sidelengths.asDiagonal();
-    Tr2.block(0, 3, 3, 1) = obb2.BoxCenter();
-    Tr2(3, 3) = 1;
-
-    return (unitOverlap(Tr1.inverse() * Tr2) + unitOverlap(Tr2.inverse() * Tr1))/2.0;
-}
-
 
 double unitOverlap(const Eigen::Matrix4f &Tr)
 {
@@ -357,7 +279,6 @@ boxes overlap. */
 the two boxes overlap */
 
     return true;
-
 }
 
 

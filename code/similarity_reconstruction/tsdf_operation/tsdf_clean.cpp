@@ -147,30 +147,6 @@ bool FilterTriangle(const std::vector<int>& connected_components, const int comp
     return true;
 }
 
-//void FilterTriangleLargest(const std::vector<int>& connected_components, const int comp_num, std::vector<bool>* reserved_tri)
-//{
-//    vector<int> component_sizes = ComponentSizes(comp_num, connected_components);
-//    int thresh = std::max_element(component_sizes.begin(), component_sizes.end());
-//    reserved_tri->resize(connected_components.size());
-//    for (int i = 0; i < connected_components.size(); ++i)
-//    {
-//        if (component_sizes[connected_components[i]] < thresh)
-//        {
-//            connected_components[i] = false;
-//        }
-//    }
-//}
-
-
-
-
-
-
-
-//void CleanVoxelsSample(
-//        const std::vector<Eigen::Vector3i>& removed_voxels,
-//        )
-
 }
 
 namespace cpu_tsdf {
@@ -344,8 +320,6 @@ void ComputeRemovedVoxelsFromRemovedTris(
             {
                 cv::Vec3f voxel_coord = tsdf->World2Voxel( utility::PCLPoint2CvVec(points->at(v.vertices[j])) );
                 cv::Vec3i voxel_coord_int = utility::round(voxel_coord);
-//                static const int neighborst = -1;
-//                static const int neighbored = 2;
                 for (int x = neighborst; x < neighbored; ++x)
                     for (int y = neighborst; y < neighbored; ++y)
                         for (int z = neighborst; z < neighbored; ++z)
@@ -405,19 +379,7 @@ bool CleanNoiseInSamples(
     Eigen::SparseMatrix<float, Eigen::ColMajor>& weights = *pweights;
     valid_obs_weight_mat->resize(pweights->rows(), pweights->cols());
     valid_obs_weight_mat->setZero();
-    // copy to valid_obs_weight_mat
-    //std::vector<Eigen::Triplet<float>> trip_vec;
-    //trip_vec.reserve(weights.nonZeros());
-    //for (int k=0; k<weights.outerSize(); ++k)
-    //  for (Eigen::SparseMatrix<float, Eigen::ColMajor>::InnerIterator it(weights,k); it; ++it)
-    //  {
-    //      if (it.value() > 1e-5)
-    //      {
-    //          trip_vec.push_back(Eigen::Triplet<float>(it.row(), it.col(), cpu_tsdf::TSDFHashing::getVoxelMaxWeight()));
-    //      }
-    //  }
-    //valid_obs_weight_mat->setFromTriplets(trip_vec.begin(), trip_vec.end());
-    // const int sample_number = samples.cols();
+
     const int feature_dim = samples.rows();
     const int model_number = *(std::max_element(model_assign_idx.begin(), model_assign_idx.end())) + 1;
     vector<vector<int>> cluster_sample_idx;
@@ -492,8 +454,6 @@ bool CleanNoiseInSamplesOneCluster(
     }
     // cpu_tsdf::Write3DArrayMatlab(obs_counter, options.boundingbox_size, "obs_counter", options.save_path);
     cout << "finished setting zeros" << endl;
-//    char ch;
-//    cin >> ch;
     weights->prune(weight_thresh, 1);
     return true;
 }

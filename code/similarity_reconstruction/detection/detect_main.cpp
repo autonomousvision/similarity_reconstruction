@@ -7,12 +7,8 @@
 #include <time.h>
 #include <cstdlib>
 
-#include <pcl/console/print.h>
-#include <pcl/console/time.h>
-#include <pcl/visualization/cloud_viewer.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/io/ply_io.h>
-#include <pcl/io/vtk_lib_io.h>
 #include <pcl/pcl_macros.h>
 #include <boost/format.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -26,7 +22,6 @@
 #include <glog/logging.h>
 
 #include "tsdf_operation/tsdf_slice.h"
-// #include "tsdf_operation//tsdf_feature_generate.h"
 #include "tsdf_representation/tsdf_hash.h"
 #include "marching_cubes/marching_cubes_tsdf_hash.h"
 #include "common/utilities/pcl_utility.h"

@@ -1,6 +1,3 @@
-/*
- * Chen Zhou (zhouch@pku.edu.cn)
- */
 #pragma once
 /*--------------------------------------------------------------------
 2D OBB Intersection

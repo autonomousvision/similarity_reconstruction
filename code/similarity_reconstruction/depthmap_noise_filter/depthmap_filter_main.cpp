@@ -21,80 +21,10 @@
 namespace bfs = boost::filesystem;
 using namespace std;
 
-// std::vector<string> ListFiles(const std::string& dir_name)
-// {
-//     DIR *dir;
-//     struct dirent *ent;
-//     vector<string> res;
-//     if ((dir = opendir (dir_name.c_str())) != NULL)
-//     {
-//         /* print all the files and directories within directory */
-//         while ((ent = readdir (dir)) != NULL)
-//         {
-//             //printf ("%s\n", ent->d_name);
-//             res.push_back(ent->d_name);
-//         }
-//         closedir (dir);
-//     }
-//     else
-//     {
-//         /* could not open directory */
-//         fprintf(stderr, "%s\n", "Directory doe not exist.");
-//     }
-//     std::sort( res.begin(), res.end() );
-//     return res;
-// }
-
 inline bool FileExists(const std::string& filepath)
 {
-//     struct stat buffer;
-//     return (stat(filepath.c_str(), &buffer) == 0);
 	return bfs::exists(filepath);
 }
-
-//void ReadDepthMaps(const std::vector<std::string>& filelist,
-//                   std::vector<std::unique_ptr<cv::Mat>>& depthmaps)
-//{
-//    depthmaps.clear();
-//    for(int i=0; i < filelist.size(); ++i)
-//    {
-//        depthmaps.push_back(std::unique_ptr<cv::Mat>(new cv::Mat(cv::imread(filelist[i], -1))));
-//    }
-//}
-//
-//void ReadImages(const std::vector<std::string>& filelist,
-//                   std::vector<std::unique_ptr<cv::Mat>>& images)
-//{
-//    images.clear();
-//    for(int i=0; i < filelist.size(); ++i)
-//    {
-//        images.push_back(std::unique_ptr<cv::Mat>(new cv::Mat(cv::imread(filelist[i]))));
-//    }
-//}
-
-// void ReadCameraInfos(const std::vector<std::string>& param_filelist,
-//                      std::vector<RectifiedCameraPair>& cam_infos)
-// {
-//     cam_infos.clear();
-//     for (int i = 0; i < param_filelist.size(); ++i)
-//     {
-//         const string& cur_param_file = param_filelist[i];
-//         //cout << cur_param_file << endl;
-//         std::ifstream cur_param_ifstream;
-//         cur_param_ifstream.open(cur_param_file);
-//         if (!cur_param_ifstream.is_open())
-//         {
-//             fprintf(stderr,"\nERROR: Could not open File %s", cur_param_file.c_str());
-//             exit(1);
-//         }
-//         else
-//         {
-//             RectifiedCameraPair new_pair;
-//             cur_param_ifstream >> new_pair;
-//             cam_infos.push_back(new_pair);
-//         }
-//     }
-// }
 
 bool AppendFilesOfOneFrameBoth(const string& param_dir,
                                int cur_frame,
@@ -224,8 +154,6 @@ bool ConstructFileLists2(const string& param_dir, int cur_frame, std::vector<std
     {
         if (i == cur_frame) continue;
         AppendFilesOfOneFrame2(param_dir, i, param_filelist, 3);
-        //AppendFilesOfOneFrameBoth(param_dir, i, param_filelist, 1);
-        //AppendFilesOfOneFrameBoth(param_dir, i, param_filelist, 1);
     }
     return true;
 }
@@ -235,7 +163,6 @@ std::string FindCorrespondingOtherFile(const std::string& param_file, const std:
     using namespace boost::filesystem;
     path basename = path(param_file).stem();
     return std::string(depth_dir + "/" + basename.string() + ".png");
-    //return std::string(depth_dir + "/" + basename.string() + ".png");
 }
 
 void FindCorrespondingOtherFiles(const std::vector<std::string>& param_files, const std::string& depth_dir, std::vector<std::string>& depth_files)
@@ -346,7 +273,6 @@ int main(int argc, char *argv[])
                 cam_infos[j].SetVoxelScalingParameters(cv::Vec3d(0,0,0),
                                                        1.0,
                                                        depth_image_scaling_factor, maxCamDistance);
-                //cam_infos[j].InitializeBackProjectionBuffers(depth_maps[j]->cols, depth_maps[j]->rows);
             }
             for (int di = 0; di < cam_infos.size(); ++di)
             {
@@ -363,19 +289,7 @@ int main(int argc, char *argv[])
             vector<cv::Vec3d> points3d;
             vector<cv::Vec3i> pointscolor;
             assert(images.size() == cam_infos.size());
-//            DebugPointCloud(cam_infos, depth_maps, images, maxCamDistance, points3d, pointscolor);
-//            WritePointCloudToFile("test_zc_3dptcloud.asc", points3d, pointscolor);
 
-//            SimpleFusionDisparity(cam_infos, depth_maps, &fusioned_map, &confidence_map, maxCamDistance, param_filelist, image_filelist, 0.5);
-//            {
-//            cv::Mat_<unsigned short> depth_map_16b;
-//            fusioned_map.convertTo(depth_map_16b, CV_16UC1, 1.0/depth_image_scaling_factor);
-//            cv::Mat_<unsigned short> conf_map_16b;
-//            confidence_map.convertTo(conf_map_16b, CV_16UC1, 1.0*65535);
-//            using namespace boost::filesystem;
-//            imwrite(depth_output_dir + path(param_filelist[0]).stem().string() + "-withreproj.png", depth_map_16b);
-//            imwrite(conf_output_dir + path(param_filelist[0]).stem().string() + "-withreproj.png", conf_map_16b);
-//            }
            // SimpleFusionDisparity_onlyrefsupport(cam_infos, depth_maps, &fusioned_map, &confidence_map, maxCamDistance, param_filelist, image_filelist, support_thresh);
             Fusion_SphericalError(cam_infos, depth_maps, &fusioned_map, &confidence_map, maxCamDistance, param_filelist, image_filelist, support_thresh);
             std::cout << "visibility fusion for " << i << " finished..." << std::endl;

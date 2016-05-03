@@ -50,8 +50,6 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 
-// #include <pcl/point_cloud.h>
-// #include <pcl/point_types.h>
 #include <Eigen/Eigen>
 #include <opencv2/opencv.hpp>
 #include <glog/logging.h>
@@ -84,12 +82,6 @@ namespace cpu_tsdf
       ar & max_dist_pos_;
       ar & max_dist_neg_;
       ar & neighbor_adding_limit_;
-//      if (version > 0)
-//      {
-//          ar & dist_neg_inflection_point_;
-//          ar & neg_inflection_weight_;
-//          ar & dist_neg_delta_point_;
-//      }
     }
   public:
     typedef boost::shared_ptr<TSDFHashing> Ptr;
@@ -149,13 +141,7 @@ namespace cpu_tsdf
 
     void CopyHashParametersFrom(const cpu_tsdf::TSDFHashing& tsdf);
     void Init(float voxel_length, const Eigen::Vector3f& offset, float max_dist_pos, float max_dist_neg);
-    // void Init(float voxel_length, const Eigen::Vector3f& offset, float max_dist_pos, float max_dist_neg, float vneg_inflection_dist, float vneg_inflection_weight);
     ~TSDFHashing(){};
-
-    inline void RemoveDuplicateSurfaceTSDF(float min_mesh_weight)
-    {
-       voxel_hash_map_.RemoveDuplicateSurfaceTSDF(min_mesh_weight);
-    }
 
     inline void SetAllTSDFWeightToOne()
     {
@@ -163,8 +149,6 @@ namespace cpu_tsdf
     }
 
     static inline float getVoxelMaxWeight() { return VoxelHashMap::getVoxelMaxWeight(); }
-
-    //int BlockNumber() const { return voxel_hash_map_.
 
     // 1. Integrating a new depth map (with confidence & RGB image and optionally semantic_labels) into
     // the 3D TSDF representation
@@ -373,11 +357,6 @@ namespace cpu_tsdf
     inline Eigen::Vector3f offset() const { return offset_; }
     inline void offset(const Eigen::Vector3f& v) { offset_ = v; }
 
-//    inline float dist_neg_inflection_point() const { return dist_neg_inflection_point_; }
-//    inline void dist_neg_inflection_point(float vdist_neg_inflection_point) { dist_neg_inflection_point_ = vdist_neg_inflection_point; }
-//    inline float neg_inflection_weight() const { return neg_inflection_weight_; }
-//    inline void neg_inflection_weight(int vneg_inflection_weight) { neg_inflection_weight_ = vneg_inflection_weight; }
-
     inline int brick_neighbor_adding_limit() { return neighbor_adding_limit_; }
 
     inline void setDepthTruncationLimits (float max_dist_pos, float max_dist_neg)
@@ -439,72 +418,6 @@ namespace cpu_tsdf
     }
     void Clear() { voxel_hash_map_.Clear(); }
 
-
-
-//    class TSDFHashingVoxelIterator
-//    {
-//    public:
-//      TSDFHashingVoxelIterator(VoxelHashMap::VoxelIterator itr, float max_dist_pos, float max_dist_neg) :
-//        itr_(itr), max_dist_pos_(max_dist_pos), max_dist_neg_(max_dist_neg) {}
-//      TSDFHashingVoxelIterator& operator++() { ++itr_; return *this; }  // pre
-//      bool operator != (const TSDFHashingVoxelIterator& rhs) { return this->itr_ != rhs.itr_; }
-//      inline void RetriveData(cv::Vec3i* pos, float* d, float* w, cv::Vec3b* color) const
-//      {
-//        itr_.RetriveData(pos, d, w, color);
-//      }
-//      inline void RetriveData(cv::Vec3i* pos, float* d, float* w, cv::Vec3b* color, VoxelData::VoxelState* st) const
-//      {
-//        itr_.RetriveData(pos, d, w, color, st);
-//      }
-//      inline bool SetTSDFValue(float d, float w, const cv::Vec3b& color)
-//      {
-//        return itr_.SetTSDFValue(d, w, color, max_dist_pos_, max_dist_neg_);
-//      }
-//      inline bool SetTSDFValue(float d, float w, const cv::Vec3b& color, const VoxelData::VoxelState& st)
-//      {
-//        return itr_.SetTSDFValue(d, w, color, st, max_dist_pos_, max_dist_neg_);
-//      }
-//    private:
-//      VoxelHashMap::VoxelIterator itr_;
-//      float max_dist_pos_;
-//      float max_dist_neg_;
-//    };
-//    TSDFHashingVoxelIterator begin()
-//    {
-//      return TSDFHashingVoxelIterator(voxel_hash_map_.begin(), max_dist_pos_, max_dist_neg_);
-//    }
-//    TSDFHashingVoxelIterator end()
-//    {
-//      return TSDFHashingVoxelIterator(voxel_hash_map_.end(), max_dist_pos_, max_dist_neg_);
-//    }
-
-//    class TSDFHashingConstVoxelIterator
-//    {
-//    public:
-//      TSDFHashingConstVoxelIterator(VoxelHashMap::ConstVoxelIterator citr) :
-//        citr_(citr) {}
-//      TSDFHashingConstVoxelIterator& operator++() { ++citr_; return *this; }  // pre
-//      bool operator != (const TSDFHashingConstVoxelIterator& rhs) { return this->citr_ != rhs.citr_; }
-//      inline void RetriveData(cv::Vec3i* pos, float* d, float* w, cv::Vec3b* color) const
-//      {
-//        citr_.RetriveData(pos, d, w, color);
-//      }
-//      inline void RetriveData(cv::Vec3i* pos, float* d, float* w, cv::Vec3b* color, VoxelData::VoxelState* st, int* semantic_label = NULL) const
-//      {
-//        citr_.RetriveData(pos, d, w, color, st, semantic_label);
-//      }
-//    private:
-//      VoxelHashMap::ConstVoxelIterator citr_;
-//    };
-//    TSDFHashingConstVoxelIterator begin() const
-//    {
-//      return TSDFHashingConstVoxelIterator(voxel_hash_map_.begin());
-//    }
-//    TSDFHashingConstVoxelIterator end() const
-//    {
-//      return TSDFHashingConstVoxelIterator(voxel_hash_map_.end());
-//    }
-
     // 8. voxel/world coordinate conversion
     inline Eigen::Vector3f World2Voxel(const Eigen::Vector3f& world_coord) const
     {
@@ -548,16 +461,7 @@ namespace cpu_tsdf
     // how many neighboring bricks of an affected brick should be considered for updating.
     // usually set to 1. i.e. when a brick needs
     int neighbor_adding_limit_;
-
-//    float dist_neg_inflection_point_;
-//    float neg_inflection_weight_;
-//    float dist_neg_delta_point_;
   };
-
-
-  bool ReweightTSDFWithNegProfile(
-          TSDFHashing* tsdf, float neg_dist_full_weight_delta, float neg_weight_thresh, float neg_weight_dist_thresh);
-  bool ReweightTSDFsWithNegProfile(std::vector<TSDFHashing::Ptr>* tsdfs, float neg_dist_full_weight_delta, float neg_weight_thresh, float neg_weight_dist_thresh);
 
   bool ComputeMedians(TSDFHashing* tsdf);
 
