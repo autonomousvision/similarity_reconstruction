@@ -5,8 +5,7 @@
 #pragma once
 #include <pcl/surface/marching_cubes.h>
 #include <pcl/surface/impl/marching_cubes.hpp>
-
-#include "../tsdf_representation/tsdf_hash.h"
+#include "tsdf_representation/tsdf_hash.h"
 
 namespace cpu_tsdf
 {

@@ -112,29 +112,28 @@ main (int argc, char** argv)
   cv::Vec3d offset(0, 0, 0);
   InitializeCamInfos(temp_depth.cols, temp_depth.rows,
                      offset, voxel_length, depth_image_scaling_factor, max_cam_distance, cam_infos);
-  for(int i = 0; i < 1; ++i)
-  {
-      cout << i << "th frame:" << endl;
-      cout << "depth: " << depth_filelist[i] << endl;
-      cout << "cam file:" << cam_info_filelist[i] << endl;
-      cout << "cam_info: " << cam_infos[i] << endl;
-      cout << "image file: " << image_filelist[0] << endl;
-  }
-  cout << "dd_factor " << dd_factor << endl;
 
-  cout << "convert depth maps to meshes " << endl;
+  // for(int i = 0; i < 1; ++i)
+  // {
+  //     cout << i << "th frame:" << endl;
+  //     cout << "depth: " << depth_filelist[i] << endl;
+  //     cout << "cam file:" << cam_info_filelist[i] << endl;
+  //     cout << "cam_info: " << cam_infos[i] << endl;
+  //     cout << "image file: " << image_filelist[0] << endl;
+  // }
+  // cout << "dd_factor " << dd_factor << endl;
+
+  cout << "begin converting depth maps to meshes " << endl;
   const bfs::path output_dir_path(output_dir);
   for (size_t i = 0; i < depth_filelist.size(); i++)
   {
-    PCL_INFO ("On file %d / %d\n", i + 1, depth_filelist.size ());
-    PCL_INFO ("depth: %s\n", depth_filelist[i].c_str ());
+    PCL_INFO ("file %d / %d\n", i + 1, depth_filelist.size ());
+    PCL_INFO ("input:  %s\n", depth_filelist[i].c_str ());
     // add depth to organized point cloud
     cv::Mat depth_map = cv::imread(depth_filelist[i], -1);  // as is
     cpu_tsdf::MaskImageSidesAsZero(margin, &depth_map);
     cv::Mat image = cv::imread(image_filelist[i], 1);  // always color
     pcl::PolygonMesh mesh;
-//    cv::imshow("show", depth_map);
-//    cv::waitKey();
     cpu_tsdf::DepthMapTriangulate(depth_map, image, cam_infos[i],
                                   dd_factor, check_edge_ratio, check_view_angle,
                                   &mesh);
@@ -143,7 +142,7 @@ main (int argc, char** argv)
     if (flatten)
       utility::flattenVertices(mesh);
     pcl::io::savePLYFileBinary (saving_filename, mesh);
-    cout << "saved " << i + 1 << "th depth" << endl;
+    PCL_INFO ("output: %s\n", saving_filename.c_str ());
   }
   return 0;
 }

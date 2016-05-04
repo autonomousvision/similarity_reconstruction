@@ -597,7 +597,7 @@ bool TriMesh::loadPly(char *fn, bool color) {
 		// get the description of the first element
 		elemName = elemNames[i];
 		plist = ply_get_element_description(ply, elemName, &numElems, &nprops);
-                cout << "loadPLY: elemName " << elemName << "\n nprops: " << nprops << endl;
+        // cout << "loadPLY: elemName " << elemName << "\n nprops: " << nprops << endl;
 
 		// if we're on vertex elements, read them in
 		if (strcmp("vertex", elemName) == 0) {

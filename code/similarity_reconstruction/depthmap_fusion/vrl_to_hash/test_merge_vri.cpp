@@ -84,7 +84,7 @@ main (int argc, char** argv)
   std::cout << "reading files. " << std::endl;
   vector<string> vri_filelist;
   ListFilesWithinFrameRange(input_dir, vri_suffix, start_image, end_image, &vri_filelist);
-  std::cout << "read in " << vri_filelist.size() << " vri files" << std::endl;
+  std::cout << "will merge " << vri_filelist.size() << " vri files" << std::endl;
   if (vri_filelist.empty()) return -1;
 
   {
@@ -136,7 +136,7 @@ main (int argc, char** argv)
       }
       Eigen::Vector3i bsz;
       tsdf->getVoxelBoundingBoxSize(bsz);
-      std::cout << "bounding box size for tsdf: " << bsz(0) << " " << bsz(1) << " " << bsz(2) << std::endl;
+      // std::cout << "bounding box size for tsdf: " << bsz(0) << " " << bsz(1) << " " << bsz(2) << std::endl;
       cv::Vec3f min_pt, max_pt;
       tsdf->getBoundingBoxInWorldCoord(min_pt, max_pt);
       Eigen::Vector3f offset;

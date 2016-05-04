@@ -42,21 +42,15 @@ bool cpu_tsdf::ConvertRLEGridToHashMap(OccGridRLE& rle_grid, int original_ramp_s
 #else
                 unsigned int color = 0xffffffff;
 #endif
-                if (weight > 0)
-                {
-                    // printf("cur_color: %d\n", color);
+                if (weight > 0) {
                     cv::Vec3b cur_color;
                     cur_color[2] = color & 0xff;
                     cur_color[1] = (color & 0xff00) >> 8;
                     cur_color[0] = (color & 0xff0000) >> 16;
-                    // printf("cur_color:rgb: %d %d %d\n", cur_color[0], cur_color[1], cur_color[2]);
-                    // float float_dist_world = float((int)value - USHRT_MAX/2) / USHRT_MAX * 2 * float(ramp_size) * voxel_length;
                     float float_dist_world = (((float)value/(float)USHRT_MAX) - 0.5) * 2 * float(ramp_size) * voxel_length;
                     float float_weight = float(weight)/USHRT_MAX;
                     hash_grid->SetTSDFValue(cv::Vec3i(ix, iy, iz), -float_dist_world, float_weight, cur_color);  // note -float_dist is set here
-                }
-                else
-                {
+                } else {
                     continue;
                 }
             }
@@ -69,6 +63,6 @@ bool cpu_tsdf::ReadFromVRIFile(const std::string& filepath, int original_ramp_si
 {
     OccGridRLE rle_grid(1, 1, 1, CHUNK_SIZE);
     if (!rle_grid.read(const_cast<char*>(filepath.c_str()))) return false;
-    cout << "reading VRI file finished" << endl;
+    // cout << "reading VRI file finished" << endl;
     return ConvertRLEGridToHashMap(rle_grid, original_ramp_size, hash_grid, init_hash);
 }

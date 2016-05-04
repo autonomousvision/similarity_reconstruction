@@ -985,8 +985,8 @@ int ply_get_property(
   prop_ptr = find_property (elem, prop->name, &index);
   if (prop_ptr == NULL) {
 	  // commented out by Brett Allen
-    fprintf (stderr, "Warning:  Can't find property '%s' in element '%s'\n",
-             prop->name, elem_name);
+    //fprintf (stderr, "Warning:  Can't find property '%s' in element '%s'\n",
+    //         prop->name, elem_name);
     return 0;
   }
   prop_ptr->internal_type  = prop->internal_type;

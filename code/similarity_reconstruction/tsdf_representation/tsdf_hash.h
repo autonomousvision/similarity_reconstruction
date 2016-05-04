@@ -181,13 +181,13 @@ namespace cpu_tsdf
     template<typename TSDFVoxelUpdater>
     inline bool UpdateBricksInQueue(const update_hashset_type& update_hashset, TSDFVoxelUpdater& voxel_updater)
     {
-      fprintf(stderr, "update modified bricks\n");
-      for(update_hashset_type::const_iterator itr = update_hashset.begin(); itr != update_hashset.end(); ++itr)
+      // fprintf(stderr, "update modified bricks\n");
+        for(update_hashset_type::const_iterator itr = update_hashset.begin(); itr != update_hashset.end(); ++itr)
         {
-          UpdateBrick(*itr, voxel_updater);
+            UpdateBrick(*itr, voxel_updater);
         }
-      voxel_hash_map_.DisplayHashMapInfo();
-      fprintf(stderr, "finished updating\n");
+      // voxel_hash_map_.DisplayHashMapInfo();
+      // fprintf(stderr, "finished updating\n");
       return true;
     }
     // Update one brick

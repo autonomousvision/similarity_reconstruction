@@ -60,10 +60,10 @@ void TSDFHashing::Init(float voxel_length, const Eigen::Vector3f& offset, float 
     neighbor_adding_limit_ = ceil(std::max(fabs(max_dist_pos_/voxel_length_/(float)VoxelHashMap::kBrickSideLength), 
             fabs(max_dist_neg_/voxel_length_/(float)VoxelHashMap::kBrickSideLength)));
     voxel_hash_map_.Clear();
-    std::cout << "voxel_length: " << voxel_length_ << std::endl;
-    std::cout << "max_dist_pos_: " << max_dist_pos_ << std::endl;
-    std::cout << "max_dist_neg_: " << max_dist_neg_ << std::endl;
-    std::cout << "neighbor_adding_limit_: " << neighbor_adding_limit_ << std::endl;
+    // std::cout << "voxel_length: " << voxel_length_ << std::endl;
+    // std::cout << "max_dist_pos_: " << max_dist_pos_ << std::endl;
+    // std::cout << "max_dist_neg_: " << max_dist_neg_ << std::endl;
+    // std::cout << "neighbor_adding_limit_: " << neighbor_adding_limit_ << std::endl;
 }
 
 bool TSDFHashing::integrateCloud_Spherical_Queue (const cv::Mat& depth,
@@ -219,7 +219,6 @@ bool TSDFHashing::UpdateBrick(const VoxelHashMap::BrickPosition& bpos, const Rec
                                                        neg_weight_thresh,
                                                        neg_weight_dist_thresh);
                 if (w_dist == 0.0 || d_inc > max_dist_pos_ || d_inc < max_dist_neg_) continue;
-                //std::cout << "w_dist: " << w_dist << " d_inc:" << d_inc << " " << max_dist_neg_ / 20.0 << std::endl;
                 w_inc = w_dist * w_inc;
                 cv::Vec3b cur_color = image.at<cv::Vec3b>(cur_imy, cur_imx);
                 int semantic_labelv = -1;

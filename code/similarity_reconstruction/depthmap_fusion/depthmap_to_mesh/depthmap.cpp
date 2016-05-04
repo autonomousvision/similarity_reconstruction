@@ -579,7 +579,7 @@ void cpu_tsdf::DepthMapTriangulate(
     {
         return val.vertices.empty();
     });
-    std::cout << "num of invalid tris: " << mesh->polygons.end() - last << std::endl;
+    // std::cout << "num of invalid tris: " << mesh->polygons.end() - last << std::endl;
     mesh->polygons.erase(last, mesh->polygons.end());
     pcl::toPCLPointCloud2 (point_cloud, mesh->cloud);
 }

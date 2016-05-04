@@ -670,7 +670,7 @@ bool cpu_tsdf::CleanTSDFPart(cpu_tsdf::TSDFHashing *tsdf_volume, const Eigen::Af
 bool cpu_tsdf::MergeTSDF(const cpu_tsdf::TSDFHashing &tsdf_origin, cpu_tsdf::TSDFHashing *target)
 {
     using namespace std;
-    cout << "begin merge TSDF. " << endl;
+    // cout << "begin merge TSDF. " << endl;
     TSDFHashing::update_hashset_type brick_update_hashset;
     for (TSDFHashing::const_iterator citr = tsdf_origin.begin(); citr != tsdf_origin.end(); ++citr)
     {
@@ -685,7 +685,7 @@ bool cpu_tsdf::MergeTSDF(const cpu_tsdf::TSDFHashing &tsdf_origin, cpu_tsdf::TSD
             target->AddBrickUpdateList(voxel_coord_target, &brick_update_hashset);
         }  // end if
     }  // end for
-    cout << "update list size: " << brick_update_hashset.size() << endl;
+    // cout << "update list size: " << brick_update_hashset.size() << endl;
 
     struct TSDFTargetVoxelUpdater
     {
@@ -709,7 +709,7 @@ bool cpu_tsdf::MergeTSDF(const cpu_tsdf::TSDFHashing &tsdf_origin, cpu_tsdf::TSD
     };
     TSDFTargetVoxelUpdater updater(tsdf_origin, *target);
     target->UpdateBricksInQueue(brick_update_hashset, updater);
-    cout << "finished merging TSDF. " << endl;
+    // cout << "finished merging TSDF. " << endl;
     return true;
 }
 
