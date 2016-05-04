@@ -1,4 +1,5 @@
 /*
+ * performing detector training
  * Chen Zhou (zhouch@pku.edu.cn)
  */
 #include <iostream>

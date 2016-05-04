@@ -1,4 +1,5 @@
 /*
+ * object detection samples
  * Chen Zhou (zhouch@pku.edu.cn)
  */
 #pragma once

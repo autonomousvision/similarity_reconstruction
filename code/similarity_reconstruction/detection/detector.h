@@ -1,4 +1,5 @@
 /*
+ * Functions for detector training & testing
  * Chen Zhou (zhouch@pku.edu.cn)
  */
 #pragma once
