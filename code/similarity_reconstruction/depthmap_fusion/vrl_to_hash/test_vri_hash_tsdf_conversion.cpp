@@ -1,6 +1,3 @@
-/*
- * Chen Zhou (zhouch@pku.edu.cn)
- */
 #include <iostream>
 #include <string>
 #include <vector>
@@ -22,8 +19,6 @@
 #include "marching_cubes/marching_cubes_tsdf_hash.h"
 #include "common/utilities/pcl_utility.h"
 
-//using std::vector;
-//using std::string;
 using namespace std;
 using namespace utility;
 

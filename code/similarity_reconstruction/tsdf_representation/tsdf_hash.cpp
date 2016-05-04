@@ -279,7 +279,8 @@ bool TSDFHashing::RetriveDataFromWorldCoord(const Eigen::Vector3f& world_coord, 
                 total_color += linear_w * Eigen::Vector3f(color[0], color[1], color[2]);
                 total_point_w += linear_w * cur_w;
             }
-    const float total_thresh = 0.5;
+    // const float total_thresh = 0.5;
+    const float total_thresh = 0.01;
     if (total_linear_w > total_thresh)
     {
         *d = final_d / total_linear_w;

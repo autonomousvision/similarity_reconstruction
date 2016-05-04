@@ -24,8 +24,7 @@ bool cpu_tsdf::ConvertRLEGridToHashMap(OccGridRLE& rle_grid, int original_ramp_s
     //Eigen::Vector3f offset(0, 0, 0);
     //offset = offset - Eigen::Vector3f::Ones() * delta ;
     const int ramp_size = original_ramp_size;
-    if (init_hash)
-    {
+    if (init_hash) {
         hash_grid->Init(voxel_length, offset, ramp_size*voxel_length, -ramp_size*voxel_length);
     }
     // iterate over the voxels and store the results
@@ -54,11 +53,7 @@ bool cpu_tsdf::ConvertRLEGridToHashMap(OccGridRLE& rle_grid, int original_ramp_s
                     // float float_dist_world = float((int)value - USHRT_MAX/2) / USHRT_MAX * 2 * float(ramp_size) * voxel_length;
                     float float_dist_world = (((float)value/(float)USHRT_MAX) - 0.5) * 2 * float(ramp_size) * voxel_length;
                     float float_weight = float(weight)/USHRT_MAX;
-                    hash_grid->SetTSDFValue(cv::Vec3i(ix, iy, iz), float_dist_world, float_weight, cur_color);  // note -float_dist is set here
-//                    if (ix == 105 && iy == 29 && iz == 16)
-//                    {
-//                        printf("cur conversion debug points: %d %d %d\nvalue: %d\n fvalue: %f\n", ix, iy, iz, value, float_dist_world);
-//                    }
+                    hash_grid->SetTSDFValue(cv::Vec3i(ix, iy, iz), -float_dist_world, float_weight, cur_color);  // note -float_dist is set here
                 }
                 else
                 {

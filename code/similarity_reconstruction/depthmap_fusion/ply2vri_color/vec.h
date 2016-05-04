@@ -267,7 +267,6 @@ public:
 
 	//---[ Arithmetic Operators ]----------------
 
-        Vec3<T> operator-() const { return Vec3(-n[0], -n[1], -n[2]); }
 	Vec3<T> operator-( const Vec3<T>& a ) { return Vec3<T>(n[0]-a.n[0],n[1]-a.n[1],n[2]-a.n[2]); }
 	Vec3<T> operator+( const Vec3<T>& a ) { return Vec3<T>(a.n[0]+n[0],a.n[1]+n[1],a.n[2]+n[2]); }
 
@@ -339,17 +338,9 @@ public:
 #endif
 };
 
-typedef Vec3<unsigned char> Vec3b;
 typedef Vec3<int> Vec3i;
 typedef Vec3<float> Vec3f;
 typedef Vec3<double> Vec3d;
-
-template<typename T>
-inline Vec3<T> floor(const Vec3<T>& v)
-{
-    using std::floor;
-    return (Vec3<T>(floor(v[0]), floor(v[1]), floor(v[2])));
-}
 
 //==========[ class Vec4 ]=================================
 

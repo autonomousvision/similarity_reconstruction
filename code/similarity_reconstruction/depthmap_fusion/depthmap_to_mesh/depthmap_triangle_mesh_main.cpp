@@ -31,15 +31,6 @@ using namespace std;
 using namespace cv;
 using namespace pcl;
 
-//void InitializeCamInfos(int depth_width, int depth_height, const cv::Vec3d& offset, double voxel_length, double depth_image_scaling_factor, double cam_max_distance, std::vector<RectifiedCameraPair>& cam_infos) {
-//  for (int i = 0; i < cam_infos.size(); ++i) {
-//      cam_infos[i].SetVoxelScalingParameters(offset,
-//                                             voxel_length,
-//                                             depth_image_scaling_factor, cam_max_distance);
-//      //cam_infos[i].InitializeBackProjectionBuffers(depth_width, depth_height);
-//  }
-//}
-
 int
 main (int argc, char** argv)
 {
@@ -73,7 +64,6 @@ main (int argc, char** argv)
     ("max-camera-distance", bpo::value<float>(&max_cam_distance)->required(), "Maximum allowed depth value")
     ("startimage", bpo::value<int>(&start_image)->required(), "starting image number")
     ("endimage", bpo::value<int>(&end_image)->required(), "ending image number")
-    // ("use_confidence", "use confidence map")
     ("voxel_length", bpo::value<float>(&voxel_length)->default_value(0.2), "voxel length")
     ("flatten", "Remove duplicated mesh vertices during marching cubes")
     ("margin", bpo::value<int>(&margin)->default_value(0), "how much of the depth map should be cropped")
@@ -83,10 +73,8 @@ main (int argc, char** argv)
 
   bpo::variables_map opts;
   bpo::store(bpo::parse_command_line(argc, argv, opts_desc, bpo::command_line_style::unix_style ^ bpo::command_line_style::allow_short), opts);
-  bool badargs = false;
-  /*try*/ { bpo::notify(opts); }
-//  catch(...) { badargs = true; }
-  if(opts.count("help") || badargs) {
+  bpo::notify(opts);
+  if(opts.count("help")) {
     cout << "Usage: " << bfs::basename(argv[0]) << " --in [in_dir] --out [out_dir] [OPTS]" << endl;
     cout << endl;
     cout << opts_desc << endl;

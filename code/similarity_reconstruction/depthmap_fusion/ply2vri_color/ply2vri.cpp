@@ -8,18 +8,13 @@
 // *** For license information, please see license.txt. ***
 
 #include <fstream>
-#include <iomanip>
+using namespace std;
 #include <limits.h>
 #include <stdio.h>
 #include <iostream>
 #include <cmath>
-#include <algorithm>
-#include <stdint.h>
-#include <string>
 #include "trimesh.h"
 #include "vrip/OccGridRLE.h"
-
-#define CLOSEST_TRI_IDX
 
 using namespace std;
 
@@ -40,15 +35,8 @@ public:
 	int max[3];
 	int numPts;
 	unsigned short *rawData;
-#ifdef CLOSEST_TRI_IDX
-        int *triIndices;
-#endif
 
-        VoxelGrid():rawData(NULL)
-  #ifdef CLOSEST_TRI_IDX
-          , triIndices(NULL)
-  #endif
-        {}
+        VoxelGrid():rawData(NULL) {}
         ~VoxelGrid() { clearData(); }
 	bool initData(int x, int y, int z) {
                 clearData();
@@ -61,12 +49,6 @@ public:
 			return false;
 
                 memset(rawData, 0, 4 * max[0] * max[1] * max[2] * sizeof(unsigned short));
-
-#ifdef CLOSEST_TRI_IDX
-                triIndices = new int[4 * numPts];
-                if (triIndices == NULL) return false;
-                for (int i = 0; i < 4 * numPts; ++i) triIndices[i] = -1; // no closest triangle
-#endif
 		return true;
 	}
 
@@ -74,9 +56,6 @@ public:
         bool clearData()
         {
             if (rawData) { delete [] rawData;  rawData = NULL; }
-#ifdef CLOSEST_TRI_IDX
-            if (triIndices) { delete [] triIndices; triIndices = NULL; }
-#endif
         }
 
 	unsigned short &dist(int x, int y, int z) {
@@ -91,22 +70,6 @@ public:
                 rawData[4 * ((z*max[1] + y)*max[0] + x) + 2] = g << 8 | b;
                 rawData[4 * ((z*max[1] + y)*max[0] + x) + 3] = r;
         }
-
-#ifdef CLOSEST_TRI_IDX
-        int &closest_tri_idx(int x, int y, int z) {
-            return triIndices[ ((z*max[1] + y)*max[0] + x) * 4 + 0 ];
-        }
-        void set_closest_tri_intersection(int x, int y, int z, const int *vert_idx) {
-            triIndices[ ((z*max[1] + y)*max[0] + x) * 4 + 1 ] = vert_idx[0];
-            triIndices[ ((z*max[1] + y)*max[0] + x) * 4 + 2 ] = vert_idx[1];
-            triIndices[ ((z*max[1] + y)*max[0] + x) * 4 + 3 ] = vert_idx[2];
-        }
-        Vec3i closest_tri_point_idx(int x, int y, int z) {
-            return Vec3i(triIndices[ ((z*max[1] + y)*max[0] + x) * 4 + 1 ],
-                    triIndices[ ((z*max[1] + y)*max[0] + x) * 4 + 2 ],
-                    triIndices[ ((z*max[1] + y)*max[0] + x) * 4 + 3 ]);
-        }
-#endif
 
 	void removeLowConf(unsigned short minConf) {
 		int x, y, z;
@@ -168,7 +131,7 @@ public:
 		for (z=0; z < max[2]; z++) {
 			for (y=0; y < max[1]; y++) {
 				for (x=0; x < max[0]; x++) {
-                                        fwrite(rawData + (((z*max[1] + y) * max[0] + x) * 2 /*not valid any more*/ ), sizeof(unsigned short), 1, f);
+					fwrite(rawData + (((z*max[1] + y) * max[0] + x) * 2), sizeof(unsigned short), 1, f);
 				}
 			}
 		}
@@ -190,49 +153,9 @@ public:
                                 rle.putScanline((OccElement *)(rawData + ((z*max[1] + y) * max[0] * 4)), y, z);
 			}
 		}
+
 		rle.write(fname);
 	}
-
-#ifdef CLOSEST_TRI_IDX
-        void SaveClosestTriangles(const char *fname, double scale = 1, Vec3d trans = Vec3d(0, 0, 0)) {
-            FILE* f = fopen(fname, "wb");
-            if (!f) {
-                    cout << "can't open " << fname << endl;
-                    return;
-            }
-            int x, y, z;
-            x = 0;
-            // version
-            fwrite(&x, sizeof(int), 1, f);
-
-            fwrite(&scale, sizeof(double), 1, f);
-            fwrite(&trans[0], sizeof(double), 1, f);
-            fwrite(&trans[1], sizeof(double), 1, f);
-            fwrite(&trans[2], sizeof(double), 1, f);
-
-            fwrite(&max[0], sizeof(int), 1, f);
-            fwrite(&max[1], sizeof(int), 1, f);
-            fwrite(&max[2], sizeof(int), 1, f);
-
-            int vox_pos[3] = {0};
-            for (z=0; z < max[2]; z++) {
-                for (y=0; y < max[1]; y++) {
-                    for (x=0; x < max[0]; x++) {
-                        if ( triIndices[ (((z*max[1] + y) * max[0] + x) * 1) ] >= 0 ) {
-                            vox_pos[0] = x; vox_pos[1] = y; vox_pos[2] = z;
-                            fwrite(vox_pos, sizeof(int), 3, f);
-                            fwrite(triIndices + (((z*max[1] + y) * max[0] + x) * 4), sizeof(int), 4, f);
-                        }
-                    }
-                }
-            }
-            fclose(f);
-        }
-#endif
-
-        // added by zc
-        void DumpGridPoints(const Vec3d &world_min_pt, const Vec3d &world_max_pt, const double resolution, const Vec3d& trans, const int rampsize, const char *fname);
-        void SetClosestTrimeshColor(const Vec3d& world_min_pt, const Vec3d& world_max_pt, const double resolution, const Vec3d &trans, const int rampsize, const TriMesh &depthmap_tm, TriMesh* closesttri_tm);
 };
 
 
@@ -367,13 +290,10 @@ void updateFromClosest(TriMesh &tm, Vec3d &voxelPt, VoxelGrid &vg) {
 	unsigned short conf = USHRT_MAX;
         // added by zc
         Vec3d grid_point_color;
-        // tm.closestTri: the three vert indices of the closest triangle
 
 	// if closest point is a vertex, check if we need to flip the sign
 	if (tm.closestTri[1] == -1) {
-                Vec3d delta = tm.closestPt - voxelPt;
-                // modified by zc
-                // Vec3d delta = voxelPt - tm.closestPt;
+		Vec3d delta = tm.closestPt - voxelPt;
 		delta.normalize();
 		double dotProd = delta * tm.m_vertexNormals[tm.closestTri[0]];
 		if (dotProd < 0)
@@ -388,9 +308,7 @@ void updateFromClosest(TriMesh &tm, Vec3d &voxelPt, VoxelGrid &vg) {
 	}
 	// if closest point is an edge, check if we need to flip the sign
 	else if (tm.closestTri[2] == - 1) {
-                Vec3d delta = tm.closestPt - voxelPt;
-                // modified by zc
-                // Vec3d delta = voxelPt - tm.closestPt;
+		Vec3d delta = tm.closestPt - voxelPt;
 		delta.normalize();
 
 		EdgeInfo *ei = edgeList.findEdge(tm.closestTri[0], tm.closestTri[1]);
@@ -411,20 +329,6 @@ void updateFromClosest(TriMesh &tm, Vec3d &voxelPt, VoxelGrid &vg) {
                 if (!tm.m_colors.empty())
                         grid_point_color = tm.m_colors[tm.closestTri[0]] +
                                 ((tm.m_colors[tm.closestTri[1]] - tm.m_colors[tm.closestTri[0]]) * tm.closestBary[0]);
-
-                if (voxelPt == Vec3d(105, 29, 16))
-                {
-                    cout << endl;
-                    cout << "voxelPt: " << voxelPt << endl;
-                    cout << "closestPt: " << tm.closestPt << endl;
-                    cout << "delta: " << delta << endl;
-                    cout << "ei normal: " << ei->normal << endl;
-                    cout << "dotProd: " << dotProd << endl;
-                    cout << "dist: " << dist << endl;
-                    cout << "conf: " << conf << endl;
-                    cout << "closest_tri: " << tm.closest_tri_idx << endl;
-                    cout << "closest_tri_pt: " << tm.closestTri[0] << " " << tm.closestTri[1] << " " << tm.closestTri[2] << endl;
-                }
 	}
         else {
             // added by zc, compute grid_point_color when the closest point is on the triangle
@@ -435,9 +339,7 @@ void updateFromClosest(TriMesh &tm, Vec3d &voxelPt, VoxelGrid &vg) {
         }
 
 	dist = dist / (rampSize * 2);
-        // dist = (-dist + 0.5) * USHRT_MAX;
-        // modified by zc (sign flipped)
-        dist = (dist + 0.5) * USHRT_MAX;
+	dist = (-dist + 0.5) * USHRT_MAX;
 	if (dist < 0)
 		dist = 0;
 	if (dist > USHRT_MAX)
@@ -445,10 +347,6 @@ void updateFromClosest(TriMesh &tm, Vec3d &voxelPt, VoxelGrid &vg) {
 
         vg.dist(voxelPt[0], voxelPt[1], voxelPt[2]) = (unsigned short)round(dist);
 	vg.conf(voxelPt[0], voxelPt[1], voxelPt[2]) = conf;
-
-        // update closest tri, added by zc
-        vg.closest_tri_idx(voxelPt[0], voxelPt[1], voxelPt[2]) = tm.closest_tri_idx;
-        vg.set_closest_tri_intersection(voxelPt[0], voxelPt[1], voxelPt[2], tm.closestTri);
 
         if (!tm.m_colors.empty())
         {
@@ -533,7 +431,6 @@ void processTriangle(TriMesh &tm, int tri, VoxelGrid &vg, bool markOnly = false)
 				
 				if (tm.calcClosestPoint(pts)) {
                                     // tm.closestDist is updated if calcClosestPoint returns true
-                                    tm.closest_tri_idx = tri/3;
                                     updateFromClosest(tm, voxelPt, vg);
 				}
 			}
@@ -636,7 +533,7 @@ int main(int argc, char *argv[]) {
 
         if (!tm.loadPly(input, true))
 		return 0;
-        cout << "loaded " << (tm.m_tris.size()/3) << " triangles" << endl;
+	cout << "loaded " << (tm.m_tris.size()/3) << " triangles" << endl;
         if (tm.m_colors.empty())
         {
             cout << "no color information read, adding color information for testing" << endl;
@@ -648,18 +545,12 @@ int main(int argc, char *argv[]) {
 
         cout << "computing point bounds" << endl;
 	// scale and translate the triangle mesh so that 1 unit == 1 voxel
-        double bb[6];
-        tm.calcPointBounds(bb);
+	double bb[6];
+	tm.calcPointBounds(bb);
         cout << "finished point bounds" << endl;
 	if (!templateVRI)
 		trans = Vec3d(-bb[0] + resolution * rampSize, -bb[2] + resolution * rampSize, -bb[4] + resolution * rampSize);
-        // added by zc
-        // clamp to final grid points
-        Vec3d final_offset = Vec3d(0, 0, 0); // defaults to 0, 0, 0, voxel2World offset in final grid
-        trans = floor(((-trans) - final_offset)/resolution) * resolution;
-        trans = -trans;
-
-        tm.translate(trans[0], trans[1], trans[2]);
+	tm.translate(trans[0], trans[1], trans[2]);
         cout << "finished translating" << endl;
 
 	VoxelGrid vg;
@@ -671,10 +562,9 @@ int main(int argc, char *argv[]) {
 	}
 	else {
 		if (!vg.initData(
-                            // +1 added by zc to compensate for clamping current grid points to final grid points
-                        ceil((bb[1]-bb[0]) / resolution) + rampSize * 2 + 1,
-                        ceil((bb[3]-bb[2]) / resolution) + rampSize * 2 + 1,
-                        ceil((bb[5]-bb[4]) / resolution) + rampSize * 2 + 1)) {
+			ceil((bb[1]-bb[0]) / resolution) + rampSize * 2,
+			ceil((bb[3]-bb[2]) / resolution) + rampSize * 2,
+			ceil((bb[5]-bb[4]) / resolution) + rampSize * 2)) {
 			cout << "couldn't allocate " << (vg.max[0]*vg.max[1]*vg.max[2]*2*sizeof(short)) << " bytes of voxel data; aborting" << endl;
 			return 0;
 		}
@@ -696,12 +586,11 @@ int main(int argc, char *argv[]) {
 		edgeList.buildFromTriMesh(tm);
 		if (vertList)
 			delete []vertList;
-                // if the vert is on the boundary, mark it as true
 		vertList = new bool[edgeList.numVerts];
 		edgeList.markVerts(vertList);
 
 		if (stripEdges > 0) {
-                        cout << "cur_stripEdge " << stripEdges << endl;
+                    cout << "cur_stripEdge " << stripEdges << endl;
 			// remove all vertices that are on an edge
 			vector<Vec3d> oldPoints = tm.m_points;
 			vector<Vec3d> oldVNormals = tm.m_vertexNormals;
@@ -829,15 +718,6 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-    //    Vec3d ext(0.6, 0.6, 0.6);
-    //    Vec3d world_pt_center(1230.3, 3699.2, 116.6);
-    //    Vec3d world_min_pt = world_pt_center - ext;
-    //    Vec3d world_max_pt = world_pt_center + ext;
-    //    vg.DumpGridPoints(world_min_pt, world_max_pt,  resolution, -trans, rampSize, (std::string(output) + "_gridinfo.ply").c_str());
-    //    TriMesh closest_tm;
-    //    vg.SetClosestTrimeshColor(world_min_pt, world_max_pt, resolution, -trans, rampSize, tm, &closest_tm);
-    //    closest_tm.savePly((std::string(output) + "closest_tm.ply").c_str());
-
 	if (strcmp(output + strlen(output) - 3, "ppm") == 0) {
 		cout << "saving ppm '" << output << "'" << endl;
 		vg.savePPM(output);
@@ -858,123 +738,4 @@ int main(int argc, char *argv[]) {
 //		vg.saveRaw(argv[2], resolution, -trans);
 	}
 	return 0;
-}
-
-
-void VoxelGrid::DumpGridPoints(
-        const Vec3d &world_min_pt,
-        const Vec3d &world_max_pt,
-        const double resolution, const Vec3d& trans, const int rampsize,
-        const char *fname)
-{
-    const float map[8][4] = {
-        {0,0,0,114},{0,0,1,185},{1,0,0,114},{1,0,1,174},
-        {0,1,0,114},{0,1,1,185},{1,1,0,114},{1,1,1,0}
-    };
-    float sum = 0;
-    for (int32_t i=0; i<8; i++)
-        sum += map[i][3];
-
-    float weights[8]; // relative weights
-    float cumsum[8];  // cumulative weights
-    cumsum[0] = 0;
-    for (int32_t i=0; i<7; i++)
-    {
-        weights[i]  = sum/map[i][3];
-        cumsum[i+1] = cumsum[i] + map[i][3]/sum;
-    }
-
-    TriMesh tm;
-    std::ofstream ofs( (std::string(fname) + "_tsdf_info.txt").c_str() );
-    for (int z=0; z < max[2]; z++) {
-            for (int y=0; y < max[1]; y++) {
-                    for (int x=0; x < max[0]; x++) {
-                            unsigned short d = dist(x, y, z);
-                            unsigned short voxel_conf  = conf(x, y, z);
-                            if (voxel_conf > 0)
-                            {
-                                float scaled_val = d / 65535.0;
-                                // find bin
-                                int32_t i;
-                                for (i=0; i<7; i++)
-                                    if (scaled_val < cumsum[i+1])
-                                        break;
-                                // compute red/green/blue values
-                                float   w = 1.0 - (scaled_val-cumsum[i])*weights[i];
-                                uint8_t r = (uint8_t)((w*map[i][0]+(1.0-w)*map[i+1][0]) * 255.0);
-                                uint8_t g = (uint8_t)((w*map[i][1]+(1.0-w)*map[i+1][1]) * 255.0);
-                                uint8_t b = (uint8_t)((w*map[i][2]+(1.0-w)*map[i+1][2]) * 255.0);
-
-                                Vec3d world_coord = resolution * Vec3d(x, y, z) + trans;
-
-                                if (world_coord[0] >= world_min_pt[0] && world_coord[0] <= world_max_pt[0] &&
-                                        world_coord[1] >= world_min_pt[1] && world_coord[1] <= world_max_pt[1] &&
-                                        world_coord[2] >= world_min_pt[2] && world_coord[2] <= world_max_pt[2])
-                                {
-                                    tm.m_points.push_back(world_coord);
-                                    tm.m_colors.push_back(Vec3d((float)r/255.0, (float)g/255.0, (float)b/255.0));
-                                    tm.m_conf.push_back(voxel_conf);
-                                    Vec3i nearest_pts = closest_tri_point_idx(x, y, z);
-                                    ofs << x << " " << y << " " << z << " "
-                                                  << std::right << std::setw(10)  << world_coord[0] << " "
-                                                  << std::right << std::setw(10)  << world_coord[1] << " "
-                                                  << std::right << std::setw(10)  << world_coord[2] << " "
-                                                  << std::right << std::setw(10)  << d << " "
-                                                  << std::right << std::setw(10) << (scaled_val - 0.5) * rampsize * resolution << " "
-                                                  << std::right << std::setw(10) << voxel_conf/65535.0 << " | "
-                                                  << std::right << std::setw(10) << closest_tri_idx(x, y, z ) <<  " | "
-                                                  << std::right << std::setw(10) << nearest_pts[0] << " "
-                                                  << std::right << std::setw(10) << nearest_pts[1] << " "
-                                                  << std::right << std::setw(10) << nearest_pts[2] << " "
-                                                  << std::endl ;
-                                }  // if world_coord
-                            }  // if conf
-                    }  // for x
-            }  // for y
-    }  // for z
-    tm.savePly(fname);
-}
-
-void VoxelGrid::SetClosestTrimeshColor(
-        const Vec3d &world_min_pt,
-        const Vec3d &world_max_pt,
-        const double resolution, const Vec3d& trans, const int rampsize,
-        const TriMesh& depthmap_tm,
-        TriMesh* closesttri_tm)
-{
-    for (int z=0; z < max[2]; z++) {
-            for (int y=0; y < max[1]; y++) {
-                    for (int x=0; x < max[0]; x++) {
-                            unsigned short d = dist(x, y, z);
-                            unsigned short voxel_conf  = conf(x, y, z);
-                            if (voxel_conf > 0)
-                            {
-                                float scaled_val = d / 65535.0;
-                                Vec3d world_coord = resolution * Vec3d(x, y, z) + trans;
-                                if (world_coord[0] >= world_min_pt[0] && world_coord[0] <= world_max_pt[0] &&
-                                        world_coord[1] >= world_min_pt[1] && world_coord[1] <= world_max_pt[1] &&
-                                        world_coord[2] >= world_min_pt[2] && world_coord[2] <= world_max_pt[2])
-                                {
-                                    int closest_tri = closest_tri_idx(x, y, z);
-                                    cout << closest_tri << endl;
-                                    // Vec3i closest_tri_points = closest_tri_point_idx(x, y, z);
-                                    Vec3i closest_tri_points(depthmap_tm.m_tris[3 * closest_tri + 0], depthmap_tm.m_tris[3 * closest_tri + 1], depthmap_tm.m_tris[3 * closest_tri + 2]);
-                                    closesttri_tm->m_points.push_back(depthmap_tm.m_points[closest_tri_points[0]]);
-                                    closesttri_tm->m_points.push_back(depthmap_tm.m_points[closest_tri_points[1]]);
-                                    closesttri_tm->m_points.push_back(depthmap_tm.m_points[closest_tri_points[2]]);
-
-                                    closesttri_tm->m_colors.push_back(Vec3d(1.0, 0.0, 0.0));
-                                    closesttri_tm->m_colors.push_back(Vec3d(1.0, 0.0, 0.0));
-                                    closesttri_tm->m_colors.push_back(Vec3d(1.0, 0.0, 0.0));
-
-                                    closesttri_tm->m_tris.push_back(closesttri_tm->m_points.size() - 3);
-                                    closesttri_tm->m_tris.push_back(closesttri_tm->m_points.size() - 2);
-                                    closesttri_tm->m_tris.push_back(closesttri_tm->m_points.size() - 1);
-                                }  // if world_coord
-                            }  // if conf
-                    }  // for x
-            }  // for y
-    }  // for z
-    closesttri_tm->scale(resolution, resolution, resolution);
-    closesttri_tm->translate(trans[0], trans[1], trans[2]);
 }

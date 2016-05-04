@@ -40,9 +40,6 @@ public:
 	double alpha;
 	bool showColor;
 
-        // added by zc
-        int closest_tri_idx;
-
 	HBBox  *m_hbb;
 	
 	TriMesh();
@@ -52,7 +49,7 @@ public:
 	bool loadRaw(istream &in);
 	bool loadTxt(istream &in);
 	bool loadPly(char *fn, bool color = false);
-        bool savePly(const char *fn);
+	bool savePly(char *fn);
 	void makeCylinder(double len, double rad, int lenSegs, int radSegs, double eRad = 0, double zMult = 1.0);
 	void calcNormals();
 

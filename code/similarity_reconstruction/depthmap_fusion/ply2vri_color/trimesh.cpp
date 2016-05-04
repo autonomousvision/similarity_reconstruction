@@ -351,7 +351,7 @@ bool pointToTriDist(Vec3d orig, Vec3d *verts, double maxDist,
 	Vec3d delta;
 	Vec3d norm = -(verts[1] - verts[0]) ^ (verts[2] - verts[0]);
 	norm.normalize();
-        double baryDenom = ((verts[1] - verts[0]) ^ (verts[2] - verts[0])) * norm;  // zc: negative norm length?
+	double baryDenom = ((verts[1] - verts[0]) ^ (verts[2] - verts[0])) * norm;
 
 	// project current voxel's position onto the triangle's plane
 	dist = (verts[0] - orig) * norm;
@@ -447,7 +447,6 @@ TriMesh::TriMesh() {
 	showColor = false;
 	solidColor = Vec3d(1, 1, 1);
 	alpha = 1;
-        closest_tri_idx = -1;
 }
 
 TriMesh::TriMesh(TriMesh *t) {
@@ -686,7 +685,7 @@ bool TriMesh::loadPly(char *fn, bool color) {
 	return true;
 }
 
-bool TriMesh::savePly(const char *fn) {
+bool TriMesh::savePly(char *fn) {
 	int i;
 
 	FILE *f = fopen(fn, "w");
@@ -707,7 +706,7 @@ bool TriMesh::savePly(const char *fn) {
 		return false;
 	}
 
-        ply_describe_element(ply, elemNames[0], m_points.size(), 7, vert_props);
+	ply_describe_element(ply, elemNames[0], m_points.size(), 3, vert_props);
 	ply_describe_element(ply, elemNames[1], m_tris.size() / 3, 1, face_props);
 	ply_header_complete(ply);
 
@@ -743,64 +742,6 @@ bool TriMesh::savePly(const char *fn) {
 
 	return true;
 }
-
-//bool TriMesh::savePlyWithColor(char *fn) {
-//        int i;
-
-//        FILE *f = fopen(fn, "w");
-//        if (f == NULL) {
-//                cerr << "couldn't open " << fn << endl;
-//                return false;
-//        }
-
-//        char **elemNames = new char*[2];
-//        elemNames[0] = new char[20];
-//        strcpy(elemNames[0], "vertex");
-//        elemNames[1] = new char[20];
-//        strcpy(elemNames[1], "face");
-
-//        PlyFile *ply = ply_write(f, 2, elemNames, PLY_ASCII);
-//        if (ply == NULL) {
-//                cerr << "couldn't write ply file " << fn << endl;
-//                return false;
-//        }
-
-//        ply_describe_element(ply, elemNames[0], m_points.size(), 3, vert_props);
-//        ply_describe_element(ply, elemNames[1], m_tris.size() / 3, 1, face_props);
-//        ply_header_complete(ply);
-
-//        // write vertices
-//        ply_put_element_setup(ply, elemNames[0]);
-//        PlyVertex vertex;
-//        for (i=0; i < m_points.size(); i++) {
-//                vertex.x = m_points[i][0];
-//                vertex.y = m_points[i][1];
-//                vertex.z = m_points[i][2];
-//                if (m_colors.size() > 0) {
-//                        vertex.r = floor(m_colors[i][0]*255+0.5);
-//                        vertex.g = floor(m_colors[i][1]*255+0.5);
-//                        vertex.b = floor(m_colors[i][2]*255+0.5);
-//                }
-//                ply_put_element(ply, &vertex);
-//        }
-
-//        // write triangles
-//        ply_put_element_setup(ply, elemNames[1]);
-//        PlyFace face;
-//        face.nverts = 3;
-//        face.verts = new int[3];
-//        for (i=0; i < m_tris.size(); i += 3) {
-//                face.verts[0] = m_tris[i + 0];
-//                face.verts[1] = m_tris[i + 1];
-//                face.verts[2] = m_tris[i + 2];
-//                ply_put_element(ply, &face);
-//        }
-//        delete []face.verts;
-
-//        ply_close(ply);
-
-//        return true;
-//}
 
 void TriMesh::makeCylinder(double len, double rad, int lenSegs, int radSegs, double eRad, double zMult) {
 	int i, j, k;
@@ -1198,7 +1139,6 @@ bool TriMesh::calcClosestPoint(intVec &tris) {
 			closestDist = dist;
 			closestPt = pt;
 			closestBary = bary;
-                        //closest_tri_idx = j/3;
 			for (i=0; i < 3; i++)
 				if (tri[i] == -1)
 					closestTri[i] = -1;

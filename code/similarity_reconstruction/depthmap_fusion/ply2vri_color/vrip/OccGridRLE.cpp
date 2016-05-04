@@ -291,7 +291,10 @@ OccGridRLE::setScanline(int y, int z)
 }
 
 
-#if (defined(linux) && BYTE_ORDER == LITTLE_ENDIAN) || defined(WIN32)
+// #if (defined(linux) && BYTE_ORDER == LITTLE_ENDIAN) || defined(WIN32)
+#if defined(__linux__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#pragma message("compiling with little endian")
+
 
 static inline void
 swap_4(const void *p, size_t size)
