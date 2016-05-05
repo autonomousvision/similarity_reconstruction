@@ -323,35 +323,6 @@ void cpu_tsdf::DepthMapTriangulate(const cv::Mat& depthmap,
                 }
             }
 
-//            if (check_edge_ratio > 0)
-//            {
-//                for (int j = 0; j < 2; ++j)
-//                {
-//                    if (tri[j] == 0) continue;
-//                    const int* tv = tris[tri[j] - 1];
-//                    cv::Vec3f vertices[3];
-//                    vertices[0] = PCLPoint2CvVec(point_cloud_world_coord->at(point_index[tv[0]]));
-//                    vertices[1] = PCLPoint2CvVec(point_cloud_world_coord->at(point_index[tv[1]]));
-//                    vertices[2] = PCLPoint2CvVec(point_cloud_world_coord->at(point_index[tv[2]]));
-//                    if (CheckSlantedTriangleEdgeRatio(vertices, check_edge_ratio)) tri[j] = 0;
-//                }
-//            }
-
-//            if (check_view_angle > 0)
-//            {
-//                for (int j = 0; j < 2; ++j)
-//                {
-//                    if (tri[j] == 0) continue;
-//                    const int* tv = tris[tri[j] - 1];
-//                    cv::Vec3f vertices[3];
-//                    vertices[0] = PCLPoint2CvVec(point_cloud_world_coord->at(point_index[tv[0]]));
-//                    vertices[1] = PCLPoint2CvVec(point_cloud_world_coord->at(point_index[tv[1]]));
-//                    vertices[2] = PCLPoint2CvVec(point_cloud_world_coord->at(point_index[tv[2]]));
-//                    cv::Vec3f ref_cam_center = cam_info.RefCameraCenterInWorldCoord();
-//                    if (CheckSlantedTriangleNormal(vertices, ref_cam_center, check_view_angle)) tri[j] = 0;
-//                }
-//            }
-
             /* Build triangles. */
             for (int j = 0; j < 2; ++j)
             {

@@ -187,14 +187,11 @@ bool cpu_tsdf::ExtractSamplesFromAffineTransform(const TSDFHashing &scene_tsdf, 
 bool cpu_tsdf::ExtractOneSampleFromAffineTransform(const TSDFHashing &scene_tsdf, const Eigen::Affine3f &affine_transform, const TSDFGridInfo &options, Eigen::SparseVector<float> *sample, Eigen::SparseVector<float> *weight)
 {
     using namespace std;
-    // cout << "affine now: \n" << affine_transform.matrix() << endl;
     const Eigen::Vector3f& offset = options.offset();
     const Eigen::Vector3i& voxel_bb_size = options.boundingbox_size();
     const int total_voxel_size = voxel_bb_size[0] * voxel_bb_size[1] * voxel_bb_size[2];
     sample->resize(total_voxel_size);
-    //sample->reserve(total_voxel_size * 0.6);
     weight->resize(total_voxel_size);
-    //weight->reserve(total_voxel_size * 0.6);
     for (int x = 0; x < options.boundingbox_size()[0]; ++x)
         for (int y = 0; y < options.boundingbox_size()[1]; ++y)
             for (int z = 0; z < options.boundingbox_size()[2]; ++z)
@@ -206,14 +203,12 @@ bool cpu_tsdf::ExtractOneSampleFromAffineTransform(const TSDFHashing &scene_tsdf
                 Eigen::Vector3f transformed_world_point = affine_transform * current_world_point;
                 float cur_d = 0;
                 float cur_w = 0;
-                //if (tsdf_origin.RetriveDataFromWorldCoord_NearestNeighbor(cur_world_coord, &cur_d, &cur_w))
                 if(scene_tsdf.RetriveDataFromWorldCoord(transformed_world_point, &cur_d, &cur_w) && /*cur_w > 0*/ cur_w > options.min_model_weight())
                 {
                     int current_index = z +
                             (y + x * options.boundingbox_size()[1]) * options.boundingbox_size()[2];
                     sample->coeffRef(current_index) = cur_d;
                     weight->coeffRef(current_index) = cur_w;
-                    //std::cerr << "world_pt: " << transformed_world_point << " cur_d: " << cur_d << " cur_w: " << cur_w << std::endl;
                 }
             }
     return true;
