@@ -161,7 +161,6 @@ bool JointOptimization(
                                   &samples,
                                   &weights);
         params.save_path = cur_save_path + "_TransformScale_EndSave";
-        //WriteAffineTransformsAndTSDFs(scene_tsdf, *affine_transforms, params);
         {
             tsdf_utility::OutputOBBsAsPly(*obbs, params.save_path);
             TSDFGridInfo tsdf_info(scene_tsdf, params.sample_size, 0);
@@ -387,8 +386,6 @@ bool OptimizePCACoeffAndCluster(
     for (int i = 0; i < (*cluster_assignment).size(); ++i)
     {
         double err_i = sqrt((*cluster_assignment_error)[i]) - params.lambda_outlier;
-        //cout << "outlier: " << i << " " << err_i << endl;
-        //cout << "outlier detail: " << i << " " << (params.lambda_average_scale * ((obbs[i].SideLengths() - (*cluster_average_scales)[(*cluster_assignment)[i]]).squaredNorm())) << " " << squared_errors[i] - (pca_options.lambda_scale_diff * ((scale - (*cluster_average_scales)[(*cluster_assignment)[i]]).squaredNorm())) << endl;
         err_i = err_i >= 0 ? err_i:0;
         (*outlier_gammas)[i] = err_i;
     }

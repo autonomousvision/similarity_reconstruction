@@ -219,10 +219,10 @@ bool WriteTSDFModel(
         float mesh_min_weight)
 {
     string output_dir = bfs::path(output_filename).remove_filename().string();
-    string output_tsdf_gridfilename =
-                    (bfs::path(output_dir) / (bfs::path(output_filename).stem().string()
-                                              + "_tsdf_grid.ply"
-                                              )).string();
+    //string output_tsdf_gridfilename =
+    //                (bfs::path(output_dir) / (bfs::path(output_filename).stem().string()
+    //                                          + "_tsdf_grid.ply"
+    //                                          )).string();
     // tsdf_model->OutputTSDFGrid(output_tsdf_gridfilename, NULL, NULL);
     if (save_tsdf_bin)
     {
@@ -820,6 +820,23 @@ bool WriteOBBsAndTSDFs(const TSDFHashing &scene_tsdf, const std::vector<tsdf_uti
         }
     }
     return true;
+}
+
+void WriteForVisualization(const string &dir_prefix, TSDFHashing::ConstPtr tsdf_model, float mesh_min_weight, const std::vector<tsdf_utility::OrientedBoundingBox> *obbs) {
+    bfs::create_directories(dir_prefix);
+    vector<string> output_filenames;
+    string mesh_filename = dir_prefix + "/scene_mesh.ply";
+    WriteTSDFMesh(tsdf_model, mesh_min_weight, mesh_filename, false);
+    output_filenames.push_back(string("m ") + mesh_filename); // display as mesh
+    if (obbs) {
+        vector<string> saved_obb_filelist;
+        string obb_filename = dir_prefix + "/obb.ply";
+        tsdf_utility::OutputOBBsAsPly(*obbs, obb_filename, &saved_obb_filelist);
+        for (const auto& li : saved_obb_filelist) {
+            output_filenames.push_back(string("e ") + li);  // display as edges
+        }
+    }
+    utility::OutputVector(dir_prefix + "/visualization.txt", output_filenames);
 }
 
 } // end namespace cpu_tsdf

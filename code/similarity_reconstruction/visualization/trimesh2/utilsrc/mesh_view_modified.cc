@@ -6,6 +6,8 @@ mesh_view.cc
 Simple viewer
 */
 
+// modified to display reconstructed scene in mesh and bounding boxes in wireframe
+
 #include "TriMesh.h"
 #include "XForm.h"
 #include "GLCamera.h"
@@ -14,6 +16,7 @@ Simple viewer
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include <string>
 #include <memory>
 #include <GL/freeglut.h>
@@ -21,6 +24,25 @@ Simple viewer
 using namespace std;
 using namespace trimesh;
 
+// added by zc, reading a file containing paths to the output meshes/bounding boxes and display them
+std::vector<bool> draw_edges_per_obj;
+void ReadFileList(const string& file_for_meshes, vector<string>& mesh_paths, vector<bool>& display_edges) {
+    ifstream is(file_for_meshes);
+    if (!is) {
+        fprintf(stderr, "Reading file failed for %s\n", file_for_meshes.c_str());
+        exit(EXIT_FAILURE);
+    }
+    string cur_line;
+    while (getline(is, cur_line)) {
+        if (cur_line.empty()) continue;
+        if (cur_line[0] == 'm' /*mesh display*/) {
+            display_edges.push_back(false);
+        } else if (cur_line[0] == 'e' /*edge display*/) {
+            display_edges.push_back(true);
+        }
+        mesh_paths.push_back(cur_line.substr(2));  // the following part should be the file path
+    }
+}
 
 // Globals
 vector<TriMesh *> meshes;
@@ -236,23 +258,19 @@ void draw_mesh(int i)
 		return;
 	}
 
-    //if (draw_edges) {
-    //	glPolygonOffset(10.0f, 10.0f);
-    //	glEnable(GL_POLYGON_OFFSET_FILL);
-    //}
-
-    if (draw_edges) {
-        glPolygonMode(GL_FRONT, GL_LINE);
+    if (draw_edges || draw_edges_per_obj[i]) {
+        // glPolygonOffset(10.0f, 10.0f);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glLineWidth(float(line_width));
     }
     draw_tstrips(themesh);
 	glDisable(GL_POLYGON_OFFSET_FILL);
     glPolygonMode(GL_FRONT, GL_FILL);
 
-	// Edge drawing pass
-    //if (draw_edges) {
-    //	glPolygonMode(GL_FRONT, GL_LINE);
-    //	glLineWidth(float(line_width));
+ // Edge drawing pass
+ // if (draw_edges) {
+ //	       glPolygonMode(GL_FRONT, GL_LINE);
+ //	       glLineWidth(float(line_width));
  //       glDisableClientState(GL_COLOR_ARRAY);
  //       glDisable(GL_COLOR_MATERIAL);
  //       GLfloat global_ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
@@ -677,23 +695,21 @@ int main(int argc, char *argv[])
 	if (argc < 2)
 		usage(argv[0]);
 
-	for (int i = 1; i < argc; i++) {
-		if (!strcmp(argv[i], "-grab")) {
-			grab_only = true;
-			continue;
-		}
-		const char *filename = argv[i];
-		TriMesh *themesh = TriMesh::read(filename);
-		if (!themesh)
-			usage(argv[0]);
-		themesh->need_normals();
-		themesh->need_tstrips();
-		themesh->need_bsphere();
-		meshes.push_back(themesh);
-		xforms.push_back(xform());
-		visible.push_back(true);
-		filenames.push_back(filename);
-	}
+    vector<string> mesh_paths;
+    ReadFileList(argv[1], mesh_paths, draw_edges_per_obj);
+    for (size_t i = 0; i < mesh_paths.size(); i++) {
+        const char *filename =mesh_paths[i].c_str();
+        TriMesh *themesh = TriMesh::read(filename);
+        if (!themesh)
+            usage(argv[0]);
+        themesh->need_normals();
+        themesh->need_tstrips();
+        themesh->need_bsphere();
+        meshes.push_back(themesh);
+        xforms.push_back(xform());
+        visible.push_back(true);
+        filenames.push_back(filename);
+    }
 
 	glutCreateWindow(argv[1]);
 	glutDisplayFunc(redraw);

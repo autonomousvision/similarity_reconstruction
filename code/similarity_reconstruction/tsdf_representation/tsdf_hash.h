@@ -437,6 +437,9 @@ namespace cpu_tsdf
     }
     inline bool Empty() { return voxel_hash_map_.Empty(); }
 
+  public:
+    // when doing bilinear interpolation, this threshold determines whether to return points that falls at the edge of the TSDF
+    static float bilinear_interpolation_weight_thresh;
   private:
     // only used in integrateCloud_Spherical_Queue function.
     // first enqueue affected bricks and then update the TSDF values within them

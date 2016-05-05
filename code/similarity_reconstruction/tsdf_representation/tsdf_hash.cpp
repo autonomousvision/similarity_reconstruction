@@ -45,6 +45,8 @@ inline cv::Vec3i RoundVec3d(const cv::Vec3d& v)
     return cv::Vec3i(cvRound(v[0]), cvRound(v[1]), cvRound(v[2]));
 }
 
+float TSDFHashing::bilinear_interpolation_weight_thresh = 0.5;
+
 void TSDFHashing::CopyHashParametersFrom(const TSDFHashing &tsdf)
 {
     this->Init(tsdf.voxel_length_, tsdf.offset_, tsdf.max_dist_pos_, tsdf.max_dist_neg_);
@@ -56,14 +58,9 @@ void TSDFHashing::Init(float voxel_length, const Eigen::Vector3f& offset, float 
     voxel_length_ = voxel_length;
     max_dist_pos_ = max_dist_pos;
     max_dist_neg_ = max_dist_neg;
-    // dist_neg_inflection_point_ = max_dist_neg;
     neighbor_adding_limit_ = ceil(std::max(fabs(max_dist_pos_/voxel_length_/(float)VoxelHashMap::kBrickSideLength), 
             fabs(max_dist_neg_/voxel_length_/(float)VoxelHashMap::kBrickSideLength)));
     voxel_hash_map_.Clear();
-    // std::cout << "voxel_length: " << voxel_length_ << std::endl;
-    // std::cout << "max_dist_pos_: " << max_dist_pos_ << std::endl;
-    // std::cout << "max_dist_neg_: " << max_dist_neg_ << std::endl;
-    // std::cout << "neighbor_adding_limit_: " << neighbor_adding_limit_ << std::endl;
 }
 
 bool TSDFHashing::integrateCloud_Spherical_Queue (const cv::Mat& depth,
@@ -266,7 +263,6 @@ bool TSDFHashing::RetriveDataFromWorldCoord(const Eigen::Vector3f& world_coord, 
                 cv::Vec3b color;
                 if (!this->RetriveData(cur_voxel, &cur_d, &cur_w, &color) || cur_w == 0)
                 {
-                    //return false;
                     continue;
                 }
                 assert(cur_w > 0);
@@ -278,9 +274,7 @@ bool TSDFHashing::RetriveDataFromWorldCoord(const Eigen::Vector3f& world_coord, 
                 total_color += linear_w * Eigen::Vector3f(color[0], color[1], color[2]);
                 total_point_w += linear_w * cur_w;
             }
-    // const float total_thresh = 0.5;
-    const float total_thresh = 0.01;
-    if (total_linear_w > total_thresh)
+    if (total_linear_w > bilinear_interpolation_weight_thresh)
     {
         *d = final_d / total_linear_w;
         if (w)
@@ -290,7 +284,7 @@ bool TSDFHashing::RetriveDataFromWorldCoord(const Eigen::Vector3f& world_coord, 
             *pcolor = utility::EigenVectorToCvVector3((total_color / total_linear_w).eval());
         }
     }
-    return total_linear_w > total_thresh;
+    return total_linear_w > bilinear_interpolation_weight_thresh;
 }
 
 bool TSDFHashing::RetriveDataFromWorldCoord_NearestNeighbor(const Eigen::Vector3f& world_coord, float* d, float* w /*=NULL*/, cv::Vec3b* pcolor /*=NULL*/) const

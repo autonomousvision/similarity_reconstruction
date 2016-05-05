@@ -41,7 +41,7 @@ include_directories(${THIRD_PARTY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # find third party library dependencies
-find_package(PCL 1.7 REQUIRED COMPONENTS common io surface kdtree search segmentation)
+find_package(PCL 1.7 REQUIRED COMPONENTS common io surface kdtree search segmentation visualization)
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})

@@ -72,14 +72,6 @@ bool WriteAffineTransformsAndTSDFs(
         const std::string& save_path,
         bool save_text_data = false);
 
-//bool WriteObbsAndTSDFs(
-//        const cpu_tsdf::TSDFHashing& scene_tsdf,
-//        const std::vector<cpu_tsdf::OrientedBoundingBox>& obbs,
-//        const Eigen::Vector3i& sample_obb_voxel_size,
-//        const std::string& save_path,
-//        const float vmin_model_weight,
-//        bool save_text_data = false);
-
 inline bool WriteObbsAndTSDFs(
         const cpu_tsdf::TSDFHashing& scene_tsdf,
         const std::vector<cpu_tsdf::OrientedBoundingBox>& obbs,
@@ -95,10 +87,6 @@ inline bool WriteObbsAndTSDFs(
                                          save_path,
                                          save_text_data);
 }
-
-/* deprecated */
-//bool WriteAffineTransformsAndTSDFs(const cpu_tsdf::TSDFHashing& scene_tsdf,
-//                           const std::vector<Eigen::Affine3f>& affine_transforms, const PCAOptions &options, bool save_text_data = false);
 
 /**************************
  * Read/Write TSDF models in feature vectors
@@ -192,17 +180,5 @@ bool ReadMatrixMatlab(const std::string &filepath, const std::string & varname, 
 
 bool WriteMatrixMatlab(const std::string &filepath, const std::string &variable_name, const Eigen::MatrixXf &matrix);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+void WriteForVisualization(const std::string &dir_prefix, TSDFHashing::ConstPtr tsdf_model, float mesh_min_weight, const std::vector<tsdf_utility::OrientedBoundingBox>* obbs);
 }

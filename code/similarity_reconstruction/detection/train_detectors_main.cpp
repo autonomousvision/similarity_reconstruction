@@ -11,6 +11,7 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl/io/ply_io.h>
 #include <pcl/io/vtk_lib_io.h>
+#include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/pcl_macros.h>
 #include <boost/format.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -134,19 +135,8 @@ main (int argc, char** argv)
       vector<tsdf_utility::OrientedBoundingBox> current_training_obbs = category_training_obbs[category];
       if (current_training_obbs.empty()) continue;
 
-      // the template oriented bounding box for sampling negatives / doing detection
-      //Eigen::Vector3f mean_sidelengths(0, 0, 0);
-      //for (auto& obbi : current_training_obbs) {
-      //    obbi = obbi.ExtendSidesByPercent(Eigen::Vector3f(0.1, 0.1, 0.2));
-      //    mean_sidelengths += obbi.SideLengths();
-      //}
-      //mean_sidelengths /= (current_training_obbs.size());
-      //Eigen::Vector3f obb_pos = current_training_obbs[0].BottomCenter();
-      //tsdf_utility::OrientedBoundingBox template_bb(mean_sidelengths, obb_pos[0], obb_pos[1], obb_pos[2],
-      //        current_training_obbs[0].AngleRangeTwoPI());
       tsdf_utility::OrientedBoundingBox template_bb = current_training_obbs[0];
       Eigen::Vector3f mean_sidelengths = template_bb.SideLengths();
-
       // scene discretization info
       // when doing detection (in negative mining), the detector is placed at discretized positions
       // the SceneDiscretizeInfo converts between discretized positions and positions in the world coordinate
@@ -164,6 +154,14 @@ main (int argc, char** argv)
                       Vector3f(delta_x, delta_y, delta_rotation));
       discretize_info.DisplayDiscretizeInfo();
 
+      //////
+      cpu_tsdf::WriteForVisualization( output_prefix + "/visualization/category_" + utility::int2str(category, 0), tsdf_model, params.min_nonempty_voxel_weight, &current_training_obbs);
+      continue;
+      //////
+
+      // for the more noisy cars, use a higher bilinear weight threshold to prevent extracting noisy TSDF values near the truncation limit
+      // where we cannot reliably interpolate the TSDF value
+      // this slightly increases the accuracy for cars
       tsdf_detection::SampleCollection pos_samples;
       pos_samples.AddSamplesFromOBBs(current_training_obbs, sample_size, *tsdf_model, params.min_nonempty_voxel_weight, 1);  // add pos samples
       tsdf_detection::Detector detector;

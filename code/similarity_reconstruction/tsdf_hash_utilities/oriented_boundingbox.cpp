@@ -235,11 +235,12 @@ void InputAnnotatedOBB(const std::string &filename, std::vector<std::vector<Orie
     }
 }
 
-void OutputOBBsAsPly(const std::vector<OrientedBoundingBox> &obbs, const std::string &filename)
+void OutputOBBsAsPly(const std::vector<OrientedBoundingBox> &obbs, const std::string &filename, std::vector<std::string>* saved_filelist)
 {
     for (int i = 0; i < obbs.size(); ++i) {
         std::string  cur_file = filename + "_" + utility::int2str(i, 3) + ".ply";
         obbs[i].WriteToPly(cur_file);
+        if (saved_filelist) saved_filelist->push_back(cur_file);
     }
 }
 

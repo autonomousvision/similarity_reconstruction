@@ -165,7 +165,6 @@ template<typename T>
       {
           os << vec[i] << endl;
       }
-      os << endl;
       return true;
   }
 

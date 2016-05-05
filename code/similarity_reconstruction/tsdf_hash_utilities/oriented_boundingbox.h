@@ -59,7 +59,7 @@ private:
 };
 std::istream& operator >> (std::istream& ifs, OrientedBoundingBox& obb);
 std::ostream& operator << (std::ostream& ofs, const OrientedBoundingBox& obb);
-void OutputOBBsAsPly(const std::vector<OrientedBoundingBox>& obbs, const std::string & filename);
+void OutputOBBsAsPly(const std::vector<OrientedBoundingBox>& obbs, const std::string & filename, std::vector<std::string> *saved_filelist = NULL);
 void OutputAnnotatedOBB(const std::vector<std::vector<tsdf_utility::OrientedBoundingBox> > &obbs, const std::string &filename);
 void OutputAnnotatedOBB(const std::vector<OrientedBoundingBox>& obb_vec, const std::vector<int>& sample_model_idx, const std::string& filename);
 void InputAnnotatedOBB(const std::string& filename, std::vector<std::vector<tsdf_utility::OrientedBoundingBox>>* obbs);

@@ -159,11 +159,8 @@ main (int argc, char** argv)
                       Vector2f(min_pt[1], max_pt[1]),
                       Vector3f(delta_x, delta_y, delta_rotation));
       discretize_info.DisplayDiscretizeInfo();
-      tsdf_detection::Sample temp = tsdf_detection::Sample(template_obb.OBB(), template_obb.sample_size(), *tsdf_model, -1, params.min_nonempty_voxel_weight);
-      // params.minimum_occupied_ratio = temp.OccupiedRatio() * 0.3;
 
       tsdf_detection::SampleCollection cur_samples;
-      // cur_samples.ReadOBBs(params.save_prefix + "/obbs.txt");
       tsdf_detection::Detect(*tsdf_model, (*detectors[category]), discretize_info, params, 0, &cur_samples);
       // set object category label
       for (auto& samplei : cur_samples.samples) {
