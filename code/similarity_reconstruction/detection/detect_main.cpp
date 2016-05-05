@@ -190,6 +190,9 @@ main (int argc, char** argv)
   });
   sample_collections.WriteOBBs(output_prefix + "/detect_res_all_obb_nmsed.txt");
   sample_collections.WriteOBBsToPLY(output_prefix + "/detect_res_all_obb_nmsed.ply");
+  vector<tsdf_utility::OrientedBoundingBox> obbs_for_save;
+  sample_collections.GetOBBCollection(&obbs_for_save);
+  cpu_tsdf::WriteForVisualization( output_prefix + "/visualization/", tsdf_model, params.min_nonempty_voxel_weight, &obbs_for_save);
   return 0;
 }
 

@@ -154,11 +154,6 @@ main (int argc, char** argv)
                       Vector3f(delta_x, delta_y, delta_rotation));
       discretize_info.DisplayDiscretizeInfo();
 
-      //////
-      cpu_tsdf::WriteForVisualization( output_prefix + "/visualization/category_" + utility::int2str(category, 0), tsdf_model, params.min_nonempty_voxel_weight, &current_training_obbs);
-      continue;
-      //////
-
       // for the more noisy cars, use a higher bilinear weight threshold to prevent extracting noisy TSDF values near the truncation limit
       // where we cannot reliably interpolate the TSDF value
       // this slightly increases the accuracy for cars

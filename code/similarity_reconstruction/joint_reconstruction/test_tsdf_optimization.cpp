@@ -64,7 +64,7 @@ main (int argc, char** argv)
             ("help,h", "produce help message")
             ("scene_file", bpo::value<std::string>(&input_scene_file)->required(), "input scene tsdf file")
             ("detect_obb_file", bpo::value<std::string>(&detect_obb_file)->required(), "detected oriented bounging box file")
-            ("output_prefix", bpo::value<std::string>(&output_prefix)->required (), "output ply path")
+            ("output_prefix", bpo::value<std::string>(&output_prefix)->required (), "output directory path")
             ("mesh_min_weight", bpo::value<float>(&min_meshing_weight)->default_value(0.0), "minimum weight doing marching cubes")
             ("pca_number", bpo::value<int>(&pc_num)->default_value(0), "principal component number")
             ("optimize_max_iter", bpo::value<int>(&optimize_max_iter)->default_value(3), "max iteration number")
@@ -137,7 +137,7 @@ main (int argc, char** argv)
 
     LOG(INFO) << "Initialize.";
     tsdf_utility::OptimizationParams params;
-    params.save_path = output_prefix + "res.ply";
+    params.save_path = output_prefix + "/res.ply";
     params.min_meshing_weight = min_meshing_weight;
     params.lambda_average_scale = lambda_average_scale;
     params.lambda_observation = lambda_observation;
@@ -156,8 +156,6 @@ main (int argc, char** argv)
     std::vector<Eigen::Vector3f> model_average_scales;
     Eigen::SparseMatrix<float, Eigen::ColMajor> reconstructed_sample_weights;
 
-    params.save_path = output_prefix + "_icompnum_" + boost::lexical_cast<string>(0) + ".ply";
-
     tsdf_optimization::InitializeOptimization(
                 *scene_tsdf,
                 obbs,
@@ -174,9 +172,9 @@ main (int argc, char** argv)
     std::vector<double> outlier_gammas(obbs.size(), 0.0);
     for (int icompnum = 0; icompnum <= pc_num; ++icompnum)
     {
-        bfs::path write_dir(bfs::path(output_prefix).parent_path()/(string("comp_num_") + boost::lexical_cast<string>(icompnum)));
-        bfs::create_directories(write_dir);
-        params.save_path = (write_dir/bfs::path(output_prefix).stem()).string() + "res.ply";
+        bfs::path intermediate_write_dir(bfs::path(output_prefix)/(string("comp_num_") + boost::lexical_cast<string>(icompnum)));
+        bfs::create_directories(intermediate_write_dir);
+        params.save_path = (intermediate_write_dir/"res.ply").string();
         params.pc_num = icompnum;
 
         cout << "begin following optimization " << endl;
@@ -194,11 +192,10 @@ main (int argc, char** argv)
                                                            );
         cout << "finished following optimization " << icompnum << endl;
     }
-    tsdf_utility::OutputOBBsAsPly(obbs, params.save_path + "finalres.ply");
-    tsdf_detection::SampleCollection samples;
-    samples.AddSamplesFromOBBs(obbs, sample_model_idx);
-    samples.WriteOBBs(params.save_path + "finalres.txt");
-    cout << "begin fusing reconstructed tsdf samples with original scene tsdf " << endl;
+    // save results
+    bfs::path write_dir(bfs::path(output_prefix)/string("final_result"));
+    bfs::create_directories(write_dir);
+    // save reconstructed samples individually
     cpu_tsdf::TSDFGridInfo grid_info(*scene_tsdf, params.sample_size, params.min_meshing_weight);
     std::vector<cpu_tsdf::TSDFHashing::Ptr> reconstructed_samples_original_pos;
     cpu_tsdf::ReconstructTSDFsFromPCAOriginPos(
@@ -212,35 +209,50 @@ main (int argc, char** argv)
             scene_tsdf->voxel_length(),
             scene_tsdf->offset(),
             &reconstructed_samples_original_pos);
-    cpu_tsdf::WriteTSDFModels(reconstructed_samples_original_pos,
-                              (bfs::path(params.save_path).replace_extension(".frecon_tsdf.ply")).string(),
-                              false, true, min_meshing_weight, outlier_gammas);
-    cpu_tsdf::CleanTSDFs(reconstructed_samples_original_pos, -1, 0, 1);
-    cpu_tsdf::WriteTSDFModels(reconstructed_samples_original_pos,
-                              (bfs::path(params.save_path).replace_extension(".sample_cleaned_frecon_tsdf.ply")).string(),
-                              false, true, min_meshing_weight, outlier_gammas);
-    scene_tsdf->DisplayInfo();
-    cout << "begin merging... " << endl;
+    // removing outlier detections for both obbs and reconstructed samples, not used in the iccv version
+    vector<bool> to_remove(obbs.size(), false);
     for (int i = 0; i < reconstructed_samples_original_pos.size(); ++i) {
         if (outlier_gammas[i] > 1e-5) {
             reconstructed_samples_original_pos[i].reset();
+            to_remove[i] = true;
         }
     }
     reconstructed_samples_original_pos.erase(std::remove_if(reconstructed_samples_original_pos.begin(), reconstructed_samples_original_pos.end(), [](const  cpu_tsdf::TSDFHashing::Ptr& ptr){
         return !bool(ptr);
     }), reconstructed_samples_original_pos.end());
-    std::vector<Eigen::Affine3f> obb_affines;
-    for (int i = 0; i < obbs.size(); ++i) {
-            obb_affines.push_back(obbs[i].AffineTransformOriginAsCenter());
-    }
+    cpu_tsdf::EraseElementsAccordingToFlags(to_remove, &obbs);
+    cpu_tsdf::WriteTSDFModels(reconstructed_samples_original_pos,
+                              write_dir.string() + "/reconstructed_sample.ply",
+                              false, true, min_meshing_weight, outlier_gammas);
+    cpu_tsdf::CleanTSDFs(reconstructed_samples_original_pos, -1, 0, 1);
+    cpu_tsdf::WriteTSDFModels(reconstructed_samples_original_pos,
+                              write_dir.string() + "/reconstructed_sample_cleaned.ply",
+                              false, true, min_meshing_weight, outlier_gammas);
+
+    // save aligned oriented bounding boxes
+    tsdf_detection::SampleCollection samples;
+    samples.AddSamplesFromOBBs(obbs, sample_model_idx);
+    samples.WriteOBBs(write_dir.string() + "/final_obbs.txt");
+
+    // begin fusing
+    scene_tsdf->DisplayInfo();
+    cout << "begin fusing reconstructed tsdf samples with original scene tsdf " << endl;
+    //std::vector<Eigen::Affine3f> obb_affines;
+    //for (int i = 0; i < obbs.size(); ++i) {
+    //        obb_affines.push_back(obbs[i].AffineTransformOriginAsCenter());
+    //}
     // cpu_tsdf::ScaleTSDFParts(scene_tsdf.get(), obb_affines, 0.5);
     cpu_tsdf::MergeTSDFs(reconstructed_samples_original_pos, scene_tsdf.get());
     cpu_tsdf::CleanTSDF(scene_tsdf, 100);
     scene_tsdf->DisplayInfo();
     cpu_tsdf::WriteTSDFModel(scene_tsdf,
-                             (bfs::path(params.save_path).replace_extension(".merged_tsdf.ply")).string(),
+                             write_dir.string() + "/merged_scene.ply",
                              true, true, min_meshing_weight);
     cout << "finished fusing" << endl;
+    // save results for visualization
+    bfs::path vis_dir(bfs::path(output_prefix)/string("visualization"));
+    bfs::create_directories(vis_dir);
+    cpu_tsdf::WriteForVisualization(vis_dir.string(), scene_tsdf, params.min_meshing_weight, &obbs);
     return 0;
 }
 

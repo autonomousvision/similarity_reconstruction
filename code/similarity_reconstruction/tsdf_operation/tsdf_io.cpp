@@ -28,12 +28,9 @@
 #include "marching_cubes/marching_cubes_tsdf_hash.h"
 #include "common/utilities/eigen_utility.h"
 
-
 using namespace std;
 namespace bfs = boost::filesystem;
 using namespace bfs;
-
-
 
 namespace cpu_tsdf {
 

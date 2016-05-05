@@ -200,6 +200,7 @@ bool JointOptimization(
         Eigen::SparseMatrix<float, Eigen::ColMajor> recon_sample_mat = cpu_tsdf::SparseVectorsToEigenMat(recon_samples);
         CleanTSDFSampleMatrix(scene_tsdf, recon_sample_mat, params.sample_size, params.noise_connected_component_thresh, &valid_weights, -1, 2);
         *reconstructed_sample_weights = valid_weights;
+
         TSDFGridInfo tsdf_info(scene_tsdf, params.sample_size, 0);
         tsdf_info.offset(Eigen::Vector3f(-0.5,-0.5,-0.5));
         cpu_tsdf::WriteTSDFsFromMatWithWeight(recon_sample_mat, *reconstructed_sample_weights, tsdf_info, params.save_path + "_ModelCoeffPCA_reconweight.ply");
@@ -246,7 +247,6 @@ bool JointOptimization(
         //}
         params.save_path = params_init_save_path;
     }  // optimization iteration
-    params.save_path = params_init_save_path;
     return true;
 }
 
