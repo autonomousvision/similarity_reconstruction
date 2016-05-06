@@ -196,11 +196,7 @@ main (int argc, char** argv)
       cpu_tsdf::CleanMesh(*pmesh, filter_noise);
       pcl::io::savePLYFileBinary(out_filename + ".tsdf_consistency_cleaned.ply", *pmesh);
   }
-  //cout << "write obbs" << endl;
-  //cout << out_filename + "_out_obbs.txt" << endl;
-  //tsdf_utility::OutputOBBsAsPly(detected_obbs, out_filename + ".final_obbs.ply");
-  ////cpu_tsdf::WriteOrientedBoundingboxesPly(apply_obbs, out_filename + "_out_obbs.txt");
-  //cpu_tsdf::WriteOrientedBoundingBoxes(out_filename + "_out_obbs.txt", detected_obbs,  apply_categories, std::vector<bool>(detected_obbs.size(), true));
+  cpu_tsdf::WriteForVisualization((bfs::path(out_filename).parent_path() / "visualization").string(), tsdf, mesh_min_weight, &detected_obbs);
   return 0;
 }
 
