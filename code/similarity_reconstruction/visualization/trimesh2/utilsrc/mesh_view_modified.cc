@@ -682,8 +682,9 @@ void keyboardfunc(unsigned char key, int, int)
 
 void usage(const char *myname)
 {
-	fprintf(stderr, "Usage: %s [-grab] infile...\n", myname);
-	exit(1);
+    fprintf(stderr, "Usage: %s windowtitle infile\n", myname);
+    fprintf(stderr, "the infile can be a visualization_txt file or a set of ply files\n");
+    exit(1);
 }
 
 int main(int argc, char *argv[])
@@ -692,23 +693,44 @@ int main(int argc, char *argv[])
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInit(&argc, argv);
 
-	if (argc < 2)
+    if (argc < 3)
 		usage(argv[0]);
 
-    vector<string> mesh_paths;
-    ReadFileList(argv[1], mesh_paths, draw_edges_per_obj);
-    for (size_t i = 0; i < mesh_paths.size(); i++) {
-        const char *filename =mesh_paths[i].c_str();
-        TriMesh *themesh = TriMesh::read(filename);
-        if (!themesh)
-            usage(argv[0]);
-        themesh->need_normals();
-        themesh->need_tstrips();
-        themesh->need_bsphere();
-        meshes.push_back(themesh);
-        xforms.push_back(xform());
-        visible.push_back(true);
-        filenames.push_back(filename);
+    string first_file(argv[2]);
+    if (first_file.size() > 4 && first_file.substr(first_file.size() - 4) == ".txt") {
+        vector<string> mesh_paths;
+        ReadFileList(argv[2], mesh_paths, draw_edges_per_obj);
+        for (size_t i = 0; i < mesh_paths.size(); i++) {
+            const char *filename =mesh_paths[i].c_str();
+            TriMesh *themesh = TriMesh::read(filename);
+            if (!themesh)
+                usage(argv[0]);
+            themesh->need_normals();
+            themesh->need_tstrips();
+            themesh->need_bsphere();
+            meshes.push_back(themesh);
+            xforms.push_back(xform());
+            visible.push_back(true);
+            filenames.push_back(filename);
+        }
+    } else {
+        for (int i = 2; i < argc; i++) {
+                if (!strcmp(argv[i], "-grab")) {
+                    grab_only = true;
+                    continue;
+                }
+                const char *filename = argv[i];
+                TriMesh *themesh = TriMesh::read(filename);
+                if (!themesh)
+                    usage(argv[0]);
+                themesh->need_normals();
+                themesh->need_tstrips();
+                themesh->need_bsphere();
+                meshes.push_back(themesh);
+                xforms.push_back(xform());
+                visible.push_back(true);
+                filenames.push_back(filename);
+            }
     }
 
 	glutCreateWindow(argv[1]);
