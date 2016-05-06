@@ -24,7 +24,7 @@ Simple viewer
 using namespace std;
 using namespace trimesh;
 
-// added by zc, reading a file containing paths to the output meshes/bounding boxes and display them
+// reading a file containing paths to the output meshes/bounding boxes and display them
 std::vector<bool> draw_edges_per_obj;
 void ReadFileList(const string& file_for_meshes, vector<string>& mesh_paths, vector<bool>& display_edges) {
     ifstream is(file_for_meshes);
@@ -313,8 +313,8 @@ void redraw()
 		dump_image();
 		exit(0);
 	}
-	printf("\r                        \r%.1f msec.", 1000.0f * (now() - t));
-	fflush(stdout);
+    //printf("\r                        \r%.1f msec.", 1000.0f * (now() - t));
+    //fflush(stdout);
 }
 
 
@@ -730,6 +730,7 @@ int main(int argc, char *argv[])
                 xforms.push_back(xform());
                 visible.push_back(true);
                 filenames.push_back(filename);
+                draw_edges_per_obj.push_back(false);
             }
     }
 
