@@ -19,6 +19,7 @@
 #include "tsdf_operation/tsdf_clean.h"
 using namespace std;
 
+
 void SelectVisibleCamerasCoarse(
         const Eigen::Vector3f &point,
         const std::vector<RectifiedCameraPair> &cameras,

@@ -103,43 +103,16 @@ main (int argc, char** argv)
   }
 
   LOG(INFO) << "Reading detected box file\n " <<  obb_filename << endl;
-  //std::vector<std::vector<tsdf_utility::OrientedBoundingBox>> obbvec;
-  //std::vector<tsdf_utility::OrientedBoundingBox> detected_obbs;
-  //tsdf_utility::InputAnnotatedOBB(obb_filename, &obbvec);
-  //for (int i = 0; i < obbvec.size(); ++i) {
-  //    detected_obbs.insert(detected_obbs.end(), obbvec[i].begin(), obbvec[i].end());
-  //}
-  //std::vector<int> sample_model_idx(detected_obbs.size(), 0);
-
   tsdf_detection::SampleCollection sample_collection;
   sample_collection.ReadOBBs(obb_filename);
   std::vector<tsdf_utility::OrientedBoundingBox> detected_obbs;
   std::vector<int> sample_model_idx;
   sample_collection.GetOBBCollection(&detected_obbs, &sample_model_idx);
   tsdf_utility::OutputOBBsAsPly(detected_obbs, out_filename + ".obb.ply");
-
-  ///
-    //std::vector<tsdf_utility::OrientedBoundingBox> obbs;
-    //std::vector<int> sample_model_idx;
-    //std::vector<cpu_tsdf::OrientedBoundingBox> old_obbs;
-    //cpu_tsdf::ReadOrientedBoundingBoxes(obb_filename, &old_obbs, &sample_model_idx);
-    //for (int i = 0; i <old_obbs.size(); ++i)
-    //    {
-    //        cpu_tsdf::OrientedBoundingBox obb;
-    //        obb = old_obbs[i];
-    //        {
-    //            float z_below = 0.2;
-    //            Eigen::Vector3f ext_below_ground(0, 0, z_below);
-    //            obb.bb_offset = obb.bb_offset - ext_below_ground;
-    //            tsdf_detection::ExtendOBBNoBottom(obb, Eigen::Vector3f(1, 1, 2 + z_below));
-
-    //        }
-    //        old_obbs[i] = obb;
-    //    }
-    //obbs = tsdf_utility::ComputeNewOBBsFromOlds(old_obbs);
-    //std::vector<tsdf_utility::OrientedBoundingBox> detected_obbs;
-    //detected_obbs = obbs;
-  ///
+  for (int i = 0; i < detected_obbs.size(); ++i) {
+      detected_obbs[i] = detected_obbs[i].ExtendSides(Eigen::Vector3f(3, 3, 3));
+  }
+   // cpu_tsdf::WriteOrientedBoundingBoxes(out_filename + ".oldobb.txt", old_obbs, sample_model_idx);
   LOG(INFO) << "Read " << detected_obbs.size() << " obbs. ";
 
   vector<string> cam_filelist;
@@ -177,7 +150,7 @@ main (int argc, char** argv)
   if (opts.count("clean_tsdf")) {
       CleanTSDFWithSkyMapAndDepthMap(tsdf, detected_obbs, cam_infos, skymap_filelist, depth_filelist, sky_map_thresh, out_filename,
                                      st_neighbor, ed_neighbor, skymap_check, depthmap_check);
-      cpu_tsdf::CleanTSDF(tsdf, filter_noise, st_neighbor, ed_neighbor);
+      cpu_tsdf::CleanTSDF(tsdf, filter_noise);
       cpu_tsdf::WriteTSDFModel(tsdf, out_filename + ".tsdf_consistency_cleaned.ply", true, true, mesh_min_weight);
   } else {
       pcl::PolygonMesh::Ptr pmesh = cpu_tsdf::TSDFToPolygonMesh(tsdf, mesh_min_weight, -1);
