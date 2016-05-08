@@ -23,7 +23,7 @@ bin_dir=/home/dell/codebase/mpi_project_git/similarity_reconstruction/code/simil
 # third_party_dir=/home/dell/codebase/mpi_project_git/similarity_reconstruction/code/third_party/
 
 # folder to store result
-result_root=/home/dell/results_5/demo_$startimg"_"$end"_f1"
+result_root=/home/dell/results_5/demo_$startimg"_"$end"_testdemo"
 if [ ! -d $result_root ]; then
     mkdir $result_root
 fi

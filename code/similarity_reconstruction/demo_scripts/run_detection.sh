@@ -39,8 +39,6 @@ output_prefix=$run_root
 # detection_scene_file=$result_root/reconstruction_closest_3/vri-fusing-result5_cam_3_with_2-st-$startimg-ed-$endimg-vlen-0.2-rampsz-6-try1/recon-$startimg-$endimg-vlen-0.2-rampsz-6_tsdf.bin
 detection_scene_file=$scene_model_bin
 
-# storing trained models
-detector_file_dir=$output_prefix
 
 # training
 # display the data for training
@@ -54,6 +52,8 @@ fi
 if [ $run_train -gt 0 ]; then
     # echo $train_bin --scene_file $train_scene_file --annotations $annotations --output_prefix $output_prefix --sample_size ${detect_sample_size[@]} --total_thread $total_thread --svm_param_c 100 --svm_param_w1 10 --detect_deltas ${detect_deltas[@]}
     $train_bin --scene_file $train_scene_file --annotations $annotations --output_prefix $output_prefix --sample_size ${detect_sample_size[@]} --total_thread $total_thread --svm_param_c 100 --svm_param_w1 10 --detect_deltas ${detect_deltas[@]}
+    # storing trained models
+    detector_file_dir=$output_prefix
 fi
 
 if [ $run_detect -gt 0 ]; then
