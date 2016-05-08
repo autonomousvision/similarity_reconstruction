@@ -2,19 +2,22 @@
 set -e
 # initialize relavant folders
 # . ./init_paths.sh
+
 # binary file paths
 train_bin=$bin_dir/train_detectors_main
 detect_bin=$bin_dir/detect_main
+
 # output root for training & detection
 run_root=$result_root/run_detection
 if [ ! -d $run_root ]; then
     mkdir $run_root
 fi
+
 # parameters
 # step size used in training: step_x = 1m, step_y = 1m, step_rotation_angle = 1 degree
 detect_deltas=(1 1 1)
 # step size used in testing: step_x, step_y, step_rotation_angle (in degree)
-test_detect_deltas=(0.5 0.5 1)
+test_detect_deltas=(1 1 1)
 # sampling size: along x, y, z axis
 detect_sample_size=(9 9 6)
 # thread number for parallel detection
@@ -29,9 +32,6 @@ min_score_to_keep=(-0.5 -0.5 0.15)
 train_scene_file=$detector_train_data_dir/gt_cropped_$startimg-$endimg-building.cropped_tsdf_tsdf.bin
 annotations=$detector_train_data_dir/annotated_obbs.txt
 
-train_scene_file=$detector_train_data_dir/gt_cropped_$startimg-$endimg-building.cropped_tsdf_tsdf.bin
-annotations=$detector_train_data_dir/annotated_obbs.txt
-
 # output directory for training result
 output_prefix=$run_root
 
@@ -42,13 +42,9 @@ detection_scene_file=$scene_model_bin
 # storing trained models
 detector_file_dir=$output_prefix
 
-if ! [ $display ]; then
-    display=0
-fi
-
 # training
 # display the data for training
-if [ $display -gt 0 ]; then 
+if [[ $display && $display -gt 0 ]]; then 
     for i in 0 1 2
     do
         cur_vis_txt=$detector_train_data_dir/visualization/category_$i/visualization.txt
@@ -56,19 +52,18 @@ if [ $display -gt 0 ]; then
     done
 fi
 if [ $run_train -gt 0 ]; then
-    echo $train_bin --scene_file $train_scene_file --annotations $annotations --output_prefix $output_prefix --sample_size ${detect_sample_size[@]} --total_thread $total_thread --svm_param_c 100 --svm_param_w1 10 --detect_deltas ${detect_deltas[@]}
+    # echo $train_bin --scene_file $train_scene_file --annotations $annotations --output_prefix $output_prefix --sample_size ${detect_sample_size[@]} --total_thread $total_thread --svm_param_c 100 --svm_param_w1 10 --detect_deltas ${detect_deltas[@]}
     $train_bin --scene_file $train_scene_file --annotations $annotations --output_prefix $output_prefix --sample_size ${detect_sample_size[@]} --total_thread $total_thread --svm_param_c 100 --svm_param_w1 10 --detect_deltas ${detect_deltas[@]}
 fi
 
 if [ $run_detect -gt 0 ]; then
-    # detection
-    echo $detect_bin --scene_file $detection_scene_file --detector_file $detector_file_dir --output_prefix $output_prefix --total_thread $total_thread --min_score_to_keep ${min_score_to_keep[@]} --detect_deltas ${test_detect_deltas[@]}
+    # echo $detect_bin --scene_file $detection_scene_file --detector_file $detector_file_dir --output_prefix $output_prefix --total_thread $total_thread --min_score_to_keep ${min_score_to_keep[@]} --detect_deltas ${test_detect_deltas[@]}
     $detect_bin --scene_file $detection_scene_file --detector_file $detector_file_dir --output_prefix $output_prefix --total_thread $total_thread --min_score_to_keep ${min_score_to_keep[@]} --detect_deltas ${test_detect_deltas[@]}
 fi
 
 detect_res_txt=$output_prefix/detect_res_all_obb_nmsed.txt
 visualization_txt=$output_prefix/visualization/visualization.txt
 
-if [ $display -gt 0 ]; then
+if [[ $display && $display -gt 0 ]]; then 
 ./visualization.sh "detect_results" "$visualization_txt"
 fi

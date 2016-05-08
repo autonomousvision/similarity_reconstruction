@@ -71,7 +71,7 @@ if [ $do_depth2ply -gt 0 ]; then
   else
     mkdir $dep2ply_out_dir
   fi
-  echo $depth2ply --in-root $data_root --out $dep2ply_out_dir --image-prefix $image_prefix --depth-prefix $depth_prefix --param-prefix $cam_info_prefix --dd_factor $dd_factor --max-camera-distance $maxcamdist --startimage $startimg --endimage $endimg --voxel_length $voxel_length --flatten --margin $margin --edge_ratio $edge_ratio
+  #echo $depth2ply --in-root $data_root --out $dep2ply_out_dir --image-prefix $image_prefix --depth-prefix $depth_prefix --param-prefix $cam_info_prefix --dd_factor $dd_factor --max-camera-distance $maxcamdist --startimage $startimg --endimage $endimg --voxel_length $voxel_length --flatten --margin $margin --edge_ratio $edge_ratio
   $depth2ply --in-root $data_root --out $dep2ply_out_dir --image-prefix $image_prefix --depth-prefix $depth_prefix --param-prefix $cam_info_prefix --dd_factor $dd_factor --max-camera-distance $maxcamdist --startimage $startimg --endimage $endimg --voxel_length $voxel_length --flatten --margin $margin --edge_ratio $edge_ratio
 fi
 

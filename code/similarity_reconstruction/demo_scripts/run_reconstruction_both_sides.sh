@@ -5,12 +5,7 @@ set -e
 # set relevant paths 
 . ./init_paths.sh
 
-#startimg=1470
-#endimg=1790
-#startimg=1550
-#endimg=1630
 echo "Performing reconstruction from frame "$startimg" to "$endimg" for both sides."
-sleep 1
 
 if [ $run_reconstruction -gt 0 ]; then
     do_depth2ply=1
@@ -36,8 +31,9 @@ use_input_tsdf_file=1
 input_tsdf_file_path=$output_tsdf_file
 . ./run_reconstruction_one_side.sh
 
-echo ./visualization.sh "initial_reconstruction" "$output_tsdf_ply_file"
+if [[ $display && $display -gt 0 ]]; then
 . ./visualization.sh "initial_reconstruction" "$output_tsdf_ply_file"  
+fi
 scene_model_mesh=$output_tsdf_ply_file
 scene_model_bin=$output_tsdf_file
 

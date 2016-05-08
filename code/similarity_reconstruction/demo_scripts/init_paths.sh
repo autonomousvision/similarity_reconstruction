@@ -5,7 +5,6 @@
 data_root_dir=/home/dell/Data/data-4-10/2013_05_28_drive_0000_sync/
 root_dir_left=$data_root_dir/image_02/rect/
 root_dir_right=$data_root_dir/image_03/rect/
-data_roots="$root_dir_left $root_dir_right"
 # the prefix of pre-generated files: camera parameters, depth maps, sky labels
 # should be placed under rect/ folders
 cam_info_prefix=param_scale_4
@@ -24,7 +23,7 @@ bin_dir=/home/dell/codebase/mpi_project_git/similarity_reconstruction/code/simil
 # third_party_dir=/home/dell/codebase/mpi_project_git/similarity_reconstruction/code/third_party/
 
 # folder to store result
-result_root=/home/dell/results_5/demo_$startimg"_"$endimg-0.4bthresh
+result_root=/home/dell/results_5/demo_$startimg"_"$end"_f1"
 if [ ! -d $result_root ]; then
     mkdir $result_root
 fi
