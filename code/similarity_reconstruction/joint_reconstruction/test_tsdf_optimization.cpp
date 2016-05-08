@@ -2,6 +2,7 @@
  * Chen Zhou (zhouch@pku.edu.cn)
  */
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
 
@@ -47,7 +48,7 @@ main (int argc, char** argv)
     bpo::options_description opts_desc("Allowed options");
     string input_scene_file;
     string detect_obb_file;
-    string output_prefix;
+    string output_dir;
     float min_meshing_weight;
     int pc_num;
     int optimize_max_iter;
@@ -64,7 +65,7 @@ main (int argc, char** argv)
             ("help,h", "produce help message")
             ("scene_file", bpo::value<std::string>(&input_scene_file)->required(), "input scene tsdf file")
             ("detect_obb_file", bpo::value<std::string>(&detect_obb_file)->required(), "detected oriented bounging box file")
-            ("output_prefix", bpo::value<std::string>(&output_prefix)->required (), "output directory path")
+            ("output_dir", bpo::value<std::string>(&output_dir)->required (), "output directory path")
             ("mesh_min_weight", bpo::value<float>(&min_meshing_weight)->default_value(0.0), "minimum weight doing marching cubes")
             ("pca_number", bpo::value<int>(&pc_num)->default_value(0), "principal component number")
             ("optimize_max_iter", bpo::value<int>(&optimize_max_iter)->default_value(3), "max iteration number")
@@ -85,7 +86,7 @@ main (int argc, char** argv)
         cout << opts_desc << endl;
         return EXIT_FAILURE;
     }
-    FLAGS_log_dir = output_prefix;
+    FLAGS_log_dir = output_dir;
     google::InitGoogleLogging("...");
 
     cpu_tsdf::TSDFHashing::Ptr scene_tsdf(new cpu_tsdf::TSDFHashing);
@@ -137,7 +138,7 @@ main (int argc, char** argv)
 
     LOG(INFO) << "Initialize.";
     tsdf_utility::OptimizationParams params;
-    params.save_path = output_prefix + "/res.ply";
+    params.save_path = output_dir + "/res.ply";
     params.min_meshing_weight = min_meshing_weight;
     params.lambda_average_scale = lambda_average_scale;
     params.lambda_observation = lambda_observation;
@@ -149,6 +150,7 @@ main (int argc, char** argv)
     params.noise_connected_component_thresh = noise_connected_component_thresh;
     params.noise_observation_thresh = noise_observation_thresh;
     scene_tsdf->getDepthTruncationLimits((params.max_dist_pos), (params.max_dist_neg));
+    cpu_tsdf::TSDFHashing::bilinear_interpolation_weight_thresh = 0.5;
 
     std::vector<Eigen::SparseVector<float>> model_means;
     std::vector<Eigen::SparseMatrix<float, Eigen::ColMajor>> model_bases;
@@ -172,13 +174,11 @@ main (int argc, char** argv)
     std::vector<double> outlier_gammas(obbs.size(), 0.0);
     for (int icompnum = 0; icompnum <= pc_num; ++icompnum)
     {
-        bfs::path intermediate_write_dir(bfs::path(output_prefix)/(string("comp_num_") + boost::lexical_cast<string>(icompnum)));
+        bfs::path intermediate_write_dir(bfs::path(output_dir)/(string("comp_num_") + boost::lexical_cast<string>(icompnum)));
         bfs::create_directories(intermediate_write_dir);
         params.save_path = (intermediate_write_dir/"res.ply").string();
         params.pc_num = icompnum;
-
-        cout << "begin following optimization " << endl;
-
+        cout << "begin optimization " << endl;
         tsdf_optimization::JointOptimization(*scene_tsdf,
                                                            params,
                                                            &model_means,
@@ -193,7 +193,7 @@ main (int argc, char** argv)
         cout << "finished following optimization " << icompnum << endl;
     }
     // save results
-    bfs::path write_dir(bfs::path(output_prefix)/string("final_result"));
+    bfs::path write_dir(bfs::path(output_dir)/string("final_result"));
     bfs::create_directories(write_dir);
     // save reconstructed samples individually
     cpu_tsdf::TSDFGridInfo grid_info(*scene_tsdf, params.sample_size, params.min_meshing_weight);
@@ -250,7 +250,7 @@ main (int argc, char** argv)
                              true, true, min_meshing_weight);
     cout << "finished fusing" << endl;
     // save results for visualization
-    bfs::path vis_dir(bfs::path(output_prefix)/string("visualization"));
+    bfs::path vis_dir(bfs::path(output_dir)/string("visualization"));
     bfs::create_directories(vis_dir);
     cpu_tsdf::WriteForVisualization(vis_dir.string(), scene_tsdf, params.min_meshing_weight, &obbs);
     return 0;
