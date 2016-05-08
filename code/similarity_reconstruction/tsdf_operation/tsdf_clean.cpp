@@ -394,7 +394,6 @@ bool CleanNoiseInSamples(
             cur_samples.col(j) = samples.col(cluster_sample_idx[i][j]);
             cur_weights.col(j) = weights.col(cluster_sample_idx[i][j]);
         }
-        cout << "clean for cluster " << i << endl;
         CleanNoiseInSamplesOneCluster(
                     cur_samples, &cur_weights, &cur_valid_obs, counter_thresh,
                     pos_trunc, neg_trunc);
@@ -405,7 +404,6 @@ bool CleanNoiseInSamples(
         }
     }  // end for i
     weights.prune(0, 1);
-    cout << "finished clean noise" << endl;
     return true;
 }
 
