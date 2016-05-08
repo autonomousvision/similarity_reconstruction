@@ -120,7 +120,7 @@ void InitializeOptimization(const cpu_tsdf::TSDFHashing &scene_tsdf,
     //                        scene_tsdf.offset(),
     //                        &reconstructed_samples_original_pos);
     //WriteTSDFModels(reconstructed_samples_original_pos, params.save_path+ "trans_mean.ply", false, true, params.min_meshing_weight);
-    //////////////////////////////////
+    ////////////////////////////////////
 }
 
 bool JointOptimization(
@@ -165,8 +165,39 @@ bool JointOptimization(
             tsdf_utility::OutputOBBsAsPly(*obbs, params.save_path);
             TSDFGridInfo tsdf_info(scene_tsdf, params.sample_size, 0);
             cpu_tsdf::WriteTSDFsFromMatWithWeight(samples, *reconstructed_sample_weights, tsdf_info, params.save_path + "_transformscale.ply");
-            cpu_tsdf::WriteTSDFsFromMatWithWeight_Matlab(samples, weights, tsdf_info,
-                                                         params.save_path + "_TransformScale.mat");
+            //vector<vector<int>> cluster_sample_idx;
+            //cpu_tsdf::GetClusterSampleIdx(*sample_model_assign, *outlier_gammas, 3, &cluster_sample_idx);
+            //Eigen::SparseMatrix<float> tmp_mat_for_cars(samples.rows(), cluster_sample_idx[2].size());
+            //Eigen::SparseMatrix<float> tmp_recon_sample_weights(samples.rows(), cluster_sample_idx[2].size());
+            //Eigen::SparseMatrix<float> tmp_sample_weights(samples.rows(), cluster_sample_idx[2].size());
+            //vector<tsdf_utility::OrientedBoundingBox> tmp_sample_obbs(cluster_sample_idx[2].size());
+            //for (int i = 0; i < cluster_sample_idx[2].size(); ++i) {
+            //    tmp_mat_for_cars.col(i) = samples.col(cluster_sample_idx[2][i]);
+            //    tmp_recon_sample_weights.col(i) = (*reconstructed_sample_weights).col(cluster_sample_idx[2][i]);
+            //    tmp_sample_weights.col(i) = (weights).col(cluster_sample_idx[2][i]);
+            //    tmp_sample_obbs[i] = (*obbs)[cluster_sample_idx[2][i]];
+            //}
+            //cpu_tsdf::WriteTSDFsFromMatWithWeight(tmp_mat_for_cars, tmp_recon_sample_weights, tsdf_info, params.save_path + "_car.ply");
+            //cpu_tsdf::WriteTSDFsFromMatWithWeight(tmp_mat_for_cars, tmp_sample_weights, tsdf_info, params.save_path + "_car_sample.ply");
+            //tsdf_utility::OutputOBBsAsPly(tmp_sample_obbs, params.save_path + "car_obbs.ply");
+
+            //            std::vector<cpu_tsdf::TSDFHashing::Ptr> recon_tsdfs;
+            //            std::vector<Eigen::SparseVector<float>> tmp_vec_samples;
+            //            ConvertDataMatrixToDataVectors(tmp_mat_for_cars, &tmp_vec_samples);
+            //            ConvertDataVectorsToTSDFsWithWeight(tmp_vec_samples, tmp_sample_weights, tsdf_info, &recon_tsdfs);
+            //            // ConvertDataVectorsToTSDFsNoWeight(recon_samples, params, &recon_tsdfs);
+            //            std::vector<cpu_tsdf::TSDFHashing::Ptr> transformed_recon_tsdfs;
+            //            WriteTSDFModels(recon_tsdfs, params.save_path + "_car2_canonical.ply", false, true, params.min_meshing_weight);
+            //            float scene_vlen = scene_tsdf.voxel_length();
+            //            vector<Eigen::Affine3f> affines;
+            //            for (int i = 0; i < tmp_sample_obbs.size(); ++i) {
+            //                affines.push_back(tmp_sample_obbs[i].AffineTransform());
+            //            }
+            //            TransformTSDFs(recon_tsdfs, affines, &transformed_recon_tsdfs, &scene_vlen);
+            //            WriteTSDFModels(transformed_recon_tsdfs, params.save_path + "_car2_transformed.ply", false, true, params.min_meshing_weight);
+
+            //cpu_tsdf::WriteTSDFsFromMatWithWeight_Matlab(samples, weights, tsdf_info,
+            //                                             params.save_path + "_TransformScale.mat");
         }
 
         // block 2
@@ -268,14 +299,33 @@ bool OptimizeTransformAndScale(
     // 1. from PCA components to model_reconstructed_samples
     std::vector<Eigen::SparseVector<float>> reconstructed_samples;
     PCAReconstructionResult(model_means, model_bases, projected_coeffs, model_assign_idx, &reconstructed_samples);
-
-    std::vector<cpu_tsdf::TSDFHashing::Ptr> reconstructed_sample_tsdfs(sample_num);
+    //utility::WriteEigenMatrix(Eigen::MatrixXf(reconstructed_samples[0]), options.save_path + "_debug_house_model_tobealigned.txt");
     cpu_tsdf::TSDFGridInfo grid_info(scene_tsdf, params.sample_size, params.min_meshing_weight);
-    // ConvertDataVectorsToTSDFsWithWeight(reconstructed_samples, *weights, grid_info, &reconstructed_sample_tsdfs);
-    ConvertDataVectorsToTSDFsWithWeight(reconstructed_samples, recon_weights, grid_info, &reconstructed_sample_tsdfs);
-    cpu_tsdf::WriteTSDFModels(reconstructed_sample_tsdfs, params.save_path + "_debug_house_model_tobealigned1.txt", false, true, 0);
+    ExtractSamplesFromOBBs(
+            scene_tsdf,
+                *obbs,
+                params.sample_size,
+                params.min_meshing_weight,
+            samples,
+            weights
+            );
+    std::vector<cpu_tsdf::TSDFHashing::Ptr> reconstructed_samples_tsdf(sample_num);
+    ConvertDataVectorsToTSDFsWithWeight(reconstructed_samples, *weights, grid_info, &reconstructed_samples_tsdf);
+    // ConvertDataVectorsToTSDFsWithWeight(reconstructed_samples, reconstructed_sample_weights, options, &reconstructed_samples_tsdf);
+    cpu_tsdf::WriteTSDFModels(reconstructed_samples_tsdf, params.save_path + "_debug_house_model_tobealigned1.txt", false, true, 0);
     std::vector<const TSDFHashing*> ptr_reconstructed_samples_tsdf(sample_num);
-    for (int i = 0; i < sample_num; ++i) ptr_reconstructed_samples_tsdf[i] = reconstructed_sample_tsdfs[i].get();
+    for (int i = 0; i < sample_num; ++i) ptr_reconstructed_samples_tsdf[i] = reconstructed_samples_tsdf[i].get();
+    //std::vector<Eigen::SparseVector<float>> reconstructed_samples;
+    //PCAReconstructionResult(model_means, model_bases, projected_coeffs, model_assign_idx, &reconstructed_samples);
+    /////////////////////////////////////
+
+    //std::vector<cpu_tsdf::TSDFHashing::Ptr> reconstructed_sample_tsdfs(sample_num);
+    //cpu_tsdf::TSDFGridInfo grid_info(scene_tsdf, params.sample_size, params.min_meshing_weight);
+    //// ConvertDataVectorsToTSDFsWithWeight(reconstructed_samples, *weights, grid_info, &reconstructed_sample_tsdfs);
+    //ConvertDataVectorsToTSDFsWithWeight(reconstructed_samples, recon_weights, grid_info, &reconstructed_sample_tsdfs);
+    //cpu_tsdf::WriteTSDFModels(reconstructed_sample_tsdfs, params.save_path + "_debug_house_model_tobealigned1.txt", false, true, 0);
+    //std::vector<const TSDFHashing*> ptr_reconstructed_samples_tsdf(sample_num);
+    //for (int i = 0; i < sample_num; ++i) ptr_reconstructed_samples_tsdf[i] = reconstructed_sample_tsdfs[i].get();
     // 2. optimize
     //////////////////////////////////////////////////////////////
     const int model_number = *(std::max_element(model_assign_idx.begin(), model_assign_idx.end())) + 1;
