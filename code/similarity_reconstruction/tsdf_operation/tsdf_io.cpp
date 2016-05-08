@@ -110,6 +110,7 @@ bool WriteOrientedBoundingBoxes(const string &filename, const std::vector<Orient
     ofstream ofs(filename);
     const int sample_num = obbs.size();
     ofs << sample_num << endl;
+    ofs << fixed << setprecision(8) << endl;
     for (int i  = 0; i < sample_num; ++i)
     {
         const OrientedBoundingBox& cur_box = obbs[i];
