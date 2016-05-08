@@ -230,7 +230,6 @@ public:
         float model_weight = 0;
         double error = 0;
         double robust_squared_errors[3] = {0};
-
         if (tsdf_model->RetriveDataFromWorldCoord(cv::Vec3f(translated_pt), &model_val, &model_weight) &&
                 model_weight > min_model_weight)
         {
