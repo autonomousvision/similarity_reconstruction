@@ -488,6 +488,7 @@ static unsigned buttonstate = 0;
 
 void doubleclick(int button, int x, int y)
 {
+    return;
 	// Render and read back ID reference image
 	camera.setupGL(global_xf * global_bsph.center, global_bsph.r);
 	glDisable(GL_BLEND);
