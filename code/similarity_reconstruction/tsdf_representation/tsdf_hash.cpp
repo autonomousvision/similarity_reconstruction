@@ -45,7 +45,7 @@ inline cv::Vec3i RoundVec3d(const cv::Vec3d& v)
     return cv::Vec3i(cvRound(v[0]), cvRound(v[1]), cvRound(v[2]));
 }
 
-float TSDFHashing::bilinear_interpolation_weight_thresh = 0.5;
+float TSDFHashing::bilinear_interpolation_weight_thresh = 0.4;
 
 void TSDFHashing::CopyHashParametersFrom(const TSDFHashing &tsdf)
 {
