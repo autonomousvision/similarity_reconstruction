@@ -1,0 +1,45 @@
+/home/dell/codebase/mpi_project/urban_reconstruction/code/build_handin/bin//train_detectors_main --scene_file /home/dell/results_5/detection_training_data//training_data_1470/gt_cropped_1470-1790-building.cropped_tsdf_tsdf.bin --annotations /home/dell/results_5/detection_training_data//training_data_1470/annotated_obbs.txt --output_prefix /home/dell/results_5/refactor_detection_final1_replaced_adjusted_atfinal//detection-1470-min_occupy_adaptive/ --sample_size 9 9 6 --total_thread 10 --svm_param_c 100 --svm_param_w1 10
+/home/dell/codebase/mpi_project/urban_reconstruction/code/build_handin/bin//detect_main --scene_file /home/dell/results_5//reconstruction_closest_3/vri-fusing-result5_cam_3_with_2-st-1470-ed-1790-vlen-0.2-rampsz-6-try1/recon-1470-1790-vlen-0.2-rampsz-6_tsdf.bin --detector_file /home/dell/results_5/refactor_detection_final1_replaced_adjusted_atfinal//detection-1470-min_occupy_adaptive/ --output_prefix /home/dell/results_5/refactor_detection_final1_replaced_adjusted_atfinal//detection-1470-min_occupy_adaptive/ --total_thread 10 --min_score_to_keep -0.5 -0.5 0.1
+I0501 14:04:59.422260 11590 detect_main.cpp:81] Reading detetor model file.
+I0501 14:04:59.422498 11590 detect_main.cpp:86] detector_file /home/dell/results_5/refactor_detection_final1_replaced_adjusted_atfinal//detection-1470-min_occupy_adaptive/ is a directory.
+I0501 14:04:59.423241 11590 detect_main.cpp:95] reading: /home/dell/results_5/refactor_detection_final1_replaced_adjusted_atfinal//detection-1470-min_occupy_adaptive/category_0/trained_svm_model.svm
+I0501 14:04:59.428028 11590 detect_main.cpp:95] reading: /home/dell/results_5/refactor_detection_final1_replaced_adjusted_atfinal//detection-1470-min_occupy_adaptive/category_1/trained_svm_model.svm
+I0501 14:04:59.431499 11590 detect_main.cpp:95] reading: /home/dell/results_5/refactor_detection_final1_replaced_adjusted_atfinal//detection-1470-min_occupy_adaptive/category_2/trained_svm_model.svm
+I0501 14:04:59.457106 11590 detect_main.cpp:104] Read 3 detector(s).
+I0501 14:04:59.457149 11590 detect_main.cpp:111] Reading TSDF scene. 
+hash element size: 21850, bucket number: 30727
+hash bucket count: 30727, total_used_bucket: 15637
+ total_collision: 6213, max_bucket_size: 8
+Average collision: 0.397327
+I0501 14:05:01.234045 11590 detect_main.cpp:122] scene boundary in voxels: 
+min_pt 
+0998.8
+3822.6
+0112.4
+max_pt 
+1226.4
+4076.4
+0130.6
+I0501 14:05:01.234140 11590 detect_main.cpp:142] min detection score: -0.5
+Discretize Info: 
+discret range (x, y, angle): 
+228
+254
+180
+I0501 14:05:01.236018 11590 detect_main.cpp:142] min detection score: -0.5
+Discretize Info: 
+discret range (x, y, angle): 
+228
+254
+180
+I0501 14:05:01.237469 11590 detect_main.cpp:142] min detection score: 0.1
+Discretize Info: 
+discret range (x, y, angle): 
+456
+508
+360
+doing nms for: 2	 removed : 20overlap percent: 0.0107968
+doing nms for: 21	 removed : 52overlap percent: 0.652351
+doing nms for: 26	 removed : 47overlap percent: 0.0276342
+doing nms for: 30	 removed : 39overlap percent: 0.356469
+finished adjusting positions and scales

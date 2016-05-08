@@ -27,3 +27,4 @@ similarity_reconstruction-build
 add_copyright.sh
 mycopyright
 *backup*
+*.sh.swo
