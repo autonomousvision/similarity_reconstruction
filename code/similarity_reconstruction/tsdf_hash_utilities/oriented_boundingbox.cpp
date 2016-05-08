@@ -251,4 +251,13 @@ cpu_tsdf::OrientedBoundingBox OldOBBFromNew(const OrientedBoundingBox &obb)
     return oldobb;
 }
 
+std::vector<cpu_tsdf::OrientedBoundingBox> OldOBBsFromNew(const std::vector<OrientedBoundingBox> &obbs)
+{
+    std::vector<cpu_tsdf::OrientedBoundingBox> res;
+    for (const auto& obbi : obbs) {
+        res.push_back(OldOBBFromNew(obbi));
+    }
+    return res;
+}
+
 }

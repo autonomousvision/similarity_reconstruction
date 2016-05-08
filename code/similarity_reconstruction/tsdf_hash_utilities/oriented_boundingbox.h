@@ -64,6 +64,7 @@ void OutputAnnotatedOBB(const std::vector<std::vector<tsdf_utility::OrientedBoun
 void OutputAnnotatedOBB(const std::vector<OrientedBoundingBox>& obb_vec, const std::vector<int>& sample_model_idx, const std::string& filename);
 void InputAnnotatedOBB(const std::string& filename, std::vector<std::vector<tsdf_utility::OrientedBoundingBox>>* obbs);
 cpu_tsdf::OrientedBoundingBox OldOBBFromNew(const tsdf_utility::OrientedBoundingBox& obb);
+std::vector<cpu_tsdf::OrientedBoundingBox> OldOBBsFromNew(const std::vector<tsdf_utility::OrientedBoundingBox>& obbs);
 OrientedBoundingBox NewOBBFromOld(const cpu_tsdf::OrientedBoundingBox& old_obb);
 std::vector<OrientedBoundingBox> NewOBBsFromOlds(const std::vector<cpu_tsdf::OrientedBoundingBox>& old_obbs);
 }  // namespace tsdf_utility
