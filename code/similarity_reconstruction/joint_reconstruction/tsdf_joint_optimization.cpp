@@ -165,6 +165,39 @@ bool JointOptimization(
             tsdf_utility::OutputOBBsAsPly(*obbs, params.save_path);
             TSDFGridInfo tsdf_info(scene_tsdf, params.sample_size, 0);
             cpu_tsdf::WriteTSDFsFromMatWithWeight(samples, *reconstructed_sample_weights, tsdf_info, params.save_path + "_transformscale.ply");
+                        vector<vector<int>> cluster_sample_idx;
+                        cpu_tsdf::GetClusterSampleIdx(*sample_model_assign, *outlier_gammas, 3, &cluster_sample_idx);
+                        Eigen::SparseMatrix<float> tmp_mat_for_cars(samples.rows(), cluster_sample_idx[2].size());
+                        Eigen::SparseMatrix<float> tmp_recon_sample_weights(samples.rows(), cluster_sample_idx[2].size());
+                        Eigen::SparseMatrix<float> tmp_sample_weights(samples.rows(), cluster_sample_idx[2].size());
+                        vector<tsdf_utility::OrientedBoundingBox> tmp_sample_obbs(cluster_sample_idx[2].size());
+                        for (int i = 0; i < cluster_sample_idx[2].size(); ++i) {
+                            tmp_mat_for_cars.col(i) = samples.col(cluster_sample_idx[2][i]);
+                            tmp_recon_sample_weights.col(i) = (*reconstructed_sample_weights).col(cluster_sample_idx[2][i]);
+                            tmp_sample_weights.col(i) = (weights).col(cluster_sample_idx[2][i]);
+                            tmp_sample_obbs[i] = (*obbs)[cluster_sample_idx[2][i]];
+                        }
+                        cpu_tsdf::WriteTSDFsFromMatWithWeight(tmp_mat_for_cars, tmp_recon_sample_weights, tsdf_info, params.save_path + "_car.ply");
+                        cpu_tsdf::WriteTSDFsFromMatWithWeight(tmp_mat_for_cars, tmp_sample_weights, tsdf_info, params.save_path + "_car_sample.ply");
+                        tsdf_utility::OutputOBBsAsPly(tmp_sample_obbs, params.save_path + "car_obbs.ply");
+
+                                    std::vector<cpu_tsdf::TSDFHashing::Ptr> recon_tsdfs;
+                                    std::vector<Eigen::SparseVector<float>> tmp_vec_samples;
+                                    ConvertDataMatrixToDataVectors(tmp_mat_for_cars, &tmp_vec_samples);
+                                    ConvertDataVectorsToTSDFsWithWeight(tmp_vec_samples, tmp_sample_weights, tsdf_info, &recon_tsdfs);
+                                    // ConvertDataVectorsToTSDFsNoWeight(recon_samples, params, &recon_tsdfs);
+                                    std::vector<cpu_tsdf::TSDFHashing::Ptr> transformed_recon_tsdfs;
+                                    WriteTSDFModels(recon_tsdfs, params.save_path + "_car2_canonical.ply", false, true, params.min_meshing_weight);
+                                    float scene_vlen = scene_tsdf.voxel_length();
+                                    vector<Eigen::Affine3f> affines;
+                                    for (int i = 0; i < tmp_sample_obbs.size(); ++i) {
+                                        affines.push_back(tmp_sample_obbs[i].AffineTransform());
+                                    }
+                                    TransformTSDFs(recon_tsdfs, affines, &transformed_recon_tsdfs, &scene_vlen);
+                                    WriteTSDFModels(transformed_recon_tsdfs, params.save_path + "_car2_transformed.ply", false, true, params.min_meshing_weight);
+
+                        //cpu_tsdf::WriteTSDFsFromMatWithWeight_Matlab(samples, weights, tsdf_info,
+                        //                                             params.save_path + "_TransformScale.mat");
         }
 
         // block 2
@@ -200,9 +233,58 @@ bool JointOptimization(
         *reconstructed_sample_weights = valid_weights;
 
         TSDFGridInfo tsdf_info(scene_tsdf, params.sample_size, 0);
-        tsdf_info.offset(Eigen::Vector3f(-0.5,-0.5,-0.5));
-        cpu_tsdf::WriteTSDFsFromMatWithWeight(recon_sample_mat, *reconstructed_sample_weights, tsdf_info, params.save_path + "_ModelCoeffPCA_reconweight.ply");
-        cpu_tsdf::WriteTSDFsFromMatWithWeight_Matlab(recon_sample_mat, *reconstructed_sample_weights, tsdf_info, params.save_path + "_ModelCoeffPCA_reconweight.mat");
+        // tsdf_info.offset(Eigen::Vector3f(-0.5,-0.5,-0.5));
+        // cpu_tsdf::WriteTSDFsFromMatWithWeight(recon_sample_mat, cleaned_weights, tsdf_info, params.save_path + "_cleanw_ModelCoeffPCA_reconweight.ply");
+        // cpu_tsdf::WriteTSDFsFromMatWithWeight(recon_sample_mat, *reconstructed_sample_weights, tsdf_info, params.save_path + "_ModelCoeffPCA_reconweight.ply");
+        // cpu_tsdf::WriteTSDFsFromMatWithWeight_Matlab(recon_sample_mat, *reconstructed_sample_weights, tsdf_info, params.save_path + "_ModelCoeffPCA_reconweight.mat");
+        {
+                        vector<vector<int>> cluster_sample_idx;
+                        cpu_tsdf::GetClusterSampleIdx(*sample_model_assign, *outlier_gammas, 3, &cluster_sample_idx);
+                        Eigen::SparseMatrix<float> tmp_recon_samples(samples.rows(), cluster_sample_idx[2].size());
+                        Eigen::SparseMatrix<float> tmp_mat_for_cars(samples.rows(), cluster_sample_idx[2].size());
+                        Eigen::SparseMatrix<float> tmp_recon_sample_weights(samples.rows(), cluster_sample_idx[2].size());
+                        Eigen::SparseMatrix<float> tmp_sample_weights(samples.rows(), cluster_sample_idx[2].size());
+                        Eigen::SparseMatrix<float> tmp_sample_clean_weights(samples.rows(), cluster_sample_idx[2].size());
+                        vector<tsdf_utility::OrientedBoundingBox> tmp_sample_obbs(cluster_sample_idx[2].size());
+                        for (int i = 0; i < cluster_sample_idx[2].size(); ++i) {
+                            tmp_mat_for_cars.col(i) = samples.col(cluster_sample_idx[2][i]);
+                            tmp_recon_samples.col(i) = (recon_sample_mat).col(cluster_sample_idx[2][i]);
+                            tmp_recon_sample_weights.col(i) = (*reconstructed_sample_weights).col(cluster_sample_idx[2][i]);
+                            tmp_sample_weights.col(i) = (cleaned_weights).col(cluster_sample_idx[2][i]);
+                            tmp_sample_clean_weights.col(i) = (valid_weights).col(cluster_sample_idx[2][i]);
+                            tmp_sample_obbs[i] = (*obbs)[cluster_sample_idx[2][i]];
+                        }
+                        cpu_tsdf::WriteTSDFsFromMatWithWeight(tmp_recon_samples, tmp_sample_weights, tsdf_info, params.save_path + "_meancar_cleanedw.ply");
+                        cpu_tsdf::WriteTSDFsFromMatWithWeight(tmp_mat_for_cars, tmp_recon_sample_weights, tsdf_info, params.save_path + "_car.ply");
+                        cpu_tsdf::WriteTSDFsFromMatWithWeight(tmp_mat_for_cars, tmp_sample_weights, tsdf_info, params.save_path + "_car_sample.ply");
+                        tsdf_utility::OutputOBBsAsPly(tmp_sample_obbs, params.save_path + "car_obbs.ply");
+
+                                    std::vector<cpu_tsdf::TSDFHashing::Ptr> recon_tsdfs;
+                                    std::vector<Eigen::SparseVector<float>> tmp_vec_samples;
+                                    ConvertDataMatrixToDataVectors(tmp_mat_for_cars, &tmp_vec_samples);
+                                    // ConvertDataVectorsToTSDFsWithWeight(tmp_vec_samples, tmp_sample_weights, tsdf_info, &recon_tsdfs);
+                                    ConvertDataVectorsToTSDFsWithWeight(tmp_vec_samples, tmp_sample_weights, tsdf_info, &recon_tsdfs);
+                                    // ConvertDataVectorsToTSDFsNoWeight(recon_samples, params, &recon_tsdfs);
+                                    std::vector<cpu_tsdf::TSDFHashing::Ptr> transformed_recon_tsdfs;
+                                    WriteTSDFModels(recon_tsdfs, params.save_path + "_car2_canonical_original_dist.ply", false, true, params.min_meshing_weight);
+                                    {
+                                        for (int i = 0; i < recon_tsdfs.size(); ++i) {
+                                        string output_tsdf_gridfilename =
+                                                params.save_path + "_" + boost::lexical_cast<string>(i) +"_cartxt_gridinfo_original_dist.ply";
+                                         recon_tsdfs[i]->OutputTSDFGrid(output_tsdf_gridfilename, NULL, NULL);
+                                        }
+                                    }
+                                    float scene_vlen = scene_tsdf.voxel_length();
+                                    vector<Eigen::Affine3f> affines;
+                                    for (int i = 0; i < tmp_sample_obbs.size(); ++i) {
+                                        affines.push_back(tmp_sample_obbs[i].AffineTransform());
+                                    }
+                                    TransformTSDFs(recon_tsdfs, affines, &transformed_recon_tsdfs, &scene_vlen);
+                                    WriteTSDFModels(transformed_recon_tsdfs, params.save_path + "_car2_transformed_original_dist.ply", false, true, params.min_meshing_weight);
+
+                        //cpu_tsdf::WriteTSDFsFromMatWithWeight_Matlab(samples, weights, tsdf_info,
+                        //                                             params.save_path + "_TransformScale.mat");
+        }
 
         // block 3
         bfs::path write_dir_block3(write_dir/"block3_cluster");
