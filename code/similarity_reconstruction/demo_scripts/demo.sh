@@ -2,7 +2,7 @@
 
 . ./init_paths.sh
 run_train=0
-run_detect=1
+run_detect=0
 run_joint_opt=1
 detector_train_data_dir=/home/dell/results_5/demo_1470_1790-0.4bthresh/cropped_tsdf_for_training/train_data/
 detector_file_dir=/home/dell/results_5/demo_1470_1790-0.4bthresh/run_detection/

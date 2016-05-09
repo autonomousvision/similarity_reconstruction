@@ -50,7 +50,7 @@ check_tsdf=1
 depthmap_check=1
 skymap_check=1
 filter_noise=60
-. ./consistency_check2.sh
+. ./consistency_check.sh
 #consistent_tsdf_output=$out".tsdf_consistency_cleaned_tsdf.bin"
 
 echo "################## joint optimization ###################"
@@ -59,7 +59,7 @@ lambda_avg_scale=100
 lambda_regularization=50
 lambda_outlier=999999999
 noise_obs_thresh=2
-. ./run_optimization2.sh
+. ./run_optimization.sh
 
 echo "############### final noise cleaning ####################"
 scene_model=$joint_output_tsdf
@@ -74,7 +74,7 @@ echo consistency_check_root $consistency_check_root
 if [ ! -d $consistency_check_root ]; then
     mkdir $consistency_check_root
 fi
-. ./consistency_check2.sh
+. ./consistency_check.sh
 echo "result output to: " $consistency_tsdf_output_ply
 
 if [[ $display && $display -gt 0 ]]; then

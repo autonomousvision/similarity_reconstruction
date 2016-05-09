@@ -105,27 +105,6 @@ main (int argc, char** argv)
     std::vector<float> sample_scores;
     sample_collection.GetOBBCollection(&obbs, &sample_model_idx, &sample_scores);
 
-    ///
-    //std::vector<tsdf_utility::OrientedBoundingBox> obbs;
-    //std::vector<int> sample_model_idx;
-    //std::vector<cpu_tsdf::OrientedBoundingBox> old_obbs;
-    //cpu_tsdf::ReadOrientedBoundingBoxes(detect_obb_file, &old_obbs, &sample_model_idx);
-    //for (int i = 0; i <old_obbs.size(); ++i)
-    //    {
-    //        cpu_tsdf::OrientedBoundingBox obb;
-    //        obb = old_obbs[i];
-    //        {
-    //            float z_below = 0.2;
-    //            Eigen::Vector3f ext_below_ground(0, 0, z_below);
-    //            obb.bb_offset = obb.bb_offset - ext_below_ground;
-    //            tsdf_detection::ExtendOBBNoBottom(obb, Eigen::Vector3f(1, 1, 2 + z_below));
-    //        }
-    //        old_obbs[i] = obb;
-    //    }
-    //std::vector<float> sample_scores(old_obbs.size(), 0);
-    //obbs = tsdf_utility::NewOBBsFromOlds(old_obbs);
-    ///
-
     for (auto& obbi : obbs) {
         //obbi = obbi.ExtendSidesByPercent(Eigen::Vector3f(0.1, 0.1, 0));
         obbi = obbi.ExtendSides(Eigen::Vector3f(1, 1, 2.2));
@@ -171,6 +150,34 @@ main (int argc, char** argv)
                 &reconstructed_sample_weights
                 );
 
+    // save initial result
+    // {
+    //     cout << "saving initial merge result" << endl;
+    //     bfs::path write_dir(bfs::path(output_dir)/string("initial_result"));
+    //     bfs::create_directories(write_dir);
+    //     cpu_tsdf::TSDFGridInfo grid_info(*scene_tsdf, params.sample_size, params.min_meshing_weight);
+    //     std::vector<cpu_tsdf::TSDFHashing::Ptr> reconstructed_samples_original_pos;
+    //     cpu_tsdf::ReconstructTSDFsFromPCAOriginPos(
+    //                             model_means,
+    //                             model_bases,
+    //                             projected_coeffs,
+    //                             reconstructed_sample_weights,
+    //                             sample_model_idx,
+    //                             obbs,
+    //                             grid_info,
+    //                             scene_tsdf->voxel_length(),
+    //                             scene_tsdf->offset(),
+    //                             &reconstructed_samples_original_pos);
+    //     scene_tsdf->DisplayInfo();
+    //     cpu_tsdf::MergeTSDFs(reconstructed_samples_original_pos, scene_tsdf.get());
+    //     cpu_tsdf::CleanTSDF(scene_tsdf, 100);
+    //     scene_tsdf->DisplayInfo();
+    //     cpu_tsdf::WriteTSDFModel(scene_tsdf,
+    //                              write_dir.string() + "/initial_merged_scene.ply",
+    //                              true, true, min_meshing_weight);
+    // }
+    // // end save initial result
+
     std::vector<double> outlier_gammas(obbs.size(), 0.0);
     for (int icompnum = 0; icompnum <= pc_num; ++icompnum)
     {
@@ -190,7 +197,7 @@ main (int argc, char** argv)
                                                            &model_average_scales,
                                                            &reconstructed_sample_weights
                                                            );
-        cout << "finished following optimization " << icompnum << endl;
+        cout << "finished optimization " << icompnum << endl;
     }
     // save results
     bfs::path write_dir(bfs::path(output_dir)/string("final_result"));
