@@ -13,8 +13,6 @@ if [ ! -d $run_root ]; then
 fi
 mesh_min_weight=0
 max_cam_distance=30
-lambda_obs=0.2
-pc_num=0
 
 if [[ $run_joint_opt && $run_joint_opt -eq 0 ]]; then
     do_init_consistency_check=0
@@ -27,14 +25,12 @@ else
 fi
 
 echo "################ loading detections ####################"
-#scene_model=$result_root/reconstruction_closest_3/vri-fusing-result5_cam_3_with_2-st-$startimg-ed-$edimg-vlen-0.2-rampsz-6-try1/recon-$startimg-$edimg-vlen-0.2-rampsz-6_tsdf.bin
-#detect_obb_file=$detection_root/detection-$startimg-min_occupy_adaptive/detect_res_all_obb_nmsed.txt
 scene_model=$scene_model_bin
 detect_obb_file=$detect_res_txt
 echo scene_model $scene_model
 echo detect_obb_file $detect_obb_file
 
-seq_output_root=$run_root/joint_reconstruction_seq_$startimg-2/
+seq_output_root=$run_root/joint_reconstruction/
 if [ ! -d $seq_output_root ]; then
     mkdir $seq_output_root
 fi
@@ -57,8 +53,9 @@ echo "################## joint optimization ###################"
 cleaned_scene_model=$consistent_tsdf_output
 lambda_avg_scale=100
 lambda_regularization=50
-lambda_outlier=999999999
 noise_obs_thresh=2
+lambda_obs=0.2
+pc_num=0
 . ./run_optimization.sh
 
 echo "############### final noise cleaning ####################"

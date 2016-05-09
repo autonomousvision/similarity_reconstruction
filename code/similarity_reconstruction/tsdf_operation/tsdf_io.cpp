@@ -11,14 +11,14 @@
 #include <boost/lexical_cast.hpp>
 #include <pcl/console/print.h>
 #include <pcl/console/time.h>
-//#include <pcl/visualization/cloud_viewer.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/io/ply_io.h>
-//#include <pcl/io/vtk_lib_io.h>
 #include <pcl/pcl_macros.h>
 #include <pcl/PolygonMesh.h>
 #include <Eigen/Eigen>
+#ifdef MYMATLAB
 #include <matio.h>
+#endif
 
 #include "tsdf_operation/tsdf_align.h"
 #include "tsdf_operation/tsdf_transform.h"
@@ -276,14 +276,14 @@ void WriteTSDFMesh(
         const string &output_filename,
         const bool save_ascii)
 {
-    std::cout << "begin marching cubes" << std::endl;
+    // std::cout << "begin marching cubes" << std::endl;
     pcl::PolygonMesh::Ptr mesh = TSDFToPolygonMesh(tsdf_model, mesh_min_weight, 0.00005);
-    std::cout << "save model at ply file path: " << output_filename << std::endl;
+    // std::cout << "save model at ply file path: " << output_filename << std::endl;
     if (save_ascii)
         pcl::io::savePLYFile (output_filename, *mesh);
     else
         pcl::io::savePLYFileBinary (output_filename, *mesh);
-    std::cout << "save finished" << std::endl;
+    // std::cout << "save finished" << std::endl;
 }
 
 bool WriteAffineTransformsAndTSDFs(
@@ -403,6 +403,7 @@ void WriteTSDFsFromMatWithWeight(const Eigen::SparseMatrix<float, Eigen::ColMajo
     cpu_tsdf::WriteTSDFModels(projected_tsdf_models, output_modelply, false, true, 0);
 }
 
+#ifdef MYMATLAB
 void WriteTSDFsFromMatWithWeight_Matlab(
         const Eigen::SparseMatrix<float, Eigen::ColMajor> &data_mat,
         const Eigen::SparseMatrix<float, Eigen::ColMajor> &weight_mat,
@@ -819,6 +820,7 @@ bool WriteOBBsAndTSDFs(const TSDFHashing &scene_tsdf, const std::vector<tsdf_uti
     }
     return true;
 }
+#endif
 
 void WriteForVisualization(const string &dir_prefix, TSDFHashing::ConstPtr tsdf_model, float mesh_min_weight, const std::vector<tsdf_utility::OrientedBoundingBox> *obbs) {
     bfs::create_directories(dir_prefix);

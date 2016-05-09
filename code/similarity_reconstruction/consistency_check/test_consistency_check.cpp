@@ -90,8 +90,9 @@ main (int argc, char** argv)
     cout << opts_desc << endl;
     return EXIT_FAILURE;
   }
-  FLAGS_log_dir = bfs::path(out_filename).parent_path().string();
-  google::InitGoogleLogging("...");
+  // FLAGS_log_dir = bfs::path(out_filename).parent_path().string();
+  FLAGS_log_dir = "/tmp/";
+  google::InitGoogleLogging("");
 
   std::cout << "begin reading tsdf. " << std::endl;
   cpu_tsdf::TSDFHashing::Ptr tsdf(new cpu_tsdf::TSDFHashing);
@@ -105,12 +106,15 @@ main (int argc, char** argv)
   LOG(INFO) << "Reading detected box file\n " <<  obb_filename << endl;
   tsdf_detection::SampleCollection sample_collection;
   sample_collection.ReadOBBs(obb_filename);
+  std::vector<tsdf_utility::OrientedBoundingBox> detected_obbs_origin;
   std::vector<tsdf_utility::OrientedBoundingBox> detected_obbs;
   std::vector<int> sample_model_idx;
-  sample_collection.GetOBBCollection(&detected_obbs, &sample_model_idx);
-  tsdf_utility::OutputOBBsAsPly(detected_obbs, out_filename + ".obb.ply");
-  for (int i = 0; i < detected_obbs.size(); ++i) {
-      detected_obbs[i] = detected_obbs[i].ExtendSides(Eigen::Vector3f(3, 3, 3));
+  sample_collection.GetOBBCollection(&detected_obbs_origin, &sample_model_idx);
+  detected_obbs.resize(detected_obbs_origin.size());
+  tsdf_utility::OutputOBBsAsPly(detected_obbs_origin, out_filename + ".obb.ply");
+  for (int i = 0; i < detected_obbs_origin.size(); ++i) {
+      // extend the obbs
+      detected_obbs[i] = detected_obbs_origin[i].ExtendSides(Eigen::Vector3f(3, 3, 3));
   }
    // cpu_tsdf::WriteOrientedBoundingBoxes(out_filename + ".oldobb.txt", old_obbs, sample_model_idx);
   LOG(INFO) << "Read " << detected_obbs.size() << " obbs. ";
@@ -152,7 +156,7 @@ main (int argc, char** argv)
                                      st_neighbor, ed_neighbor, skymap_check, depthmap_check);
       cpu_tsdf::CleanTSDF(tsdf, filter_noise);
       cpu_tsdf::WriteTSDFModel(tsdf, out_filename + ".tsdf_consistency_cleaned.ply", true, true, mesh_min_weight);
-      cpu_tsdf::WriteForVisualization((bfs::path(out_filename).parent_path() / "visualization").string(), tsdf, mesh_min_weight, &detected_obbs);
+      cpu_tsdf::WriteForVisualization((bfs::path(out_filename).parent_path() / "visualization").string(), tsdf, mesh_min_weight, &detected_obbs_origin);
   } else {
       pcl::PolygonMesh::Ptr pmesh = cpu_tsdf::TSDFToPolygonMesh(tsdf, mesh_min_weight, -1);
       CleanMeshWithSkyMapAndDepthMap(
@@ -169,7 +173,7 @@ main (int argc, char** argv)
                               );
       cpu_tsdf::CleanMesh(*pmesh, filter_noise);
       pcl::io::savePLYFileBinary(out_filename + ".tsdf_consistency_cleaned.ply", *pmesh);
-      cpu_tsdf::WriteForVisualization((bfs::path(out_filename).parent_path() / "visualization").string(), *pmesh, mesh_min_weight, &detected_obbs);
+      cpu_tsdf::WriteForVisualization((bfs::path(out_filename).parent_path() / "visualization").string(), *pmesh, mesh_min_weight, &detected_obbs_origin);
   }
   return 0;
 }

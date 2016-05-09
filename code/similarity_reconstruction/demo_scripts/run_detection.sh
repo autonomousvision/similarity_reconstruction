@@ -15,8 +15,9 @@ fi
 
 # parameters
 # step size used in training: step_x = 1m, step_y = 1m, step_rotation_angle = 1 degree
+# if not specified, the default is (2, 2, 2) for large objects (min_sidelength > 8m) and (1, 1, 1) for small objects
 detect_deltas=(1 1 1)
-# step size used in testing: step_x, step_y, step_rotation_angle (in degree)
+# step size used in testing: step_x, step_y, step_rotation_angle (in degree).
 test_detect_deltas=(1 1 1)
 # sampling size: along x, y, z axis
 detect_sample_size=(9 9 6)
@@ -29,7 +30,7 @@ total_thread=10
 min_score_to_keep=(-0.5 -0.5 0.1)
 
 # tsdf model and anntations for training
-train_scene_file=$detector_train_data_dir/gt_cropped_$startimg-$endimg-building.cropped_tsdf_tsdf.bin
+train_scene_file=$detector_train_data_dir/scene_mesh.ply
 annotations=$detector_train_data_dir/annotated_obbs.txt
 
 # output directory for training result
@@ -41,29 +42,30 @@ detection_scene_file=$scene_model_bin
 
 
 # training
-# display the data for training
-if [[ $display && $display -gt 0 ]]; then 
-    for i in 0 1 2
-    do
-        cur_vis_txt=$detector_train_data_dir/visualization/category_$i/visualization.txt
-        ./visualization.sh "training_data_category_$i" "$cur_vis_txt"
-    done
-fi
 if [ $run_train -gt 0 ]; then
+    # display the data for training
+    if [[ $display && $display -gt 0 ]]; then 
+        for i in 0 1 2
+        do
+            echo "show training samples for category $i"
+            cur_vis_txt=$detector_train_data_dir/visualization/category_$i/visualization.txt
+            ./visualization.sh "training_data_category_$i" "$cur_vis_txt"
+        done
+    fi
     # echo $train_bin --scene_file $train_scene_file --annotations $annotations --output_prefix $output_prefix --sample_size ${detect_sample_size[@]} --total_thread $total_thread --svm_param_c 100 --svm_param_w1 10 --detect_deltas ${detect_deltas[@]}
     $train_bin --scene_file $train_scene_file --annotations $annotations --output_prefix $output_prefix --sample_size ${detect_sample_size[@]} --total_thread $total_thread --svm_param_c 100 --svm_param_w1 10 --detect_deltas ${detect_deltas[@]}
-    # storing trained models
+    # dir storing trained models
     detector_file_dir=$output_prefix
 fi
 
 if [ $run_detect -gt 0 ]; then
     # echo $detect_bin --scene_file $detection_scene_file --detector_file $detector_file_dir --output_prefix $output_prefix --total_thread $total_thread --min_score_to_keep ${min_score_to_keep[@]} --detect_deltas ${test_detect_deltas[@]}
     $detect_bin --scene_file $detection_scene_file --detector_file $detector_file_dir --output_prefix $output_prefix --total_thread $total_thread --min_score_to_keep ${min_score_to_keep[@]} #--detect_deltas ${test_detect_deltas[@]}
+    if [[ $display && $display -gt 0 ]]; then 
+        ./visualization.sh "detect_results" "$visualization_txt"
+    fi
 fi
 
 detect_res_txt=$output_prefix/detect_res_all_obb_nmsed.txt
 visualization_txt=$output_prefix/visualization/visualization.txt
 
-if [[ $display && $display -gt 0 ]]; then 
-./visualization.sh "detect_results" "$visualization_txt"
-fi

@@ -156,13 +156,11 @@ bool CleanMesh(
         )
 {
     CHECK_GE(mesh.polygons.size(), 0);
-    // pcl::io::savePLYFile ("/home/dell/t1.ply", *mesh);
-    //cpu_tsdf::WriteTSDFMesh(tsdf, 0, "/home/dell/t1.ply", true);
     utility::flattenVertices(mesh);
 
     EdgeMap edge_map;
     MeshToTriangleEdgeMap(mesh, &edge_map);
-    std::cout << edge_map.size() << std::endl;
+    // std::cout << edge_map.size() << std::endl;
     Graph G;
     TriangleEdgeMapToBoostGraph(edge_map, &G);
     edge_map.clear();
@@ -170,7 +168,7 @@ bool CleanMesh(
     std::vector<int> component(num_vertices(G));
 
     int num_conn = connected_components(G, &component[0]);
-    std::cout << "conn num: " << num_conn << std::endl;
+    // std::cout << "conn num: " << num_conn << std::endl;
     G.clear();
     std::vector<bool> reserved_tri;
     FilterTriangle(component, num_conn, compo_thresh, &reserved_tri);
@@ -201,18 +199,16 @@ bool ComputeTSDFCleanVoxels(
 {
     pcl::PolygonMesh::Ptr mesh = cpu_tsdf::TSDFToPolygonMesh(tsdf, 0);
     CHECK_GE(mesh->polygons.size(), 0);
-    // pcl::io::savePLYFile ("/home/dell/t1.ply", *mesh);
-    //cpu_tsdf::WriteTSDFMesh(tsdf, 0, "/home/dell/t1.ply", true);
     EdgeMap edge_map;
     MeshToTriangleEdgeMap(*mesh, &edge_map);
-    std::cout << edge_map.size() << std::endl;
+    // std::cout << edge_map.size() << std::endl;
     Graph G;
     TriangleEdgeMapToBoostGraph(edge_map, &G);
     edge_map.clear();
-    std::cout << num_vertices(G) << std::endl;
+    // std::cout << num_vertices(G) << std::endl;
     std::vector<int> component(num_vertices(G));
     int num_conn = connected_components(G, &component[0]);
-    std::cout << "conn num: " << num_conn << std::endl;
+    // std::cout << "conn num: " << num_conn << std::endl;
     G.clear();
     std::vector<bool> reserved_tri;
     FilterTriangle(component, num_conn, compo_thresh, &reserved_tri);
@@ -375,7 +371,7 @@ bool CleanNoiseInSamples(
         Eigen::SparseMatrix<float, Eigen::ColMajor>* valid_obs_weight_mat,
         float counter_thresh, float pos_trunc, float neg_trunc)
 {
-    cout << "begin clean noise" << endl;
+    // cout << "begin clean noise" << endl;
     Eigen::SparseMatrix<float, Eigen::ColMajor>& weights = *pweights;
     valid_obs_weight_mat->resize(pweights->rows(), pweights->cols());
     valid_obs_weight_mat->setZero();

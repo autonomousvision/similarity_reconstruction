@@ -211,7 +211,7 @@ bool ConvertDataVectorToTSDFWithWeight(
         pos[0] = data_dim_idx / size_yz;
         tsdf->AddObservation(pos, dist, weight, cv::Vec3b(127, 127, 127));
     }
-    tsdf->DisplayInfo();
+    // tsdf->DisplayInfo();
     return true;
 }
 
@@ -245,7 +245,7 @@ bool ConvertDataVectorToTSDFWithWeightAndWorldPos(
                                                 utility::CvVectorToEigenVector3(pos),
                                                 utility::CvVectorToEigenVector3(worldpos))));
     }
-    tsdf->DisplayInfo();
+    // tsdf->DisplayInfo();
     return true;
 }
 
@@ -274,7 +274,7 @@ bool ConvertDataMatrixToTSDFs(const float voxel_length, const Eigen::Vector3f &o
             pos[0] = data_dim_idx / size_yz;
             cur_tsdf->AddObservation(pos, data, it_w.value(), cv::Vec3b(255, 255, 255));
         }
-        cur_tsdf->DisplayInfo();
+        // cur_tsdf->DisplayInfo();
     }
     std::cout << "End convert Data Mat to TSDFs. " << std::endl;
     return true;
@@ -304,9 +304,7 @@ bool ConvertDataMatrixToTSDFsNoWeight(const float voxel_length, const Eigen::Vec
             pos[0] = data_dim_idx / size_yz;
             cur_tsdf->AddObservation(pos, data, 1, cv::Vec3b(255, 255, 255));
         }
-        cur_tsdf->DisplayInfo();
-        //char ch;
-        //std::cin >> ch;
+        // cur_tsdf->DisplayInfo();
     }
     std::cout << "End convert Data Mat to TSDFs. " << std::endl;
     return true;

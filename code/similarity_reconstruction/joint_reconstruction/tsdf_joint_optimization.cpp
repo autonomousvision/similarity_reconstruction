@@ -140,13 +140,12 @@ bool JointOptimization(
     {
         bfs::path prefix(params.save_path);
         bfs::path write_dir(prefix.parent_path()/(std::string("iteration_") + boost::lexical_cast<string>(i)));
-        bfs::create_directories(write_dir);
+        // bfs::create_directories(write_dir);
 
         bfs::path write_dir_block1(write_dir/"block1_alignment");
-        bfs::create_directories(write_dir_block1);
+        // bfs::create_directories(write_dir_block1);
         string cur_save_path = (write_dir_block1/prefix.stem()).string();
         params.save_path = (write_dir_block1/prefix.stem()).string() + "_TransformScale";
-
         // block 1
         Eigen::SparseMatrix<float, Eigen::ColMajor> samples;
         Eigen::SparseMatrix<float, Eigen::ColMajor> weights;
@@ -160,18 +159,19 @@ bool JointOptimization(
                                   *reconstructed_sample_weights,
                                   &samples,
                                   &weights);
-        params.save_path = cur_save_path + "_TransformScale_EndSave";
-        {
-            tsdf_utility::OutputOBBsAsPly(*obbs, params.save_path);
-            TSDFGridInfo tsdf_info(scene_tsdf, params.sample_size, 0);
-            cpu_tsdf::WriteTSDFsFromMatWithWeight(samples, *reconstructed_sample_weights, tsdf_info, params.save_path + "_transformscale.ply");
-        }
+        params.save_path = cur_save_path + "_TransformScale_End";
+        //{
+        //    tsdf_utility::OutputOBBsAsPly(*obbs, params.save_path);
+        //    TSDFGridInfo tsdf_info(scene_tsdf, params.sample_size, 0);
+        //    cpu_tsdf::WriteTSDFsFromMatWithWeight(samples, *reconstructed_sample_weights, tsdf_info, params.save_path + "_transformscale.ply");
+        //}
 
         // block 2
-        bfs::path write_dir_block2(write_dir/"block2_pca");
-        bfs::create_directories(write_dir_block2);
+        cout << "computing model " << endl;
+        bfs::path write_dir_block2(write_dir/"block2_model");
+        // bfs::create_directories(write_dir_block2);
         cur_save_path =  (write_dir_block2/prefix.stem()).string();
-        params.save_path = (write_dir_block2/prefix.stem()).string() + "_ModelCoeffPCA";
+        params.save_path = (write_dir_block2/prefix.stem()).string() + "_Model";
 
         float pos_trunc, neg_trunc;
         scene_tsdf.getDepthTruncationLimits(pos_trunc, neg_trunc);
@@ -199,14 +199,13 @@ bool JointOptimization(
         CleanTSDFSampleMatrix(scene_tsdf, recon_sample_mat, params.sample_size, params.noise_connected_component_thresh, &valid_weights, -1, 2);
         *reconstructed_sample_weights = valid_weights;
 
-        TSDFGridInfo tsdf_info(scene_tsdf, params.sample_size, 0);
-        cpu_tsdf::WriteTSDFsFromMatWithWeight(recon_sample_mat, cleaned_weights, tsdf_info, params.save_path + "_cleanw_ModelCoeffPCA_reconweight.ply");
-        cpu_tsdf::WriteTSDFsFromMatWithWeight(recon_sample_mat, *reconstructed_sample_weights, tsdf_info, params.save_path + "_ModelCoeffPCA_reconweight.ply");
-        // cpu_tsdf::WriteTSDFsFromMatWithWeight_Matlab(recon_sample_mat, *reconstructed_sample_weights, tsdf_info, params.save_path + "_ModelCoeffPCA_reconweight.mat");
+         //TSDFGridInfo tsdf_info(scene_tsdf, params.sample_size, 0);
+         //cpu_tsdf::WriteTSDFsFromMatWithWeight(recon_sample_mat, cleaned_weights, tsdf_info, params.save_path + "_samplew_Model.ply");
+         //cpu_tsdf::WriteTSDFsFromMatWithWeight(recon_sample_mat, *reconstructed_sample_weights, tsdf_info, params.save_path + "_meanw_Model.ply");
 
         // block 3
         bfs::path write_dir_block3(write_dir/"block3_cluster");
-        bfs::create_directories(write_dir_block3);
+        // bfs::create_directories(write_dir_block3);
         cur_save_path = (write_dir_block3/prefix.stem()).string();
         params.save_path = (write_dir_block3/prefix.stem()).string() + "_Cluster";
 
@@ -222,27 +221,7 @@ bool JointOptimization(
                                    projected_coeffs,
                                    &cluster_assignment_error,
                                    model_average_scales);
-        WriteSampleClusters(*sample_model_assign,  *model_average_scales, *outlier_gammas, cluster_assignment_error, params.save_path + "_cluster.txt");
-        //{  save intermediate result
-        //    std::vector<Eigen::SparseVector<float>> recon_samples;
-        //    params.save_path = cur_save_path + "_Cluster_recon";
-        //    PCAReconstructionResult(*model_means, *model_bases, *projected_coeffs, *sample_model_assign, &recon_samples);
-        //    std::vector<cpu_tsdf::TSDFHashing::Ptr> recon_tsdfs;
-        //    // ConvertDataVectorsToTSDFsWithWeight(recon_samples, weights, params, &recon_tsdfs);
-        //    ConvertDataVectorsToTSDFsNoWeight(recon_samples, params, &recon_tsdfs);
-        //    std::vector<cpu_tsdf::TSDFHashing::Ptr> transformed_recon_tsdfs;
-        //    WriteTSDFModels(recon_tsdfs, params.save_path + "_canonical.ply", false, true, params.min_model_weight);
-        //    TransformTSDFs(recon_tsdfs, *affine_transforms, &transformed_recon_tsdfs, &scene_voxel_length);
-        //    WriteTSDFModels(transformed_recon_tsdfs, params.save_path + "_transformed.ply", false, true, params.min_model_weight);
-
-        //    params.save_path = cur_save_path + "_Cluster_recon_with_weights";
-        //    ConvertDataVectorsToTSDFsWithWeight(recon_samples, weights, params, &recon_tsdfs);
-        //    WriteTSDFModels(recon_tsdfs, params.save_path + "_canonical.ply", false, true, params.min_model_weight);
-        //    transformed_recon_tsdfs.clear();
-        //    TransformTSDFs(recon_tsdfs, *affine_transforms, &transformed_recon_tsdfs, &scene_voxel_length);
-        //    WriteTSDFModels(transformed_recon_tsdfs, params.save_path + "_transformed.ply", false, true, params.min_model_weight);
-        //    //params.save_path = params_old_save_path;
-        //}
+        // WriteSampleClusters(*sample_model_assign,  *model_average_scales, *outlier_gammas, cluster_assignment_error, params.save_path + "_cluster.txt");
         params.save_path = params_init_save_path;
     }  // optimization iteration
     return true;
@@ -278,27 +257,15 @@ bool OptimizeTransformAndScale(
      std::vector<cpu_tsdf::TSDFHashing::Ptr> reconstructed_samples_tsdf(sample_num);
      ConvertDataVectorsToTSDFsWithWeight(reconstructed_samples, *weights, grid_info, &reconstructed_samples_tsdf);
      // ConvertDataVectorsToTSDFsWithWeight(reconstructed_samples, reconstructed_sample_weights, options, &reconstructed_samples_tsdf);
-     cpu_tsdf::WriteTSDFModels(reconstructed_samples_tsdf, params.save_path + "_debug_house_model_tobealigned1.txt", false, true, 0);
      std::vector<const TSDFHashing*> ptr_reconstructed_samples_tsdf(sample_num);
      for (int i = 0; i < sample_num; ++i) ptr_reconstructed_samples_tsdf[i] = reconstructed_samples_tsdf[i].get();
     /////////////////////////////////////
-
-    // std::vector<Eigen::SparseVector<float>> reconstructed_samples;
-    // PCAReconstructionResult(model_means, model_bases, projected_coeffs, model_assign_idx, &reconstructed_samples);
-    // std::vector<cpu_tsdf::TSDFHashing::Ptr> reconstructed_sample_tsdfs(sample_num);
-    // cpu_tsdf::TSDFGridInfo grid_info(scene_tsdf, params.sample_size, params.min_meshing_weight);
-    // // ConvertDataVectorsToTSDFsWithWeight(reconstructed_samples, *weights, grid_info, &reconstructed_sample_tsdfs);
-    // ConvertDataVectorsToTSDFsWithWeight(reconstructed_samples, recon_weights, grid_info, &reconstructed_sample_tsdfs);
-    // cpu_tsdf::WriteTSDFModels(reconstructed_sample_tsdfs, params.save_path + "_debug_house_model_tobealigned1.txt", false, true, 0);
-    // std::vector<const TSDFHashing*> ptr_reconstructed_samples_tsdf(sample_num);
-    // for (int i = 0; i < sample_num; ++i) ptr_reconstructed_samples_tsdf[i] = reconstructed_sample_tsdfs[i].get();
-    // 2. optimize
-    //////////////////////////////////////////////////////////////
     const int model_number = *(std::max_element(model_assign_idx.begin(), model_assign_idx.end())) + 1;
     vector<vector<int>> cluster_sample_idx;
     GetClusterSampleIdx(model_assign_idx,  outlier_gammas, model_number, &cluster_sample_idx);
     for (int i = 0; i < model_number; ++i)
     {
+        cout << "Aligning samples for category: " << i << endl;
         int sample_num_cur_cluster = cluster_sample_idx[i].size();
         std::vector<const TSDFHashing*> recon_samples_tsdf_cur_cluster(sample_num_cur_cluster);
         std::vector<int> model_assign_idx_cur_cluster(sample_num_cur_cluster);

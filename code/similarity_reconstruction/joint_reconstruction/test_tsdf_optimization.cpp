@@ -67,12 +67,12 @@ main (int argc, char** argv)
             ("detect_obb_file", bpo::value<std::string>(&detect_obb_file)->required(), "detected oriented bounging box file")
             ("output_dir", bpo::value<std::string>(&output_dir)->required (), "output directory path")
             ("mesh_min_weight", bpo::value<float>(&min_meshing_weight)->default_value(0.0), "minimum weight doing marching cubes")
-            ("pca_number", bpo::value<int>(&pc_num)->default_value(0), "principal component number")
+            ("pc_number", bpo::value<int>(&pc_num)->default_value(0), "principal component number")
             ("optimize_max_iter", bpo::value<int>(&optimize_max_iter)->default_value(3), "max iteration number")
             ("lambda_avg_scale", bpo::value<float>(&lambda_average_scale)->default_value(100), "average scale term weight")
             ("lambda_obs", bpo::value<float>(&lambda_observation)->default_value(0.0), "observation term weight")
             ("lambda_reg", bpo::value<float>(&lambda_regularization)->default_value(50), "regularization term weight")
-            ("lambda_outlier", bpo::value<float>(&lambda_outlier)->default_value(50000), "lambda_outlier_thresh")
+            ("lambda_outlier", bpo::value<float>(&lambda_outlier)->default_value(500000), "lambda_outlier_thresh")  // the outlier slack variable is not used. setting it to a large value disables this term
             ("noise_observation_thresh", bpo::value<float>(&noise_observation_thresh)->default_value(2), "observed voxels less than the threshold will be removed")
             ("noise_connected_component_thresh", bpo::value<float>(&noise_connected_component_thresh)->default_value(-1), "connected component parts smaller than this thresh wil be removed")
             ("logtostderr", bpo::bool_switch(&FLAGS_logtostderr)->default_value(false), "log to std error")
@@ -86,8 +86,8 @@ main (int argc, char** argv)
         cout << opts_desc << endl;
         return EXIT_FAILURE;
     }
-    FLAGS_log_dir = output_dir;
-    google::InitGoogleLogging("...");
+    FLAGS_log_dir = "/tmp/";
+    google::InitGoogleLogging("");
 
     cpu_tsdf::TSDFHashing::Ptr scene_tsdf(new cpu_tsdf::TSDFHashing);
     LOG(INFO) << "Reading scene model file.";
@@ -106,7 +106,6 @@ main (int argc, char** argv)
     sample_collection.GetOBBCollection(&obbs, &sample_model_idx, &sample_scores);
 
     for (auto& obbi : obbs) {
-        //obbi = obbi.ExtendSidesByPercent(Eigen::Vector3f(0.1, 0.1, 0));
         obbi = obbi.ExtendSides(Eigen::Vector3f(1, 1, 2.2));
         Eigen::AffineCompact3f temp1 = obbi.transform();
         temp1.translation() -= Eigen::Vector3f(0,0,0.2);
@@ -150,42 +149,15 @@ main (int argc, char** argv)
                 &reconstructed_sample_weights
                 );
 
-    // save initial result
-    // {
-    //     cout << "saving initial merge result" << endl;
-    //     bfs::path write_dir(bfs::path(output_dir)/string("initial_result"));
-    //     bfs::create_directories(write_dir);
-    //     cpu_tsdf::TSDFGridInfo grid_info(*scene_tsdf, params.sample_size, params.min_meshing_weight);
-    //     std::vector<cpu_tsdf::TSDFHashing::Ptr> reconstructed_samples_original_pos;
-    //     cpu_tsdf::ReconstructTSDFsFromPCAOriginPos(
-    //                             model_means,
-    //                             model_bases,
-    //                             projected_coeffs,
-    //                             reconstructed_sample_weights,
-    //                             sample_model_idx,
-    //                             obbs,
-    //                             grid_info,
-    //                             scene_tsdf->voxel_length(),
-    //                             scene_tsdf->offset(),
-    //                             &reconstructed_samples_original_pos);
-    //     scene_tsdf->DisplayInfo();
-    //     cpu_tsdf::MergeTSDFs(reconstructed_samples_original_pos, scene_tsdf.get());
-    //     cpu_tsdf::CleanTSDF(scene_tsdf, 100);
-    //     scene_tsdf->DisplayInfo();
-    //     cpu_tsdf::WriteTSDFModel(scene_tsdf,
-    //                              write_dir.string() + "/initial_merged_scene.ply",
-    //                              true, true, min_meshing_weight);
-    // }
-    // // end save initial result
-
+    LOG(INFO) << "begin optimization. ";
     std::vector<double> outlier_gammas(obbs.size(), 0.0);
     for (int icompnum = 0; icompnum <= pc_num; ++icompnum)
     {
+        cout << "optimization for pc num: " << icompnum << endl;
         bfs::path intermediate_write_dir(bfs::path(output_dir)/(string("comp_num_") + boost::lexical_cast<string>(icompnum)));
-        bfs::create_directories(intermediate_write_dir);
+        // bfs::create_directories(intermediate_write_dir);
         params.save_path = (intermediate_write_dir/"res.ply").string();
         params.pc_num = icompnum;
-        cout << "begin optimization " << endl;
         tsdf_optimization::JointOptimization(*scene_tsdf,
                                                            params,
                                                            &model_means,
@@ -197,8 +169,8 @@ main (int argc, char** argv)
                                                            &model_average_scales,
                                                            &reconstructed_sample_weights
                                                            );
-        cout << "finished optimization " << icompnum << endl;
     }
+    LOG(INFO) << "finished optimization. ";
     // save results
     bfs::path write_dir(bfs::path(output_dir)/string("final_result"));
     bfs::create_directories(write_dir);
@@ -244,11 +216,6 @@ main (int argc, char** argv)
     // begin fusing
     scene_tsdf->DisplayInfo();
     cout << "begin fusing reconstructed tsdf samples with original scene tsdf " << endl;
-    //std::vector<Eigen::Affine3f> obb_affines;
-    //for (int i = 0; i < obbs.size(); ++i) {
-    //        obb_affines.push_back(obbs[i].AffineTransformOriginAsCenter());
-    //}
-    // cpu_tsdf::ScaleTSDFParts(scene_tsdf.get(), obb_affines, 0.5);
     cpu_tsdf::MergeTSDFs(reconstructed_samples_original_pos, scene_tsdf.get());
     cpu_tsdf::CleanTSDF(scene_tsdf, 100);
     scene_tsdf->DisplayInfo();

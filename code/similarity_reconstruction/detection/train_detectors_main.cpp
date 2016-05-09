@@ -82,8 +82,9 @@ main (int argc, char** argv)
       return EXIT_FAILURE;
   }
   CHECK_EQ(sample_size_vec.size(), 3);
-  FLAGS_log_dir = output_prefix;
-  google::InitGoogleLogging("...");
+  // FLAGS_log_dir = output_prefix;
+  FLAGS_log_dir = "/tmp/";
+  google::InitGoogleLogging("");
 
   // show input options
   Vector3i sample_size(sample_size_vec[0], sample_size_vec[1], sample_size_vec[2]);

@@ -154,7 +154,10 @@ inline void WriteTSDFsFromVectorsWithWeight(
                 save_filepath);
 }
 
+void WriteForVisualization(const std::string &dir_prefix, TSDFHashing::ConstPtr tsdf_model, float mesh_min_weight, const std::vector<tsdf_utility::OrientedBoundingBox>* obbs);
+void WriteForVisualization(const std::string &dir_prefix, const pcl::PolygonMesh& mesh, float mesh_min_weight, const std::vector<tsdf_utility::OrientedBoundingBox> *obbs);
 
+#ifdef MYMATLAB
 void WriteTSDFsFromMatWithWeight_Matlab(const Eigen::SparseMatrix<float, Eigen::ColMajor>& data_mat,
         const Eigen::SparseMatrix<float, Eigen::ColMajor>& weight_mat,
         const TSDFGridInfo& tsdf_info,
@@ -179,8 +182,7 @@ bool Read3DArraysMatlab(const std::string &filepath, const std::string &filter, 
 bool ReadMatrixMatlab(const std::string &filepath, const std::string & varname, Eigen::MatrixXf *matrix);
 
 bool WriteMatrixMatlab(const std::string &filepath, const std::string &variable_name, const Eigen::MatrixXf &matrix);
+#endif
 
-void WriteForVisualization(const std::string &dir_prefix, TSDFHashing::ConstPtr tsdf_model, float mesh_min_weight, const std::vector<tsdf_utility::OrientedBoundingBox>* obbs);
-void WriteForVisualization(const std::string &dir_prefix, const pcl::PolygonMesh& mesh, float mesh_min_weight, const std::vector<tsdf_utility::OrientedBoundingBox> *obbs);
 
 }

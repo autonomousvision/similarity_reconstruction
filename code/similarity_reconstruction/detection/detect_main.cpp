@@ -74,8 +74,9 @@ main (int argc, char** argv)
       cout << opts_desc << endl;
       return EXIT_FAILURE;
   }
-  FLAGS_log_dir = output_prefix;
-  google::InitGoogleLogging("...");
+  // FLAGS_log_dir = output_prefix;
+  FLAGS_log_dir = "/tmp/";
+  google::InitGoogleLogging("");
 
   LOG(INFO) << "Reading detetor model file.";
   boost::system::error_code ec;

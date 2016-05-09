@@ -450,7 +450,6 @@ bool OptimizeTransformAndScalesImplRobustLoss1(
     TSDFAlignRobustCostFunction2DRObsWeight::max_model_weight = TSDFHashing::getVoxelMaxWeight() + 1.0;
     TSDFAlignRobustCostFunction2DRObsWeight::sqrt_lambda_obs = sqrt(lambda_obs);
 
-    cout << "sqrt_lambda_obs: " << TSDFAlignRobustCostFunction2DRObsWeight::sqrt_lambda_obs << endl;
     ceres::Problem problem;
     // saves all the parameters and pass them to problem
     std::vector<double> problem_sample_rotations(sample_num);
@@ -459,7 +458,6 @@ bool OptimizeTransformAndScalesImplRobustLoss1(
     std::vector<Vector3d> problem_model_scales(model_num);
     for (int i = 0; i < model_num; ++i) problem_model_scales[i] = (*model_scales)[i].cast<double>();
 
-    //std::unique_ptr<ceres::LossFunction> robust_loss_function(new HuberLoss(robust_loss_outlier_threshold));
     std::unique_ptr<ceres::LossFunction> robust_loss_function(new ceres::TrivialLoss());
     static const double inlier_thresh = 1e-5;
     int cnt = 0;
@@ -475,10 +473,6 @@ bool OptimizeTransformAndScalesImplRobustLoss1(
 
         // problem
         std::cout << "building problem for sample " << sample_i << std::endl;
-        std::cout << "building problem for inlier sample " << sample_i << std::endl;
-        cout << "initial rotation: \n" << problem_sample_rotations[sample_i] << endl;
-        cout << "initial scale: \n" << problem_sample_scales3d[sample_i] << endl;
-        cout << "initial trans: \n" << problem_sample_trans[sample_i] << endl;
         for (TSDFHashing::const_iterator citr = current_model.begin(); citr != current_model.end(); ++citr)
         {
             cv::Vec3i voxel_coord = citr.VoxelCoord();
@@ -505,7 +499,6 @@ bool OptimizeTransformAndScalesImplRobustLoss1(
     }  // end for sample_i
 
     // add scale consistency blocks
-    cout << "lambda_average_scale: " << lambda_average_scale  << endl;
     for (int sample_i = 0; sample_i < sample_num; ++sample_i)
     {
         if (gammas[sample_i] > inlier_thresh) continue;
@@ -582,75 +575,6 @@ bool OptimizeTransformAndScalesImplRobustLoss1(
     }
     params.lambda_observation *= 0.3; // decays during iteration
     return true;
-}
-
-void ComputeTargetZScaleOneCluster(
-        std::vector<const TSDFHashing *> tsdfs,
-        const std::vector<double>& current_zscale,
-        std::vector<double> *target_scale,
-        const Eigen::Vector3i &boundingbox_size, const float percentile)
-{
-    cout << "computing z scale " << endl;
-    std::vector<float> highest_percentiles(tsdfs.size());
-    for (int i = 0; i < tsdfs.size(); ++i)
-    {
-        cpu_tsdf::TSDFHashing::Ptr cur_tsdf(new cpu_tsdf::TSDFHashing);
-        *cur_tsdf = *(tsdfs[i]);
-        std::vector<float> heights;
-        cout << "begin clean z scale " << i << endl;
-        CleanTSDF(cur_tsdf, -1);
-        if (i == 2)
-        {
-            cpu_tsdf::WriteTSDFModel(cur_tsdf, "/home/dell/test1.ply", false, true, 0);
-        }
-
-        for (cpu_tsdf::TSDFHashing::iterator itr = cur_tsdf->begin(); itr != cur_tsdf->end(); ++itr)
-        {
-            float d, w;
-            cv::Vec3b color;
-            if (itr->RetriveData(&d, &w, &color) && w > 0 && d != 0)
-            {
-                Eigen::Vector3i cur_vcoord = utility::CvVectorToEigenVector3(itr.VoxelCoord());
-                double z_height_normed = (double(cur_vcoord[2]))/double(boundingbox_size[2]);
-                heights.push_back(z_height_normed);
-            }
-        }
-        cout << "hight size " << heights.size() << endl;
-        // int nth = round(percentile * heights.size());
-        int nth = std::min<int>(20, heights.size() - 1);
-        std::nth_element(heights.begin(), heights.begin() + nth, heights.end(), std::greater<float>());
-        highest_percentiles[i] = heights[nth];
-        cout << i << "th highest perventile " << highest_percentiles[i] << endl;
-    }
-
-    // align the scales to the first sample
-    target_scale->resize(tsdfs.size());
-    for (int i = 0; i < tsdfs.size(); ++i)
-    {
-        (*target_scale)[i] = (highest_percentiles[i]/highest_percentiles[0]) * current_zscale[i];
-        cout << i << "th original scale: " << current_zscale[i] << endl;
-        cout << i << "th scale target: " << (*target_scale)[i] << endl;
-        cout << i << "ith scale target scaling factor: " <<  (highest_percentiles[i]/highest_percentiles[0])  << endl;
-    }
-    return;
-}
-
-void ComputeTargetZScaleOneCluster(
-        const Eigen::SparseMatrix<float, Eigen::ColMajor> &samples,
-        const Eigen::SparseMatrix<float, Eigen::ColMajor> &weights,
-        const std::vector<double> &cur_zscale,
-        const TSDFGridInfo &grid_info,
-        std::vector<double> *target_scale, const float percentile)
-{
-    std::vector<cpu_tsdf::TSDFHashing::Ptr> tsdfs;
-    ConvertDataMatrixToTSDFs(samples, weights, grid_info, &tsdfs);
-
-    std::vector<const cpu_tsdf::TSDFHashing*> ptsdfs(tsdfs.size());
-    for (int i = 0; i < tsdfs.size(); ++i)
-    {
-        ptsdfs[i] = tsdfs[i].get();
-    }
-    return ComputeTargetZScaleOneCluster(ptsdfs, cur_zscale, target_scale, grid_info.boundingbox_size(), percentile);
 }
 
 }  // namespace cpu_tsdf

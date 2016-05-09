@@ -331,7 +331,6 @@ pcl::PolygonMesh::Ptr cpu_tsdf::TSDFToPolygonMesh(cpu_tsdf::TSDFHashing::ConstPt
     mc.setMinWeight(mesh_min_weight);
     mc.setInputTSDF (tsdf_model);
     pcl::PolygonMesh::Ptr mesh (new pcl::PolygonMesh);
-    fprintf(stderr, "perform reconstruction: \n");
     mc.reconstruct (*mesh);
     float default_dist;
     if (flatten_dist <= 0)

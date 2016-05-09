@@ -43,9 +43,9 @@ bool TransformTSDF(const TSDFHashing& tsdf_origin,
     //float scale = scaling(0, 0);
     //Eigen::Vector3f trans = transform.translation();
 
-    cout << "Eigen Rotation Matrix:\n " << rotation << endl;
-    cout << "Eigen Scaling Matrix:\n " << scaling << endl;
-    cout << "Eigen Translation:\n " << trans << endl;
+    //cout << "Eigen Rotation Matrix:\n " << rotation << endl;
+    //cout << "Eigen Scaling Matrix:\n " << scaling << endl;
+    //cout << "Eigen Translation:\n " << trans << endl;
     return TransformTSDF(tsdf_origin, EigenMatToCvMatx<float, 3, 3>(rotation),
                          EigenVectorToCvVector3(trans), EigenVectorToCvVector3(scaling), tsdf_translated, pvoxel_length, pscene_offset);
 
@@ -55,10 +55,10 @@ bool TransformTSDF(const TSDFHashing& tsdf_origin,
                    const cv::Matx33f& rotation, const cv::Vec3f& trans, const cv::Vec3f& scale, TSDFHashing* tsdf_translated,
                    const float* pvoxel_length, const Eigen::Vector3f *pscene_offset)
 {
-    cout << "begin transform TSDF. " << endl;
-    cout << "rotation: " << (cv::Mat)rotation << endl;
-    cout << "trans: " << (cv::Mat)trans << endl;
-    cout << "scale: " << scale << endl;
+    //cout << "begin transform TSDF. " << endl;
+    //cout << "rotation: " << (cv::Mat)rotation << endl;
+    //cout << "trans: " << (cv::Mat)trans << endl;
+    //cout << "scale: " << scale << endl;
 
     cv::Matx33f scale_mat = cv::Matx33f::eye();
     scale_mat(0, 0) = scale[0];
@@ -90,7 +90,7 @@ bool TransformTSDF(const TSDFHashing& tsdf_origin,
             tsdf_translated->AddBrickUpdateList(voxel_coord_transformed, &brick_update_hashset);
         }  // end if
     }  // end for
-    cout << "update list size: " << brick_update_hashset.size() << endl;
+    // cout << "update list size: " << brick_update_hashset.size() << endl;
 
     struct TSDFTranslatedVoxelUpdater
     {
@@ -127,17 +127,17 @@ bool TransformTSDF(const TSDFHashing& tsdf_origin,
     TSDFTranslatedVoxelUpdater updater(tsdf_origin, *tsdf_translated, inverse_scaled_rot, inverse_trans);
     tsdf_translated->UpdateBricksInQueue(brick_update_hashset,
                                          updater);
-    cout << "finished transform TSDF. " << endl;
+    //cout << "finished transform TSDF. " << endl;
     return true;
 }
 
 bool TransformTSDF(const TSDFHashing& tsdf_origin,
                    const cv::Matx33f& rotation, const cv::Vec3f& trans, const float scale, TSDFHashing* tsdf_translated)
 {
-    cout << "begin transform TSDF. " << endl;
-    cout << "rotation: " << (cv::Mat)rotation << endl;
-    cout << "trans: " << (cv::Mat)trans << endl;
-    cout << "scale: " << scale << endl;
+    //cout << "begin transform TSDF. " << endl;
+    //cout << "rotation: " << (cv::Mat)rotation << endl;
+    //cout << "trans: " << (cv::Mat)trans << endl;
+    //cout << "scale: " << scale << endl;
 
     cv::Matx33f scaled_rot = rotation * scale;
     float voxel_length = tsdf_origin.voxel_length();
@@ -162,7 +162,7 @@ bool TransformTSDF(const TSDFHashing& tsdf_origin,
             tsdf_translated->AddBrickUpdateList(voxel_coord_transformed, &brick_update_hashset);
         }  // end if
     }  // end for
-    cout << "update list size: " << brick_update_hashset.size() << endl;
+    // cout << "update list size: " << brick_update_hashset.size() << endl;
 
     struct TSDFTranslatedVoxelUpdater
     {
@@ -194,7 +194,7 @@ bool TransformTSDF(const TSDFHashing& tsdf_origin,
     TSDFTranslatedVoxelUpdater updater(tsdf_origin, *tsdf_translated, inverse_scaled_rot, inverse_trans);
     tsdf_translated->UpdateBricksInQueue(brick_update_hashset,
                                          updater);
-    cout << "finished transform TSDF. " << endl;
+    // cout << "finished transform TSDF. " << endl;
     return true;
 }
 

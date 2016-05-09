@@ -1,8 +1,4 @@
 #!/bin/bash
-echo "$#"
-echo "$0"
-echo "$1"
-echo "$2"
 if [ "$#" -ne 2 ]; then
     echo "visualization: usage: visualization.sh window_title visualization_txt"
     exit
@@ -24,5 +20,5 @@ if [ ! -f $visualization_txt ]; then
 fi
 
 #echo $mesh_view_bin $window_title $visualization_txt 
-$mesh_view_bin $window_title $visualization_txt &
+$mesh_view_bin $window_title $visualization_txt  &>/dev/null &
 sleep 3

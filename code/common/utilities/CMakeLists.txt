@@ -7,8 +7,8 @@ add_library (common_utility STATIC
               pcl_utility.h
               common_utility.h
               timer.h
-              matlab_utility.h
-              matlab_utility.cpp
+              #matlab_utility.h
+              #matlab_utility.cpp
             )
 target_link_libraries(common_utility ${Matlab_RT_LIBS} ${MATIO_LIBRARIES} ${GLOG_LIBRARIES} ${PCL_SEGMENTATION_LIBRARIES} ${PCL_SEARCH_LIBRARIES} ${PCL_KDTREE_LIBRARIES} ${PCL_SURFACE_LIBRARIES} ${PCL_IO_LIBRARIES} ${PCL_COMMON_LIBRARIES} ${OpenCV_LIBS} ${Boost_LIBRARIES} )
 

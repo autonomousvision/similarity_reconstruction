@@ -265,7 +265,7 @@ void draw_mesh(int i)
     }
     draw_tstrips(themesh);
 	glDisable(GL_POLYGON_OFFSET_FILL);
-    glPolygonMode(GL_FRONT, GL_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
  // Edge drawing pass
  // if (draw_edges) {

@@ -17,10 +17,9 @@
 #include "tsdf_hash_utilities/utility.h"
 #include "tsdf_operation/tsdf_io.h"
 #include "tsdf_operation/tsdf_transform.h"
-// #include "tsdf_operation/tsdf_slice.h"
-// #include "tsdf_operation/tsdf_clean.h"
-// #include "tsdf_operation/tsdf_slice.h"
+#ifdef MYMATLAB
 #include "common/utilities/matlab_utility.h"
+#endif
 #include "tsdf_utility.h"
 #include "tsdf_hash_utilities/oriented_boundingbox.h"
 
@@ -1060,7 +1059,7 @@ bool WeightedPCADeflationOrthogonal(const Eigen::SparseMatrix<float, Eigen::ColM
     // #samples: N, #dim: D, #principal_components: K
     // BaseMat: D * K; coeff_mat: K * N; mean_mat: D * 1;
     cout << "begin weighted pca" << endl;
-    cerr << "1. compute mean mat" << endl;
+    cerr << "compute mean mat" << endl;
     // ((Samples.*Weight)) * ones(N, 1) ./ Weight * ones(N, 1)
     Eigen::VectorXf onesN = Eigen::MatrixXf::Ones(sample_num, 1);
     // *mean_mat = (((samples.cwiseProduct(weights)) * onesN).cwiseQuotient( (weights * onesN) )).sparseView();
@@ -1094,9 +1093,9 @@ bool WeightedPCADeflationOrthogonal(const Eigen::SparseMatrix<float, Eigen::ColM
         //        WPCASaveUncentralizedTSDFs(centralized_data_mat, weights, *mean_mat,
         //                                   options.boundingbox_size, options.voxel_length, options.offset, options.max_dist_pos, options.max_dist_neg,
         //                                   output_filename);
-        WPCASaveMeanTSDF(*mean_mat, weights,
-                         options.sample_size, options.VoxelLength(), options.Offset(), options.max_dist_pos, options.max_dist_neg,
-                         output_filename);
+        //WPCASaveMeanTSDF(*mean_mat, weights,
+        //                 options.sample_size, options.VoxelLength(), options.Offset(), options.max_dist_pos, options.max_dist_neg,
+        //                 output_filename);
     }
     if (component_num == 0) return true;
     base_mat->resize(data_dim, sample_num);
@@ -1108,7 +1107,7 @@ bool WeightedPCADeflationOrthogonal(const Eigen::SparseMatrix<float, Eigen::ColM
     cout << "data_dim: " << data_dim << endl;
     cout << "sample_num: " << sample_num << endl;
     cout << "compo_num: " << component_num << endl;
-    cerr << "2. Initial Estimate" << endl;
+    cerr << "Initial Estimate" << endl;
     InitialEstimate(centralized_data_mat_row_major, weight_mat_row_major, component_num, &base_mat_row_major, coeff_mat);
     *base_mat = base_mat_row_major;
     if (!options.save_path.empty())
@@ -1120,16 +1119,16 @@ bool WeightedPCADeflationOrthogonal(const Eigen::SparseMatrix<float, Eigen::ColM
                                           + "_tsdf_wpca_deflation_ortho"
                                           + "_pcanum_" + boost::lexical_cast<string>(component_num)
                                           + "_init_estimated" + ".ply")).string();
-        // 1. save the initial mats for matlab debug
-        WPCASaveRelatedMatrices(&centralized_data_mat, mean_mat, &weights,
-                                base_mat, coeff_mat, output_filename);
-        // 2. save the tsdfs
-        WPCASaveRecoveredTSDFs(*mean_mat, *base_mat, *coeff_mat, component_num,
-                               options.sample_size, options.VoxelLength(), options.Offset(), options.max_dist_pos, options.max_dist_neg,
-                               output_filename);
+        //// 1. save the initial mats for matlab debug
+        //WPCASaveRelatedMatrices(&centralized_data_mat, mean_mat, &weights,
+        //                        base_mat, coeff_mat, output_filename);
+        //// 2. save the tsdfs
+        //WPCASaveRecoveredTSDFs(*mean_mat, *base_mat, *coeff_mat, component_num,
+        //                       options.sample_size, options.VoxelLength(), options.Offset(), options.max_dist_pos, options.max_dist_neg,
+        //                       output_filename);
     }
     // do EM
-    cerr << "3. Do EM" << endl;
+    cerr << "Do EM" << endl;
     const float thresh = 1e-4;
     Eigen::VectorXf prev_base(data_dim);
     Eigen::VectorXf current_base(data_dim);
@@ -1155,35 +1154,35 @@ bool WeightedPCADeflationOrthogonal(const Eigen::SparseMatrix<float, Eigen::ColM
             current_coeff *= component_norm;
             ////////////////////////////////////////////////
             /// save
-            if (!options.save_path.empty() && (i%10) == 0)
-            {
-                const string* save_filepath = &options.save_path;
-                string output_dir = bfs::path(*save_filepath).remove_filename().string();
-                string output_filename =
-                        (bfs::path(output_dir) / (bfs::path(*save_filepath).stem().string()
-                                                  + "_tsdf_wpca_deflation_ortho"
-                                                  + "_pcanum_" + boost::lexical_cast<string>(component_num)
-                                                  + "_comp_" + boost::lexical_cast<string>(k)
-                                                  + "_itr_" + boost::lexical_cast<string>(i)
-                                                  + ".ply")).string();
-                Eigen::SparseMatrix<float, ColMajor> temp_base = current_base.sparseView();
-                Eigen::MatrixXf temp_coeff = current_coeff;
-                WPCASaveRelatedMatrices(NULL, NULL, NULL,
-                                        &temp_base, &temp_coeff, output_filename);
-                Eigen::SparseMatrix<float, Eigen::ColMajor> temp_projected_data_mat
-                        =
-                        (*mean_mat) * (Eigen::Matrix<float, 1, Eigen::Dynamic>::Constant(1, sample_num, 1)).sparseView().eval()
-                        + (*base_mat).leftCols(k) * (*coeff_mat).topRows(k).sparseView().eval()
-                        + temp_base * temp_coeff.transpose().sparseView().eval();
-        WPCASaveTSDFsFromMats(temp_projected_data_mat,
-                              options.sample_size, options.VoxelLength(), options.Offset(), options.max_dist_pos, options.max_dist_neg,
-                              output_filename);
-                //                Eigen::SparseMatrix<float, Eigen::ColMajor> temp_projected_data_mat
-                //                        = (*mean_mat) * (Eigen::Matrix<float, 1, Eigen::Dynamic>::Constant(1, sample_num, 1)).sparseView().eval()
-                //                        + (*base_mat).leftCols(k) * (*coeff_mat).topRows(k).sparseView().eval();
-                //                WPCASaveRecoveredTSDFs(temp_projected_data_mat, *mean_tsdf,
-                //                                       temp_base, temp_coeff, 1, *boundingbox_size, output_filename);
-            }
+//            if (!options.save_path.empty() && (i%10) == 0)
+//            {
+//                const string* save_filepath = &options.save_path;
+//                string output_dir = bfs::path(*save_filepath).remove_filename().string();
+//                string output_filename =
+//                        (bfs::path(output_dir) / (bfs::path(*save_filepath).stem().string()
+//                                                  + "_tsdf_wpca_deflation_ortho"
+//                                                  + "_pcanum_" + boost::lexical_cast<string>(component_num)
+//                                                  + "_comp_" + boost::lexical_cast<string>(k)
+//                                                  + "_itr_" + boost::lexical_cast<string>(i)
+//                                                  + ".ply")).string();
+//                Eigen::SparseMatrix<float, ColMajor> temp_base = current_base.sparseView();
+//                Eigen::MatrixXf temp_coeff = current_coeff;
+//                WPCASaveRelatedMatrices(NULL, NULL, NULL,
+//                                        &temp_base, &temp_coeff, output_filename);
+//                Eigen::SparseMatrix<float, Eigen::ColMajor> temp_projected_data_mat
+//                        =
+//                        (*mean_mat) * (Eigen::Matrix<float, 1, Eigen::Dynamic>::Constant(1, sample_num, 1)).sparseView().eval()
+//                        + (*base_mat).leftCols(k) * (*coeff_mat).topRows(k).sparseView().eval()
+//                        + temp_base * temp_coeff.transpose().sparseView().eval();
+//        WPCASaveTSDFsFromMats(temp_projected_data_mat,
+//                              options.sample_size, options.VoxelLength(), options.Offset(), options.max_dist_pos, options.max_dist_neg,
+//                              output_filename);
+//                //                Eigen::SparseMatrix<float, Eigen::ColMajor> temp_projected_data_mat
+//                //                        = (*mean_mat) * (Eigen::Matrix<float, 1, Eigen::Dynamic>::Constant(1, sample_num, 1)).sparseView().eval()
+//                //                        + (*base_mat).leftCols(k) * (*coeff_mat).topRows(k).sparseView().eval();
+//                //                WPCASaveRecoveredTSDFs(temp_projected_data_mat, *mean_tsdf,
+//                //                                       temp_base, temp_coeff, 1, *boundingbox_size, output_filename);
+//            }
             ////////////////////////////////////////////////
             //test convergence
             float t = (prev_base.normalized() - current_base.normalized()).cwiseAbs().sum();
@@ -1206,21 +1205,21 @@ bool WeightedPCADeflationOrthogonal(const Eigen::SparseMatrix<float, Eigen::ColM
         (*coeff_mat).row(k) = current_coeff;
         centralized_data_mat -= weights.cwiseProduct(current_base.sparseView() * current_coeff.transpose());
         centralized_data_mat_row_major = centralized_data_mat;
-        if (!options.save_path.empty())
-        {
-            const string* save_filepath = &options.save_path;
-            string output_dir = bfs::path(*save_filepath).remove_filename().string();
-            string output_filename =
-                    (bfs::path(output_dir) / (bfs::path(*save_filepath).stem().string()
-                                              + "_tsdf_wpca_deflation"
-                                              + "_pcanum_" + boost::lexical_cast<string>(component_num)
-                                              + "_comp_" + boost::lexical_cast<string>(k) + ".ply")).string();
-            WPCASaveRelatedMatrices(&centralized_data_mat, NULL, NULL,
-                                    base_mat, coeff_mat, output_filename);
-            WPCASaveRecoveredTSDFs(*mean_mat, *base_mat, *coeff_mat, k + 1,
-                              options.sample_size, options.VoxelLength(), options.Offset(), options.max_dist_pos, options.max_dist_neg,
-                                   output_filename);
-        }
+//        if (!options.save_path.empty())
+//        {
+//            const string* save_filepath = &options.save_path;
+//            string output_dir = bfs::path(*save_filepath).remove_filename().string();
+//            string output_filename =
+//                    (bfs::path(output_dir) / (bfs::path(*save_filepath).stem().string()
+//                                              + "_tsdf_wpca_deflation"
+//                                              + "_pcanum_" + boost::lexical_cast<string>(component_num)
+//                                              + "_comp_" + boost::lexical_cast<string>(k) + ".ply")).string();
+//            WPCASaveRelatedMatrices(&centralized_data_mat, NULL, NULL,
+//                                    base_mat, coeff_mat, output_filename);
+//            WPCASaveRecoveredTSDFs(*mean_mat, *base_mat, *coeff_mat, k + 1,
+//                              options.sample_size, options.VoxelLength(), options.Offset(), options.max_dist_pos, options.max_dist_neg,
+//                                   output_filename);
+//        }
     }  // end for k
     return true;
 }
