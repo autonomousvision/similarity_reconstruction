@@ -66,7 +66,7 @@ scene_model=$joint_output_tsdf
 detect_obb_file=$output_obb
 do_consistency_check=$do_final_consistency_check
 check_tsdf=0
-depthmap_check=0
+depthmap_check=1
 skymap_check=1
 filter_noise=120
 consistency_check_root=$seq_output_root/final_consistency_check/
@@ -75,7 +75,7 @@ if [ ! -d $consistency_check_root ]; then
     mkdir $consistency_check_root
 fi
 . ./consistency_check.sh
-echo "result output to: " $consistency_tsdf_output_ply
+echo "result output to: " $consistent_tsdf_output_ply
 
 if [[ $display && $display -gt 0 ]]; then
     ./visualization.sh "final_result" "$visualization_txt"

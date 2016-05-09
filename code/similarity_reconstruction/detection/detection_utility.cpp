@@ -263,9 +263,9 @@ void JitterSamples(const cpu_tsdf::TSDFHashing &scene_tsdf, const SceneDiscretiz
 void StepSizeFromOBB(const Eigen::Vector3f &side_lengths, float &delta_x, float &delta_y, float &delta_rotation) {
     float min_sidelength = side_lengths.minCoeff();
     if (min_sidelength > 8) {// larger objects, use larger step size
-        delta_x = 1; delta_y = 1; delta_rotation = 2 / 180.0 * M_PI;
+        delta_x = 2; delta_y = 2; delta_rotation = 2 / 180.0 * M_PI;
     } else {
-        delta_x = 0.5; delta_y = 0.5; delta_rotation = 1 / 180.0 * M_PI;
+        delta_x = 1; delta_y = 1; delta_rotation = 1 / 180.0 * M_PI;
     }
 }
 

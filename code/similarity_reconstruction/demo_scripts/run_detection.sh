@@ -26,7 +26,7 @@ total_thread=10
 # For buildings (category 1 & 2), use a lower threshold to preserve more detected samples
 # For cars (category 3), use a higher threshold to reject false positives 
 # because the reconstruction is noisy at the scale of cars
-min_score_to_keep=(-0.5 -0.5 0.15)
+min_score_to_keep=(-0.5 -0.5 0.1)
 
 # tsdf model and anntations for training
 train_scene_file=$detector_train_data_dir/gt_cropped_$startimg-$endimg-building.cropped_tsdf_tsdf.bin
@@ -58,7 +58,7 @@ fi
 
 if [ $run_detect -gt 0 ]; then
     # echo $detect_bin --scene_file $detection_scene_file --detector_file $detector_file_dir --output_prefix $output_prefix --total_thread $total_thread --min_score_to_keep ${min_score_to_keep[@]} --detect_deltas ${test_detect_deltas[@]}
-    $detect_bin --scene_file $detection_scene_file --detector_file $detector_file_dir --output_prefix $output_prefix --total_thread $total_thread --min_score_to_keep ${min_score_to_keep[@]} --detect_deltas ${test_detect_deltas[@]}
+    $detect_bin --scene_file $detection_scene_file --detector_file $detector_file_dir --output_prefix $output_prefix --total_thread $total_thread --min_score_to_keep ${min_score_to_keep[@]} #--detect_deltas ${test_detect_deltas[@]}
 fi
 
 detect_res_txt=$output_prefix/detect_res_all_obb_nmsed.txt

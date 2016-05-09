@@ -24,7 +24,7 @@ bin_dir=/home/dell/codebase/mpi_project_git/similarity_reconstruction/code/simil
 # third_party_dir=/home/dell/codebase/mpi_project_git/similarity_reconstruction/code/third_party/
 
 # folder to store result
-result_root=/home/dell/results_5/demo_$startimg"_"$end"_testdemo"
+result_root=/home/dell/results_5/demo_$startimg"_"$end"_testdemo_newconsistcheck"
 if [ ! -d $result_root ]; then
     mkdir $result_root
 fi
@@ -34,4 +34,4 @@ detector_train_data_dir=/home/dell/results_5/detection_training_data/
 
 # the binary file for visualization
 mesh_view_bin=/home/dell/codebase/mpi_project_git/similarity_reconstruction/code/similarity_reconstruction/visualization/trimesh2/bin.Linux64/mesh_view
-display=0
+display=1
