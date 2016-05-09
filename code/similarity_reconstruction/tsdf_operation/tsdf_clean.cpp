@@ -432,6 +432,7 @@ bool CleanNoiseInSamplesOneCluster(
     cout << "begin setting zeros" << endl;
     // second time
     valid_obs_positions->resize(samples.rows());
+    valid_obs_positions->setZero();
     for (int k=0; k<weights->outerSize(); ++k)
     {
       for (Eigen::SparseMatrix<float, Eigen::ColMajor>::InnerIterator it(*weights,k); it; ++it)

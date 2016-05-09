@@ -11,6 +11,7 @@
 #include <pcl/search/kdtree.h>
 #include <boost/dynamic_bitset.hpp>
 
+#include "tsdf_operation/tsdf_clean.h"
 #include "tsdf_hash_utilities/utility.h"
 #include "tsdf_hash_utilities/oriented_boundingbox.h"
 #include "common/utilities/common_utility.h"
@@ -195,6 +196,6 @@ void CleanTSDFWithSkyMapAndDepthMap(
     vector<bool> keep_vertices;
     CheckMeshVerticesWithSkyMapAndDepMapCheckOBB(
             *mesh, cameras, skymap_filelist, depth_filelist, obbs, sky_thresh, skymap_check, depthmap_check, &keep_vertices);
-    CleanTSDFFromMeshVerts(tsdf, *mesh, keep_vertices, st_neighbor, ed_neighbor);
+    cpu_tsdf::CleanTSDFFromMeshVerts(tsdf, *mesh, keep_vertices, st_neighbor, ed_neighbor);
     return;
 }
