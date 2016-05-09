@@ -28,3 +28,4 @@ add_copyright.sh
 mycopyright
 *backup*
 *.sh.swo
+init_paths.sh
