@@ -30,14 +30,13 @@ total_thread=10
 min_score_to_keep=(-0.5 -0.5 0.1)
 
 # tsdf model and anntations for training
-train_scene_file=$detector_train_data_dir/scene_mesh.ply
+train_scene_file=$detector_train_data_dir/scene_tsdf.bin
 annotations=$detector_train_data_dir/annotated_obbs.txt
 
 # output directory for training result
 output_prefix=$run_root
 
 # tsdf model for detection
-# detection_scene_file=$result_root/reconstruction_closest_3/vri-fusing-result5_cam_3_with_2-st-$startimg-ed-$endimg-vlen-0.2-rampsz-6-try1/recon-$startimg-$endimg-vlen-0.2-rampsz-6_tsdf.bin
 detection_scene_file=$scene_model_bin
 
 

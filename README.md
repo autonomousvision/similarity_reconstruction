@@ -67,5 +67,5 @@ To run the demos one needs to download and untar a package containing the traini
      -`$demo_data_root`: the folder for the downloaded pretrained detectors and initial 3D reconstruction.
   3. Run `run_all.sh`.
 
-[screenshot](screenshot.png "screenshot")
+![screenshot](screenshot.png "screenshot")
 
