@@ -152,6 +152,7 @@ main (int argc, char** argv)
                                      st_neighbor, ed_neighbor, skymap_check, depthmap_check);
       cpu_tsdf::CleanTSDF(tsdf, filter_noise);
       cpu_tsdf::WriteTSDFModel(tsdf, out_filename + ".tsdf_consistency_cleaned.ply", true, true, mesh_min_weight);
+      cpu_tsdf::WriteForVisualization((bfs::path(out_filename).parent_path() / "visualization").string(), tsdf, mesh_min_weight, &detected_obbs);
   } else {
       pcl::PolygonMesh::Ptr pmesh = cpu_tsdf::TSDFToPolygonMesh(tsdf, mesh_min_weight, -1);
       CleanMeshWithSkyMapAndDepthMap(
@@ -168,8 +169,8 @@ main (int argc, char** argv)
                               );
       cpu_tsdf::CleanMesh(*pmesh, filter_noise);
       pcl::io::savePLYFileBinary(out_filename + ".tsdf_consistency_cleaned.ply", *pmesh);
+      cpu_tsdf::WriteForVisualization((bfs::path(out_filename).parent_path() / "visualization").string(), *pmesh, mesh_min_weight, &detected_obbs);
   }
-  cpu_tsdf::WriteForVisualization((bfs::path(out_filename).parent_path() / "visualization").string(), tsdf, mesh_min_weight, &detected_obbs);
   return 0;
 }
 

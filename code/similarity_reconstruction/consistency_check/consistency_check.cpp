@@ -2,24 +2,32 @@
  * Chen Zhou (zhouch@pku.edu.cn)
  */
 #include "consistency_check.h"
+#include <vector>
+#include <string>
+#include <cmath>
+#include <climits>
+
+#include <Eigen/Eigen>
+#include <opencv2/opencv.hpp>
+#include <pcl/point_cloud.h>
+#include <pcl/point_representation.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/io/ply_io.h>
 #include <pcl/console/print.h>
 #include <pcl/console/time.h>
 #include <pcl/segmentation/extract_clusters.h>
-#include <pcl/io/pcd_io.h>
-#include <pcl/io/ply_io.h>
-#include <pcl/io/vtk_lib_io.h>
 #include <pcl/search/kdtree.h>
-#include <boost/dynamic_bitset.hpp>
 
+#include "tsdf_representation/tsdf_hash.h"
 #include "tsdf_operation/tsdf_clean.h"
 #include "tsdf_hash_utilities/utility.h"
 #include "tsdf_hash_utilities/oriented_boundingbox.h"
 #include "common/utilities/common_utility.h"
+#include "common/utilities/eigen_utility.h"
 #include "common/utilities/pcl_utility.h"
 #include "tsdf_operation/tsdf_io.h"
 #include "tsdf_operation/tsdf_clean.h"
 using namespace std;
-
 
 void SelectVisibleCamerasCoarse(
         const Eigen::Vector3f &point,
@@ -198,4 +206,63 @@ void CleanTSDFWithSkyMapAndDepthMap(
             *mesh, cameras, skymap_filelist, depth_filelist, obbs, sky_thresh, skymap_check, depthmap_check, &keep_vertices);
     cpu_tsdf::CleanTSDFFromMeshVerts(tsdf, *mesh, keep_vertices, st_neighbor, ed_neighbor);
     return;
+
+    // mesh = cpu_tsdf::TSDFToPolygonMesh(tsdf, 0);
+    // // CleanMeshWithSkyMapAndDepthMap(
+    // //                         *mesh,
+    // //                         obbs,
+    // //                         cameras,
+    // //                         skymap_filelist,
+    // //                         depth_filelist,
+    // //                         sky_thresh,
+    // //                         save_path,
+    // //                         NULL,
+    // //                         skymap_check,
+    // //                         depthmap_check
+    // //                         );
+    // cpu_tsdf::TSDFHashing::Ptr template_tsdf(new cpu_tsdf::TSDFHashing);
+    // float max_trunc, neg_trunc;
+    // tsdf->getDepthTruncationLimits(max_trunc, neg_trunc);
+    // template_tsdf->Init(tsdf->voxel_length(), tsdf->offset(), max_trunc, neg_trunc);
+    // Mesh2TSDFRangeTemplate(*mesh, template_tsdf.get());
+    // SetTSDFAccordingToTemplateWeight(*template_tsdf, tsdf.get());
+
+    return;
+}
+
+void Mesh2TSDFRangeTemplate(const pcl::PolygonMesh &mesh, cpu_tsdf::TSDFHashing *tsdf)
+{
+    // tsdf->Init(tsdf_info.voxel_lengths()[0], tsdf_info.offset(), tsdf_info.max_dist_pos(), tsdf_info.max_dist_neg());
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr vertices (new pcl::PointCloud<pcl::PointXYZRGB>);
+    pcl::fromPCLPointCloud2 (mesh.cloud, *vertices);
+    float max_trunc, neg_trunc;
+    tsdf->getDepthTruncationLimits(max_trunc, neg_trunc);
+    int tsdf_valid_range_dist = ceil(max<float>(fabs(max_trunc), fabs(neg_trunc)) / tsdf->voxel_length());
+    Eigen::Vector2i neighbor(-tsdf_valid_range_dist, tsdf_valid_range_dist+1);
+    for (int i = 0; i < vertices->size(); ++i) {
+        const pcl::PointXYZRGB& pt = vertices->at(i);
+        Eigen::Vector3f cur_pt_pos(pt.x, pt.y, pt.z);
+        Eigen::Vector3i vox_coord = utility::round(tsdf->World2Voxel(cur_pt_pos)).cast<int>();
+        for (int ix = neighbor[0]; ix < neighbor[1]; ++ix)
+            for (int iy = neighbor[0]; iy < neighbor[1]; ++iy)
+                for (int iz = neighbor[0]; iz < neighbor[1]; ++iz) {
+                    Eigen::Vector3i cur_vox = vox_coord + Eigen::Vector3i(ix, iy, iz);
+                    tsdf->AddObservation(utility::EigenVectorToCvVector3(cur_vox), 1.0f, 1.0f, cv::Vec3b(0, 0, 0));
+                }
+    }
+}
+
+void SetTSDFAccordingToTemplateWeight(const cpu_tsdf::TSDFHashing& template_tsdf, cpu_tsdf::TSDFHashing* tsdf) {
+    using namespace cpu_tsdf;
+    float max_trunc, neg_trunc;
+    tsdf->getDepthTruncationLimits(max_trunc, neg_trunc);
+    for (TSDFHashing::iterator citr = tsdf->begin(); citr != tsdf->end(); ++citr)
+    {
+        cv::Vec3i cur_voxel_coord = citr.VoxelCoord();
+        float d, w;
+        cv::Vec3b color;
+        if (!template_tsdf.RetriveData(cur_voxel_coord, &d, &w, &color) || w <= std::numeric_limits<float>::epsilon() ) {
+            citr->SetTSDFValue(0, 0, cv::Vec3b(0, 0, 0), max_trunc, neg_trunc);
+        }
+    }  // end for
 }

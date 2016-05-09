@@ -80,4 +80,7 @@ void CheckMeshVerticesWithSkyMapAndDepMapCheckOBB(const pcl::PolygonMesh &mesh,
         const int sky_thresh, const bool sky_map_check, const bool depth_map_check,
         std::vector<bool> *kept_vertices);
 
+void Mesh2TSDFRangeTemplate(const pcl::PolygonMesh &mesh, cpu_tsdf::TSDFHashing *tsdf);
+void SetTSDFAccordingToTemplateWeight(const cpu_tsdf::TSDFHashing& template_tsdf, cpu_tsdf::TSDFHashing* tsdf);
+
 
