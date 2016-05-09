@@ -181,4 +181,6 @@ bool ReadMatrixMatlab(const std::string &filepath, const std::string & varname, 
 bool WriteMatrixMatlab(const std::string &filepath, const std::string &variable_name, const Eigen::MatrixXf &matrix);
 
 void WriteForVisualization(const std::string &dir_prefix, TSDFHashing::ConstPtr tsdf_model, float mesh_min_weight, const std::vector<tsdf_utility::OrientedBoundingBox>* obbs);
+void WriteForVisualization(const std::string &dir_prefix, const pcl::PolygonMesh& mesh, float mesh_min_weight, const std::vector<tsdf_utility::OrientedBoundingBox> *obbs);
+
 }

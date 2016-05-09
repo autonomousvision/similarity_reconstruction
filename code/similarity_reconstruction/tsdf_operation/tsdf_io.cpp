@@ -837,4 +837,20 @@ void WriteForVisualization(const string &dir_prefix, TSDFHashing::ConstPtr tsdf_
     utility::OutputVector(dir_prefix + "/visualization.txt", output_filenames);
 }
 
+void WriteForVisualization(const string &dir_prefix, const pcl::PolygonMesh& mesh, float mesh_min_weight, const std::vector<tsdf_utility::OrientedBoundingBox> *obbs) {
+    bfs::create_directories(dir_prefix);
+    vector<string> output_filenames;
+    string mesh_filename = dir_prefix + "/scene_mesh.ply";
+    pcl::io::savePLYFileBinary(mesh_filename, mesh);
+    output_filenames.push_back(string("m ") + mesh_filename); // display as mesh
+    if (obbs) {
+        vector<string> saved_obb_filelist;
+        string obb_filename = dir_prefix + "/obb.ply";
+        tsdf_utility::OutputOBBsAsPly(*obbs, obb_filename, &saved_obb_filelist);
+        for (const auto& li : saved_obb_filelist) {
+            output_filenames.push_back(string("e ") + li);  // display as edges
+        }
+    }
+    utility::OutputVector(dir_prefix + "/visualization.txt", output_filenames);
+}
 } // end namespace cpu_tsdf
