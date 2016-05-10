@@ -74,20 +74,19 @@ To run the demos one needs to download and untar a package containing the traini
 
 * Running `run_all.sh`: the scripts runs the whold pipeline, including initial 3D reconstruction from image sequence, detector training, detection and joint optimization.
 
-  Set the follwing variables in `init_paths_samples.sh` and rename it to `init_paths.sh`:
+    1. Set the follwing variables in `init_paths_samples.sh` and rename it to `init_paths.sh`:
 
-    -`$data_root_dir`: the root folder for the image sequences
+        -`$data_root_dir`: the root folder for the image sequences
 
-    -Multiple `*prefix` variables: specify the paths for camera parameters, image sequences, depth maps and sky labeling maps
+        -Multiple `*prefix` variables: specify the paths for camera parameters, image sequences, depth maps and sky labeling maps
 
-    -`$bin_dir`: the folder for the built binaries.
+        -`$bin_dir`: the folder for the built binaries.
 
-    -`$result_root`: the folder for storing results.
+        -`$result_root`: the folder for storing results.
 
-    -`$mesh_view_bin`: the binary file for the mesh viewer (optional).
+        -`$mesh_view_bin`: the binary file for the mesh viewer (optional).
 
-    -`$demo_data_root`: the folder for the downloaded pre-trained detectors and initial 3D reconstruction.
-
-  Run `run_all.sh`.
+        -`$demo_data_root`: the folder for the downloaded pre-trained detectors and initial 3D reconstruction.
+    2. Run `run_all.sh`.
 
 ![screenshot](screenshot.png "screenshot")
