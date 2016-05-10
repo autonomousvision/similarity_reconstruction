@@ -20,7 +20,9 @@ Installing prerequisites:
 sudo apt-get install libboost-all-dev libopencv-dev libgoogle-glog-dev 
 ```
   -Eigen: The eigen package in the ubuntu 14.04 repository is 3.2.0. It's recommended to download a newer version of Eigen from its [website](http://eigen.tuxfamily.org/index.php?title=Main_Page).\
+
   -Ceres-solver: The library and instructions for installing can be donwloaded from [source](http://ceres-solver.org/).\
+
   -[Point Cloud Library](http://pointclouds.org/downloads/linux.html): 
   ```
   sudo add-apt-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl
