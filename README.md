@@ -7,7 +7,7 @@ Objects of similar types and shapes are common in urban areas. In this project w
 # 1. Prerequisites
 The code is written and tested under Ubuntu 14.04.3. The following libraries are required:
 
-  1.  Boost (>=1.50)
+  1.  Boost (>=1.54)
   2.  PCL (>=1.7)
   3.  OpenCV (>=2.4.6)
   4.  Eigen (>=3.2.4)
@@ -17,11 +17,16 @@ The code is written and tested under Ubuntu 14.04.3. The following libraries are
 Installing prerequisites:
 
 ```
-sudo apt-get install libboost-all-dev libopencv-dev libpcl-all libeigen3-dev libgoogle-glog-dev 
+sudo apt-get install libboost-all-dev libopencv-dev libgoogle-glog-dev 
 ```
-
-Download the prebuilt ceres-solver from [Launchpad](https://launchpad.net/ubuntu/yakkety/+package/libceres-dev)
-or compile from [source](http://ceres-solver.org/).
+  -Eigen: The eigen package in the ubuntu 14.04 repository is 3.2.0. It's recommended to download a newer version of Eigen from its [website](http://eigen.tuxfamily.org/index.php?title=Main_Page).\
+  -Ceres-solver: The library and instructions for installing can be donwloaded from [source](http://ceres-solver.org/).\
+  -[Point Cloud Library](http://pointclouds.org/downloads/linux.html): 
+  ```
+  sudo add-apt-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl
+  sudo apt-get update
+  sudo apt-get install libpcl-all
+  ```
 
 # 2. Compile
 Download the project:
@@ -48,7 +53,7 @@ Note that the output ply files can be directly viewed in Meshlab, Cloudcompare, 
 
 # 3. Run
 Several bash scripts in `similarity_reconstruction/code/similarity_reconstruction/demo_scripts/` are used to run the code.
-To run the demos one needs to download and untar a package containing the training files and initial 3D reconstruction  from [here](https://drive.google.com/open?id=0By1iH4kzxY79Rnd6RnN5cHdEclE).
+To run the demos one needs to download and untar a package containing the training files and initial 3D reconstruction  from [here](https://drive.google.com/file/d/0By1iH4kzxY79WWtxSHFQM0syRVk/view?usp=sharing).
 * Running `demo.sh`: the demo script will run detection and joint reconstruction using pretrained detectors and the initial 3D reconstruction.
   1. Set the follwing variables in `init_paths_samples.sh` and rename it to `init_paths.sh`:\
      -`$bin_dir`: the folder for the built binaries.\

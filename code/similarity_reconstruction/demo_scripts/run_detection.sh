@@ -60,11 +60,11 @@ fi
 if [ $run_detect -gt 0 ]; then
     # echo $detect_bin --scene_file $detection_scene_file --detector_file $detector_file_dir --output_prefix $output_prefix --total_thread $total_thread --min_score_to_keep ${min_score_to_keep[@]} --detect_deltas ${test_detect_deltas[@]}
     $detect_bin --scene_file $detection_scene_file --detector_file $detector_file_dir --output_prefix $output_prefix --total_thread $total_thread --min_score_to_keep ${min_score_to_keep[@]} #--detect_deltas ${test_detect_deltas[@]}
-    if [[ $display && $display -gt 0 ]]; then 
-        ./visualization.sh "detect_results" "$visualization_txt"
-    fi
 fi
 
 detect_res_txt=$output_prefix/detect_res_all_obb_nmsed.txt
 visualization_txt=$output_prefix/visualization/visualization.txt
+if [[ $display && $display -gt 0 ]]; then 
+    ./visualization.sh "detect_results" "$visualization_txt"
+fi
 
