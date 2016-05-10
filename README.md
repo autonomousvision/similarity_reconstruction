@@ -60,17 +60,17 @@ Several bash scripts in `similarity_reconstruction/code/similarity_reconstructio
 To run the demos one needs to download and untar a package containing the training files and initial 3D reconstruction  from [here](https://drive.google.com/file/d/0By1iH4kzxY79WWtxSHFQM0syRVk/view?usp=sharing).
 
 * Running `demo.sh`: the demo script will run detection and joint reconstruction using pretrained detectors and the initial 3D reconstruction.
-  Set the follwing variables in `init_paths_samples.sh` and rename it to `init_paths.sh`:
 
-    -`$bin_dir`: the folder for the built binaries.
+    1. Set the follwing variables in `init_paths_samples.sh` and rename it to `init_paths.sh`:
 
-    -`$result_root`: the folder for storing results.
+        -`$bin_dir`: the folder for the built binaries.
 
-    -`$mesh_view_bin`: the binary file for the mesh viewer (optional).
+        -`$result_root`: the folder for storing results.
 
-    -`$demo_data_root`: the folder for the downloaded files containing training files and initial 3D reconstruction.
+        -`$mesh_view_bin`: the binary file for the mesh viewer (optional).
 
-  Run `demo.sh`.
+        -`$demo_data_root`: the folder for the downloaded files containing training files and initial 3D reconstruction.
+    2. Run `demo.sh`.
 
 * Running `run_all.sh`: the scripts runs the whold pipeline, including initial 3D reconstruction from image sequence, detector training, detection and joint optimization.
 
