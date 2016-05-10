@@ -14,11 +14,13 @@ The code is written and tested under Ubuntu 14.04.3. The following libraries are
   5.  [Ceres solver](http://ceres-solver.org/) (>=1.10)
   6.  [Glog](https://github.com/google/glog)
 
-Installing prerequisites:
+Boost, OpenCV and Glog can be installed from the repository:
 
 ```
 sudo apt-get install libboost-all-dev libopencv-dev libgoogle-glog-dev 
 ```
+The others needs to be installed manually:
+
   - Eigen: The eigen package in the ubuntu 14.04 repository is 3.2.0. It's recommended to download a newer version of Eigen from its [website](http://eigen.tuxfamily.org/index.php?title=Main_Page).
 
   - Ceres-solver: The library and instructions for installing can be donwloaded from [source](http://ceres-solver.org/).
@@ -60,13 +62,13 @@ To run the demos one needs to download and untar a package containing the traini
 * Running `demo.sh`: the demo script will run detection and joint reconstruction using pretrained detectors and the initial 3D reconstruction.
   1. Set the follwing variables in `init_paths_samples.sh` and rename it to `init_paths.sh`:
 
-      -`$bin_dir`: the folder for the built binaries.
+    -`$bin_dir`: the folder for the built binaries.
 
-      -`$result_root`: the folder for storing results.
+    -`$result_root`: the folder for storing results.
 
-      -`$mesh_view_bin`: the binary file for the mesh viewer (optional).
+    -`$mesh_view_bin`: the binary file for the mesh viewer (optional).
 
-      -`$demo_data_root`: the folder for the downloaded files containing training files and initial 3D reconstruction.
+    -`$demo_data_root`: the folder for the downloaded files containing training files and initial 3D reconstruction.
 
   2. Run `demo.sh`.
 
@@ -74,17 +76,17 @@ To run the demos one needs to download and untar a package containing the traini
 
   1. Set the follwing variables in `init_paths_samples.sh` and rename it to `init_paths.sh`:
 
-      -`$data_root_dir`: the root folder for the image sequences
+    -`$data_root_dir`: the root folder for the image sequences
 
-      -Multiple `*prefix` variables: specify the paths for camera parameters, image sequences, depth maps and sky labeling maps
+    -Multiple `*prefix` variables: specify the paths for camera parameters, image sequences, depth maps and sky labeling maps
 
-      -`$bin_dir`: the folder for the built binaries.
+    -`$bin_dir`: the folder for the built binaries.
 
-      -`$result_root`: the folder for storing results.
+    -`$result_root`: the folder for storing results.
 
-      -`$mesh_view_bin`: the binary file for the mesh viewer (optional).
+    -`$mesh_view_bin`: the binary file for the mesh viewer (optional).
 
-      -`$demo_data_root`: the folder for the downloaded pre-trained detectors and initial 3D reconstruction.
+    -`$demo_data_root`: the folder for the downloaded pre-trained detectors and initial 3D reconstruction.
 
   2. Run `run_all.sh`.
 
