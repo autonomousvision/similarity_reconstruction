@@ -61,6 +61,9 @@ include_directories(${CERES_INCLUDE_DIRS})
 set(threadpool_DIR  "${THIRD_PARTY_DIR}/threadpool-0_2_5-src/threadpool" CACHE PATH "The directory for threadpool library")
 include_directories(${threadpool_DIR})
 
+FIND_PACKAGE(Eigen3 3.2.4 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+
 #find_package(HDF5)
 #  if(HDF5_FOUND)
 #    message(STATUS "HDF5-dir: ${HDF5_INCLUDE_DIR}")
