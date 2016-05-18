@@ -11,14 +11,13 @@ The code is written and tested under Ubuntu 14.04.3. The following libraries are
   2.  PCL (>=1.7)
   3.  OpenCV (>=2.4.6)
   4.  Eigen (>=3.2.4)
-  5.  MatIO
-  6.  [Ceres solver](http://ceres-solver.org/) (>=1.10)
-  7.  [Glog](https://github.com/google/glog)
+  5.  [Ceres solver](http://ceres-solver.org/) (>=1.10)
+  6.  [Glog](https://github.com/google/glog)
 
-Boost, OpenCV, MatIO and Glog can be installed from the repository:
+Boost, OpenCV and Glog can be installed from the repository:
 
 ```
-sudo apt-get install libboost-all-dev libopencv-dev libmatio-dev libgoogle-glog-dev 
+sudo apt-get install libboost-all-dev libopencv-dev libgoogle-glog-dev 
 ```
 The others needs to be installed manually:
 
@@ -60,11 +59,14 @@ Note that the output ply files can be directly viewed in Meshlab, Cloudcompare, 
 
 # 3. Run
 Several bash scripts in `similarity_reconstruction/code/similarity_reconstruction/demo_scripts/` are used to run the code.
-To run the demos one needs to download and untar a package containing the training files and initial 3D reconstruction  from [here](https://drive.google.com/file/d/0By1iH4kzxY79WWtxSHFQM0syRVk/view?usp=sharing).
 
-* Running `demo.sh`: the demo script will run detection and joint reconstruction using pretrained detectors and the initial 3D reconstruction.
+To run the demos one needs to download the [image sequence data](https://drive.google.com/file/d/0By1iH4kzxY79TGZ4OU9WLTBmblU/view?usp=sharing) and the [training files](https://drive.google.com/file/d/0By1iH4kzxY79WWtxSHFQM0syRVk/view?usp=sharing)(the initial 3D reconstruction also contained).
+
+* Running `demo.sh`: the demo script should run detection and joint reconstruction using pretrained detectors and the initial 3D reconstruction.
 
     1. Set the follwing variables in `init_paths_samples.sh`, rename it to `init_paths.sh` and make it executable (chmod a+x init_paths.sh):
+
+        -`$data_root_dir`: the root folder containing the image sequence data
 
         -`$bin_dir`: the folder for the built binaries.
 
@@ -75,7 +77,7 @@ To run the demos one needs to download and untar a package containing the traini
         -`$demo_data_root`: the folder for the downloaded files containing training files and initial 3D reconstruction.
     2. Run `demo.sh`.
 
-* Running `run_all.sh`: the scripts runs the whold pipeline, including initial 3D reconstruction from image sequence, detector training, detection and joint optimization.
+* Running `run_all.sh`: the scripts runs the whole pipeline, including initial 3D reconstruction from image sequence, detector training, detection and joint optimization.
 
     1. Set the follwing variables in `init_paths_samples.sh` and rename it to `init_paths.sh`:
 
@@ -96,5 +98,5 @@ To run the demos one needs to download and untar a package containing the traini
 
 # 4. Comments & Questions
 
-If you have comments, questions or suggestions, please contact the first author of the paper, [Chen Zhou](mailto:zhouch08@gmail.com).
+If you have comments, questions or suggestions, please contact the first author of the paper, [Chen Zhou](mailto:zhouch@pku.edu.cn).
 

@@ -65,15 +65,15 @@ FIND_PACKAGE(Eigen3 3.2.4 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
 #find_package(HDF5)
-#  if(HDF5_FOUND)
+#if(HDF5_FOUND)
 #    message(STATUS "HDF5-dir: ${HDF5_INCLUDE_DIR}")
 #    #set (external_deps ${external_deps} "HDF5")
-#  endif()
-# find_package(MATIO REQUIRED)
-# if(MATIO_FOUND)
-#   message(STATUS "Matio-dir: ${MATIO_INCLUDE_DIRS}")
-#   INCLUDE_DIRECTORIES(${MATIO_INCLUDE_DIRS})
-# endif()
+#endif()
+#find_package(MATIO REQUIRED)
+#if(MATIO_FOUND)
+#    message(STATUS "Matio-dir: ${MATIO_INCLUDE_DIRS}")
+#    INCLUDE_DIRECTORIES(${MATIO_INCLUDE_DIRS})
+#endif()
 #
 #set(Matlab_ROOT_DIR "/usr/local/MATLAB/R2015b")
 #find_package(MATLAB 8.5 EXACT REQUIRED COMPONENT MX_LIBRARY ENG_LIBRARY MEX_COMPILER)
@@ -81,6 +81,8 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 #message(STATUS "Matlab_INCLUDE_DIRS: ${Matlab_INCLUDE_DIRS}")
 #set(Matlab_RT_LIBS  mwmclmcrrt)
 #LINK_DIRECTORIES("/usr/local/MATLAB/R2015b/runtime/glnxa64/")
+#
+#add_definitions(-DMYMATLAB)
 
 ###################
 # add sub-directories

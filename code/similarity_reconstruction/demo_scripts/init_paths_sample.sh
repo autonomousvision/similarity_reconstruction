@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# directory which contains the image sequence
-# this group of variables are only needed if we need to run the reconstruction from image sequences
+# directory containing the image sequence
 data_root_dir=/home/dell/Data/data-4-10/2013_05_28_drive_0000_sync/
 root_dir_left=$data_root_dir/image_02/rect/
 root_dir_right=$data_root_dir/image_03/rect/
@@ -23,14 +22,16 @@ bin_dir=/home/dell/codebase/mpi_project_git/similarity_reconstruction/code/simil
 # third_party_dir=/home/dell/codebase/mpi_project_git/similarity_reconstruction/code/third_party/
 
 # folder to store results
-result_root=/home/dell/results_5/recon_demo_$startimg"_"$end"_rundemo"/
+result_root=/home/dell/results_5/recon_demo_$startimg"_"$end"_demo"/
 if [ ! -d $result_root ]; then
     mkdir $result_root
 fi
 
 # the binary file for visualization
 mesh_view_bin=/home/dell/codebase/mpi_project_git/similarity_reconstruction/code/similarity_reconstruction/visualization/trimesh2/bin.Linux64/mesh_view
+if [ -z "${display}" ]; then
 display=1
+fi
 
 # root for demo data
 demo_data_root=/home/dell/results_5/training_data/
