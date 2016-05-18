@@ -11,13 +11,14 @@ The code is written and tested under Ubuntu 14.04.3. The following libraries are
   2.  PCL (>=1.7)
   3.  OpenCV (>=2.4.6)
   4.  Eigen (>=3.2.4)
-  5.  [Ceres solver](http://ceres-solver.org/) (>=1.10)
-  6.  [Glog](https://github.com/google/glog)
+  5.  MatIO
+  6.  [Ceres solver](http://ceres-solver.org/) (>=1.10)
+  7.  [Glog](https://github.com/google/glog)
 
-Boost, OpenCV and Glog can be installed from the repository:
+Boost, OpenCV, MatIO and Glog can be installed from the repository:
 
 ```
-sudo apt-get install libboost-all-dev libopencv-dev libgoogle-glog-dev 
+sudo apt-get install libboost-all-dev libopencv-dev libmatio-dev libgoogle-glog-dev 
 ```
 The others needs to be installed manually:
 
@@ -43,7 +44,9 @@ Compile the code:
 
 ```sh
 cd similarity_reconstruction/code/similarity_reconstruction
-cmake .
+mkdir build
+cd build
+cmake ..
 make
 ```
 
@@ -61,7 +64,7 @@ To run the demos one needs to download and untar a package containing the traini
 
 * Running `demo.sh`: the demo script will run detection and joint reconstruction using pretrained detectors and the initial 3D reconstruction.
 
-    1. Set the follwing variables in `init_paths_samples.sh` and rename it to `init_paths.sh`:
+    1. Set the follwing variables in `init_paths_samples.sh`, rename it to `init_paths.sh` and make it executable (chmod a+x init_paths.sh):
 
         -`$bin_dir`: the folder for the built binaries.
 
@@ -78,7 +81,7 @@ To run the demos one needs to download and untar a package containing the traini
 
         -`$data_root_dir`: the root folder for the image sequences
 
-        -Multiple `*prefix` variables: specify the paths for camera parameters, image sequences, depth maps and sky labeling maps
+        -Multiple `*prefix` variables: specify paths for pre-calculated camera parameters, image sequences, depth maps and sky segmentations. The current system uses down-scaled versions of the image sequence, semi-global matching based and consistency filtered depth maps as well as segmentation masks of the sky regions. For the downloaded demo sequence these paths can be left at their pre-specified values as these modalities have been pre-computed. For new sequences, this data has to be generated. However, as this code has larger third party dependencies and is not refactored it is not included.
 
         -`$bin_dir`: the folder for the built binaries.
 
@@ -90,4 +93,8 @@ To run the demos one needs to download and untar a package containing the traini
     2. Run `run_all.sh`.
 
 ![screenshot](screenshot.png "screenshot")
+
+# 4. Comments & Questions
+
+If you have comments, questions or suggestions, please contact the first author of the paper, [Chen Zhou](zhouch08@gmail.com).
 
