@@ -1,0 +1,9 @@
+bin.Linux64/
+gluit/OBJ.Linux64/
+lib.Linux64/
+libsrc/OBJ.Linux64/
+trimesh2_qt_proj.config
+trimesh2_qt_proj.creator
+trimesh2_qt_proj.files
+trimesh2_qt_proj.includes
+utilsrc/OBJ.Linux64/
