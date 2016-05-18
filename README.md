@@ -96,5 +96,5 @@ To run the demos one needs to download and untar a package containing the traini
 
 # 4. Comments & Questions
 
-If you have comments, questions or suggestions, please contact the first author of the paper, [Chen Zhou](zhouch08@gmail.com).
+If you have comments, questions or suggestions, please contact the first author of the paper, [Chen Zhou](mailto:zhouch08@gmail.com).
 
