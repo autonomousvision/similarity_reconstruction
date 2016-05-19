@@ -75,5 +75,5 @@ fi
 echo "result output to: " $consistent_tsdf_output_ply
 
 if [[ $display && $display -gt 0 ]]; then
-    ./visualization.sh "final_result" "$visualization_txt"
+    . ./visualization.sh "final_result" "$visualization_txt"
 fi

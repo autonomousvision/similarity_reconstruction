@@ -3,7 +3,7 @@ if [ "$#" -ne 2 ]; then
     echo "visualization: usage: visualization.sh window_title visualization_txt"
     exit
 fi
-if ! [ "$mesh_view_bin" ]; then
+if [ -z $mesh_view_bin ]; then
     mesh_view_bin=/home/dell/codebase/mpi_project_git/similarity_reconstruction/code/similarity_reconstruction/visualization/trimesh2/bin.Linux64/mesh_view
 fi
 if [ ! -f $mesh_view_bin ]; then

@@ -6,7 +6,9 @@
 #include <vector>
 #include <string>
 #include <Eigen/Eigen>
+#ifdef MYMATLAB
 #include <matio.h>
+#endif
 
 #include "tsdf_representation/tsdf_hash.h"
 #include "tsdf_hash_utilities/utility.h"

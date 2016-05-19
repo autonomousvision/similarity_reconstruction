@@ -3,7 +3,7 @@
 set -e
 # run reconstruction pipline (using the one computing true TSDF) for both sides of the street
 # set relevant paths 
-. ./init_paths.sh
+#. ./init_paths.sh
 
 echo "Performing reconstruction from frame "$startimg" to "$endimg" for both sides."
 

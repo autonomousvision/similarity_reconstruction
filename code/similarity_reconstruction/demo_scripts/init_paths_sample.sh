@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # directory containing the image sequence
-data_root_dir=/home/dell/Data/data-4-10/2013_05_28_drive_0000_sync/
+data_root_dir=/home/zhouch/Downloads/2013_05_28_drive_0000_sync/
 root_dir_left=$data_root_dir/image_02/rect/
 root_dir_right=$data_root_dir/image_03/rect/
 data_roots="$root_dir_left $root_dir_right"
@@ -16,25 +16,25 @@ startimg=1470
 endimg=1790
 
 # root folder of binary files
-bin_dir=/home/dell/codebase/mpi_project_git/similarity_reconstruction/code/similarity_reconstruction-build/bin/
+bin_dir=/home/zhouch/test_sim_recon/similarity_reconstruction/code/similarity_reconstruction/build/bin/
 
 # folder containing third party softwares
 # third_party_dir=/home/dell/codebase/mpi_project_git/similarity_reconstruction/code/third_party/
 
 # folder to store results
-result_root=/home/dell/results_5/recon_demo_$startimg"_"$end"_demo"/
+result_root=/home/zhouch/recon_demo_$startimg"_"$end"_demo"/
 if [ ! -d $result_root ]; then
     mkdir $result_root
 fi
 
 # the binary file for visualization
-mesh_view_bin=/home/dell/codebase/mpi_project_git/similarity_reconstruction/code/similarity_reconstruction/visualization/trimesh2/bin.Linux64/mesh_view
+mesh_view_bin=/home/zhouch/test_sim_recon/similarity_reconstruction/code/similarity_reconstruction/visualization/trimesh2/bin.Linux64/mesh_view
 if [ -z "${display}" ]; then
-display=1
+    display=1
 fi
 
 # root for demo data
-demo_data_root=/home/dell/results_5/training_data/
+demo_data_root=/home/zhouch/Downloads/training_data/
 # used for object detection training part: folder storing training data for object detection
 detector_train_data_dir=$demo_data_root/training_scene/
 

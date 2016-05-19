@@ -48,7 +48,7 @@ if [ $run_train -gt 0 ]; then
         do
             echo "show training samples for category $i"
             cur_vis_txt=$detector_train_data_dir/visualization/category_$i/visualization.txt
-            ./visualization.sh "training_data_category_$i" "$cur_vis_txt"
+            . ./visualization.sh "training_data_category_$i" "$cur_vis_txt"
         done
     fi
     # echo $train_bin --scene_file $train_scene_file --annotations $annotations --output_prefix $output_prefix --sample_size ${detect_sample_size[@]} --total_thread $total_thread --svm_param_c 100 --svm_param_w1 10 --detect_deltas ${detect_deltas[@]}
@@ -65,6 +65,6 @@ fi
 detect_res_txt=$output_prefix/detect_res_all_obb_nmsed.txt
 visualization_txt=$output_prefix/visualization/visualization.txt
 if [[ $display && $display -gt 0 ]]; then 
-    ./visualization.sh "detect_results" "$visualization_txt"
+. ./visualization.sh "detect_results" "$visualization_txt"
 fi
 
