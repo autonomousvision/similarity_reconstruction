@@ -36,7 +36,7 @@ The others needs to be installed manually:
 Download the project:
 
 ```sh
-git http://cvlibs.net:3000/ageiger/similarity_reconstruction.git similarity_reconstruction
+git clone http://cvlibs.net:3000/ageiger/similarity_reconstruction.git similarity_reconstruction
 ```
 
 Compile the code:
@@ -46,10 +46,11 @@ cd similarity_reconstruction/code/similarity_reconstruction
 mkdir build
 cd build
 cmake ..
-make
+make -j 6
 ```
 
 Compile the mesh viewer for visualizing the results (optional).
+In the root folder of the code:
 
 ```
 cd similarity_reconstruction/code/similarity_reconstruction/visualization/trimesh2
@@ -60,13 +61,13 @@ Note that the output ply files can be directly viewed in Meshlab, Cloudcompare, 
 # 3. Run
 Several bash scripts in `similarity_reconstruction/code/similarity_reconstruction/demo_scripts/` are used to run the code.
 
-To run the demos one needs to download the [image sequence data](https://drive.google.com/file/d/0By1iH4kzxY79TGZ4OU9WLTBmblU/view?usp=sharing) and the [training files](https://drive.google.com/file/d/0By1iH4kzxY79WWtxSHFQM0syRVk/view?usp=sharing)(the initial 3D reconstruction also contained).
+To run the demos one needs to download the [image sequence data](https://drive.google.com/file/d/0By1iH4kzxY79TGZ4OU9WLTBmblU/view?usp=sharing) and the [training files](https://drive.google.com/file/d/0By1iH4kzxY79WWtxSHFQM0syRVk/view?usp=sharing) (the initial 3D reconstruction also contained).
 
 * Running `demo.sh`: the demo script should run detection and joint reconstruction using pretrained detectors and the initial 3D reconstruction.
 
     1. Set the follwing variables in `init_paths_samples.sh`, rename it to `init_paths.sh` and make it executable (chmod a+x init_paths.sh):
 
-        -`$data_root_dir`: the root folder containing the image sequence data
+        -`$data_root_dir`: the root folder for the image sequences
 
         -`$bin_dir`: the folder for the built binaries.
 
