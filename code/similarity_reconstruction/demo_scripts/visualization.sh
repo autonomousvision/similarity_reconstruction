@@ -8,7 +8,7 @@ if [ -z $mesh_view_bin ]; then
 fi
 if [ ! -f $mesh_view_bin ]; then
     echo "visualization: The mesh_view binary file does not exist."
-    exit
+    return
 fi
 # the title of the window when displaying
 window_title=$1
@@ -16,7 +16,7 @@ window_title=$1
 visualization_txt=$2
 if [ ! -f $visualization_txt ]; then
     echo "visualization: The visualization_txt file does not exist."
-    exit
+    return
 fi
 
 #echo $mesh_view_bin $window_title $visualization_txt 

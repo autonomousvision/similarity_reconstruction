@@ -128,14 +128,17 @@ main (int argc, char** argv)
       cout << "Reading cam infos\n" << data_root_dir + "/" + cam_info_prefix << endl;
       string cam_dir = (bfs::path(data_root_dir)/cam_info_prefix).string();
       ListFilesWithinFrameRange(cam_dir, ".txt", start_image, end_image, &cam_filelist);
+      cout << "Read " << cam_filelist.size() << " files. " << endl;
 
-       cout << "Reading sky maps\n" << data_root_dir + "/" + skymap_prefix << endl;
-       string skymap_dir = (bfs::path(data_root_dir)/skymap_prefix).string();
-       ListFilesWithinFrameRange(skymap_dir, ".png", start_image, end_image, &skymap_filelist);
+      cout << "Reading sky maps\n" << data_root_dir + "/" + skymap_prefix << endl;
+      string skymap_dir = (bfs::path(data_root_dir)/skymap_prefix).string();
+      ListFilesWithinFrameRange(skymap_dir, ".png", start_image, end_image, &skymap_filelist);
+      cout << "Read " << skymap_filelist.size() << " files. " << endl;
 
-       cout << "Reading depth maps\n" << data_root_dir + "/" + depth_prefix << endl;
-       string depth_dir = (bfs::path(data_root_dir)/depth_prefix).string();
-       ListFilesWithinFrameRange(depth_dir, ".png", start_image, end_image, &depth_filelist);
+      cout << "Reading depth maps\n" << data_root_dir + "/" + depth_prefix << endl;
+      string depth_dir = (bfs::path(data_root_dir)/depth_prefix).string();
+      ListFilesWithinFrameRange(depth_dir, ".png", start_image, end_image, &depth_filelist);
+      cout << "Read " << depth_filelist.size() << " files. " << endl;
   }
   if (cam_filelist.empty() || skymap_filelist.size() != cam_filelist.size() || depth_filelist.size() != cam_filelist.size()) {
       LOG(FATAL) << "Reading camera/skymap/depth files failed. ";
