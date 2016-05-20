@@ -1,12 +1,16 @@
 #!/bin/bash
 
-# directory containing the image sequence
-data_root_dir=/home/zhouch/Downloads/2013_05_28_drive_0000_sync/
+# code directory and data directory
+code_dir=/home/ageiger/4_Projects/cvlibs_git/similarity_reconstruction
+data_dir=/media/ageiger/data/projects/similarity_reconstruction/release
+
+# directory which contains the image sequence
+data_root_dir=$data_dir/sequences/2013_05_28/2013_05_28_drive_0000_sync/
 root_dir_left=$data_root_dir/image_02/rect/
 root_dir_right=$data_root_dir/image_03/rect/
 data_roots="$root_dir_left $root_dir_right"
-# the prefix of pre-generated files: camera parameters, depth maps, sky labels
-# should be placed under rect/ folders
+
+# prefix of pre-generated files: camera parameters, depth maps, sky labels (in rect/ subfolders)
 cam_info_prefix=param_scale_4
 image_prefix=img_00_scale_4
 depth_prefix=depth_00_slic_cropped_scale_4_filtered
@@ -16,29 +20,26 @@ startimg=1470
 endimg=1790
 
 # root folder of binary files
-bin_dir=/home/zhouch/test_sim_recon/similarity_reconstruction/code/similarity_reconstruction/build/bin/
+bin_dir=$code_dir/code/similarity_reconstruction/build/bin/
 
-# folder containing third party softwares
-# third_party_dir=/home/dell/codebase/mpi_project_git/similarity_reconstruction/code/third_party/
+# third party software
+third_party_dir=$code_dir/code/third_party/
 
 # folder to store results
-result_root=/home/zhouch/recon_demo_$startimg"_"$end"_demo"/
+result_root=$data_dir/results/recon_demo_$startimg"_"$endimg/
 if [ ! -d $result_root ]; then
-    mkdir $result_root
+  mkdir $result_root
 fi
 
 # the binary file for visualization
-mesh_view_bin=/home/zhouch/test_sim_recon/similarity_reconstruction/code/similarity_reconstruction/visualization/trimesh2/bin.Linux64/mesh_view
-if [ -z "${display}" ]; then
-    display=1
-fi
+mesh_view_bin=$code_dir/code/similarity_reconstruction/visualization/trimesh2/bin.Linux64/mesh_view
+display=1
 
-# root for demo data
-demo_data_root=/home/zhouch/Downloads/training_data/
-# used for object detection training part: folder storing training data for object detection
+# training data
+demo_data_root=$data_dir/training_data/
 detector_train_data_dir=$demo_data_root/training_scene/
 
-# the path for pretrained detectors and initial 3D reconstruction
+# pretrained detectors and initial 3D reconstruction
 detector_file_dir=$demo_data_root/detectors/
 scene_model_bin=$demo_data_root/reconstructing_scene/recon_tsdf.bin
 
