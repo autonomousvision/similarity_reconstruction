@@ -41,7 +41,7 @@ git clone http://cvlibs.net:3000/ageiger/similarity_reconstruction.git similarit
 
 Create a data folder and extract the following zip file into this folder:
 
-[Sequence files & trained models (294 MB)](http://www.cvlibs.net/download.php?file=similarity_reconstruction_data.zip): 
+* [Sequence files & trained models (294 MB)](http://www.cvlibs.net/download.php?file=similarity_reconstruction_data.zip) 
 
 # 3. Compiling the Code
 
