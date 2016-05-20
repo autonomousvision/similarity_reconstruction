@@ -98,5 +98,5 @@ To run the demos one needs to download the pre-processed image sequence data, th
 
 # 5. Comments & Questions
 
-If you have comments, questions or suggestions, please contact the first author of the paper, [Chen Zhou](mailto:zhouch@pku.edu.cn).
+If you have comments, questions or suggestions, please contact the first author of the paper, mailto:zhouch@pku.edu.cn.
 
